@@ -10,7 +10,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
         
         :root {
-            --brand-purple: #7B3FAD;
+            --brand-purple: #7B3FAD; /* Extracted Brand Purple */
             --brand-purple-dark: #6A2D91;
         }
 
@@ -31,6 +31,7 @@
             background: #000;
         }
 
+        /* View Management */
         .view-content { display: none; }
         .view-content.active { display: block; }
         
@@ -49,12 +50,12 @@
 
                 <div class="hidden md:flex space-x-8 font-semibold text-sm text-gray-600">
                     <a href="#features" onclick="showView('home-view')" class="hover:text-brand transition">Features</a>
-                    <a href="#faq" onclick="showView('home-view')" class="hover:text-brand transition">FAQ</a>
                     <a href="javascript:void(0)" onclick="showView('about-view')" class="hover:text-brand transition">About</a>
                     <a href="javascript:void(0)" onclick="showView('contact-view')" class="hover:text-brand transition">Contact</a>
+                    <a href="javascript:void(0)" onclick="showView('privacy-view')" class="hover:text-brand transition text-xs opacity-70">Privacy</a>
                 </div>
 
-                <a href="#download" class="bg-brand text-white px-6 py-2.5 rounded-full font-bold shadow-lg hover:scale-105 transition-transform">
+                <a href="#hero" onclick="showView('home-view')" class="bg-brand text-white px-6 py-2.5 rounded-full font-bold shadow-lg hover:scale-105 transition-transform">
                     Download
                 </a>
             </nav>
@@ -62,74 +63,102 @@
     </header>
 
     <main id="home-view" class="view-content active">
-        <section class="pt-16 pb-20">
+        <section id="hero" class="pt-16 pb-20">
             <div class="max-w-7xl mx-auto px-4 flex flex-col lg:flex-row items-center gap-16">
                 <div class="lg:w-1/2 text-center lg:text-left">
-                    <h1 class="text-5xl lg:text-7xl font-extrabold mb-6">Crush Goals with your <span class="text-brand">AI Trainer.</span></h1>
-                    <p class="text-xl text-gray-600 mb-10">Personalized coaching, custom meal plans, and the Macro Monster to guide you.</p>
+                    <h1 class="text-5xl lg:text-7xl font-extrabold mb-6 leading-tight text-gray-900">
+                        Crush Goals with your <span class="text-brand">AI Trainer.</span>
+                    </h1>
+                    <p class="text-xl text-gray-600 mb-10 leading-relaxed">
+                        SparkFit delivers personalized coaching and custom meal plans guided by the <strong>Macro Monster</strong>.
+                    </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" class="h-12 cursor-pointer">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" class="h-12 cursor-pointer">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" class="h-12 cursor-pointer hover:opacity-80 transition">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" class="h-12 cursor-pointer hover:opacity-80 transition">
                     </div>
                 </div>
+
                 <div class="lg:w-1/2 relative">
-                    <div class="absolute -top-10 -right-10 w-48 h-48 bg-brand rounded-full flex items-center justify-center text-white font-bold p-4 text-center shadow-2xl z-10 animate-bounce">
-                        [Macro Monster]
+                    <div class="absolute -top-12 -right-12 w-48 h-48 z-10">
+                        <img src="macro-monster.png" alt="Macro Monster Mascot" class="w-full h-full object-contain animate-bounce">
                     </div>
                     <div class="iphone-frame w-[300px] h-[600px] mx-auto">
-                        <img src="Simulator Screenshot - iPhone 16 Pro - 2025-12-22 at 16.57.27.jpg" class="w-full h-full object-cover">
+                        <img src="Simulator Screenshot - iPhone 16 Pro - 2025-12-22 at 16.57.27.jpg" alt="SparkFit Dashboard" class="w-full h-full object-cover">
                     </div>
                 </div>
             </div>
         </section>
 
         <section id="features" class="py-24 bg-gray-50">
-            <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-                <div class="text-center">
-                    <div class="iphone-frame h-[500px] mb-6"><img src="Simulator Screenshot - iPhone 16 Pro - 2025-12-22 at 16.57.43.jpg" class="w-full h-full object-cover"></div>
-                    <h3 class="text-2xl font-bold mb-2">Personalized Coaching</h3>
-                    <p class="text-gray-600">Stay consistent with your own AI fitness coach.</p>
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-black mb-4">Core Features</h2>
+                    <div class="h-1.5 w-20 bg-brand mx-auto rounded-full"></div>
                 </div>
-                <div class="text-center">
-                    <div class="iphone-frame h-[500px] mb-6"><img src="Simulator Screenshot - iPhone 16 Pro - 2025-12-22 at 16.58.32.jpg" class="w-full h-full object-cover"></div>
-                    <h3 class="text-2xl font-bold mb-2">Custom Meal Plans</h3>
-                    <p class="text-gray-600">Reach your goals faster with personalized nutrition.</p>
-                </div>
-                <div class="text-center">
-                    <div class="iphone-frame h-[500px] mb-6"><img src="Simulator Screenshot - iPhone 16 Pro - 2025-12-22 at 16.58.23.jpg" class="w-full h-full object-cover"></div>
-                    <h3 class="text-2xl font-bold mb-2">Gamification</h3>
-                    <p class="text-gray-600">Earn rewards and track your progress daily.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+                    <div class="text-center">
+                        <div class="iphone-frame h-[500px] mb-6">
+                            <img src="Simulator Screenshot - iPhone 16 Pro - 2025-12-22 at 16.57.43.jpg" alt="Coaching" class="w-full h-full object-cover">
+                        </div>
+                        <h3 class="text-2xl font-bold mb-2">Personalized Coaching</h3>
+                        <p class="text-gray-600">Stay consistent with your own AI fitness coach.</p>
+                    </div>
+
+                    <div class="text-center">
+                        <div class="iphone-frame h-[500px] mb-6">
+                            <img src="Simulator Screenshot - iPhone 16 Pro - 2025-12-22 at 16.58.32.jpg" alt="Meal Plans" class="w-full h-full object-cover">
+                        </div>
+                        <h3 class="text-2xl font-bold mb-2">Custom Meal Plans</h3>
+                        <p class="text-gray-600">Reach your goals faster with personalized nutrition.</p>
+                    </div>
+
+                    <div class="text-center">
+                        <div class="iphone-frame h-[500px] mb-6">
+                            <img src="Simulator Screenshot - iPhone 16 Pro - 2025-12-22 at 16.58.23.jpg" alt="Gamification" class="w-full h-full object-cover">
+                        </div>
+                        <h3 class="text-2xl font-bold mb-2">Gamification</h3>
+                        <p class="text-gray-600">Stay motivated by tracking progress and earning rewards.</p>
+                    </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <section id="about-view" class="view-content py-20 px-4 max-w-4xl mx-auto">
+    <div id="about-view" class="view-content py-20 px-4 max-w-4xl mx-auto min-h-screen">
         <h2 class="text-4xl font-bold mb-6 text-brand">About SparkFit</h2>
-        <p class="text-lg text-gray-700 leading-relaxed">SparkFit was founded to make high-quality fitness guidance accessible without the cycle of subscriptions.</p>
-    </section>
+        <p class="text-lg text-gray-700 leading-relaxed mb-6">SparkFit was founded on the principle that high-quality fitness guidance should be accessible, personalized, and free from subscriptions.</p>
+        <p class="text-lg text-gray-700 leading-relaxed">Our mission is to empower people to take control of their well-being by providing a permanent fitness companion.</p>
+    </div>
 
-    <section id="contact-view" class="view-content py-20 px-4 max-w-xl mx-auto">
-        <h2 class="text-4xl font-bold mb-6 text-brand">Contact Us</h2>
-        <form class="space-y-4">
-            <input type="text" placeholder="Name" class="w-full p-3 border rounded-lg">
-            <input type="email" placeholder="Email" class="w-full p-3 border rounded-lg">
-            <textarea placeholder="Message" rows="4" class="w-full p-3 border rounded-lg"></textarea>
-            <button class="bg-brand text-white w-full py-3 rounded-lg font-bold">Send Message</button>
-        </form>
-    </section>
-
-    <section id="privacy-view" class="view-content py-20 px-4 max-w-4xl mx-auto">
+    <div id="privacy-view" class="view-content py-20 px-4 max-w-4xl mx-auto min-h-screen">
         <h2 class="text-4xl font-bold mb-6 text-brand">Privacy Policy</h2>
-        <p>Your data is stored locally on your device for maximum privacy.</p>
-    </section>
+        <p class="mb-4">At SparkFit, your privacy is our top priority. We do not sell your personal data or display advertisements.</p>
+        <p class="bg-red-50 p-4 border-l-4 border-red-500 text-red-700">Warning: All your progress data is stored locally on your device. Deleting the app will result in the loss of progress data.</p>
+    </div>
 
-    <footer class="bg-gray-900 text-white py-12 mt-20">
+    <div id="terms-view" class="view-content py-20 px-4 max-w-4xl mx-auto min-h-screen">
+        <h2 class="text-4xl font-bold mb-6 text-brand">Terms of Service</h2>
+        <p class="mb-4">By using SparkFit, you agree to consult with a healthcare professional before starting any new diet or fitness program.</p>
+    </div>
+
+    <div id="contact-view" class="view-content py-20 px-4 max-w-xl mx-auto min-h-screen">
+        <h2 class="text-4xl font-bold mb-6 text-brand">Contact Us</h2>
+        <form id="contact-form" class="space-y-4">
+            <input type="text" placeholder="Name" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-brand outline-none">
+            <input type="email" placeholder="Email" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-brand outline-none">
+            <textarea placeholder="Message" rows="4" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-brand outline-none"></textarea>
+            <button class="bg-brand text-white w-full py-3 rounded-lg font-bold hover:bg-opacity-90 transition">Send Message</button>
+        </form>
+    </div>
+
+    <footer class="bg-gray-900 text-white py-12">
         <div class="max-w-7xl mx-auto px-4 text-center">
             <div class="flex justify-center space-x-6 mb-8 text-sm opacity-70">
-                <a href="javascript:void(0)" onclick="showView('privacy-view')">Privacy Policy</a>
-                <a href="javascript:void(0)" onclick="showView('about-view')">About Us</a>
-                <a href="javascript:void(0)" onclick="showView('contact-view')">Contact</a>
+                <a href="javascript:void(0)" onclick="showView('privacy-view')" class="hover:text-brand transition">Privacy Policy</a>
+                <a href="javascript:void(0)" onclick="showView('about-view')" class="hover:text-brand transition">About Us</a>
+                <a href="javascript:void(0)" onclick="showView('terms-view')" class="hover:text-brand transition">Terms</a>
+                <a href="javascript:void(0)" onclick="showView('contact-view')" class="hover:text-brand transition">Contact</a>
             </div>
             <p class="text-xs opacity-50">© 2025 SparkFit. All rights reserved.</p>
         </div>
