@@ -3,547 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SparkFit - Achieve Your Fitness Goals</title>
-    <!-- Load Tailwind CSS -->
+    <title>SparkFit - Unleash the Monster Within</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Lucide Icons for aesthetic components -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        
+        :root {
+            --brand-purple: #7B3FAD;
+            --brand-purple-dark: #6A2D91;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f7f9fc;
-            /* Enable smooth scrolling for a better UX when clicking anchor links */
-            scroll-behavior: smooth; 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #ffffff;
+            scroll-behavior: smooth;
         }
-        /* Define custom colors based on app screenshots */
-        .color-primary { background-color: #5A45FF; }
-        .color-text-primary { color: #5A45FF; }
-        .color-white-card { background-color: #FFFFFF; }
-        .gradient-main {
-            background-image: linear-gradient(135deg, #5A45FF 0%, #7B68EE 100%);
+
+        .bg-brand { background-color: var(--brand-purple); }
+        .text-brand { color: var(--brand-purple); }
+        
+        .iphone-frame {
+            border: 12px solid #1a1a1a;
+            border-radius: 3rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            background: #000;
         }
-        .container-wrapper {
-            max-width: 1200px;
-        }
-        .download-btn {
-            transition: transform 0.2s, box-shadow 0.2s;
-            /* Use padding for touch target, but allow image to define visual size */
-            padding: 4px;
-        }
-        .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(90, 69, 255, 0.3), 0 4px 6px -2px rgba(90, 69, 255, 0.1);
-        }
-        .download-badge {
-            height: 48px; /* Standardize badge height */
-            width: auto;
-            max-width: 100%;
-        }
-        /* Adjust scroll margin to account for fixed header, ensuring content is not hidden behind it */
-        section[id] {
-            scroll-margin-top: 80px; 
-        }
+
+        .view-content { display: none; }
+        .view-content.active { display: block; }
+        
+        section[id] { scroll-margin-top: 100px; }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="text-gray-900">
 
-    <!-- SparkFit Logo SVG (A simple spark in a rounded container) -->
-    <script>
-        // --- Type Definitions for Future Development (TS) ---
-        /*
-        export type Language = 'en' | 'it' | 'fr' | 'es' | 'de' | 'pt' | 'ja' | 'zh' | 'ko' | 'ru';
-        */
-
-        function SparkFitLogo(size = '6', color = '#5A45FF') {
-            return `
-                <div class="flex items-center justify-center w-${size} h-${size} rounded-xl bg-white shadow-md p-1 border border-gray-100">
-                    <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="13 2 13 9 22 9 11 22 11 15 2 15 13 2" />
-                    </svg>
-                </div>
-            `;
-        }
-
-        // --- View Management Script ---
-        const views = ['home-view', 'about-view', 'privacy-view', 'terms-view', 'contact-view'];
-
-        function showView(viewId) {
-            views.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.style.display = (id === viewId) ? 'block' : 'none';
-                }
-            });
-
-            // Update URL hash for simple back button compatibility
-            window.location.hash = viewId === 'home-view' ? '' : viewId;
-        }
-
-        window.onload = () => {
-            // Initialize Lucide icons
-            lucide.createIcons();
-
-            // Check URL hash for initial view
-            const hash = window.location.hash.replace('#', '');
-            if (hash && views.includes(hash)) {
-                showView(hash);
-            } else {
-                showView('home-view');
-            }
-
-            // Simple Contact Form submission handler
-            document.getElementById('contact-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                // In a real app, you would send this data to a backend server.
-                document.getElementById('contact-message').innerHTML = '<p class="text-green-600 font-semibold mt-4">Thank you! Your message has been sent successfully. We will get back to you soon.</p>';
-                this.reset();
-            });
-        };
-
-        // Render logo into the header
-        document.addEventListener('DOMContentLoaded', () => {
-            const logoContainer = document.getElementById('sparkfit-logo-container');
-            if (logoContainer) {
-                logoContainer.innerHTML = SparkFitLogo('6', '#5A45FF');
-            }
-        });
-    </script>
-
-    <!-- Header & Navigation -->
-    <header class="sticky top-0 z-50 bg-white shadow-md">
-        <div class="container-wrapper mx-auto px-4 sm:px-6 lg:px-8">
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <nav class="flex items-center justify-between h-20">
-                <!-- Logo -->
-                <a href="#hero" onclick="showView('home-view')" class="flex items-center space-x-2 text-xl font-extrabold text-gray-900">
-                    <div id="sparkfit-logo-container" class="w-6 h-6"></div>
-                    <span class="color-text-primary">SparkFit</span>
+                <a href="#" onclick="showView('home-view')" class="flex items-center space-x-3">
+                    <img src="icon.jpg" alt="SparkFit Icon" class="w-10 h-10 rounded-xl shadow-lg">
+                    <span class="text-2xl font-extrabold tracking-tight">Spark<span class="text-brand">Fit</span></span>
                 </a>
 
-                <!-- Nav Links -->
-                <div class="hidden md:flex space-x-8 text-sm font-medium">
-                    <a href="#features" class="hover:color-text-primary transition duration-150">Features</a>
-                    <a href="#faq" class="hover:color-text-primary transition duration-150">FAQ</a>
-                    <a onclick="showView('about-view')" class="hover:color-text-primary transition duration-150 cursor-pointer">About Us</a>
-                    <a onclick="showView('contact-view')" class="hover:color-text-primary transition duration-150 cursor-pointer">Contact</a>
-                    <a onclick="showView('privacy-view')" class="hover:color-text-primary transition duration-150 cursor-pointer">Privacy</a>
-                    <a onclick="showView('terms-view')" class="hover:color-text-primary transition duration-150 cursor-pointer">Terms</a>
+                <div class="hidden md:flex space-x-8 font-semibold text-sm text-gray-600">
+                    <a href="#features" onclick="showView('home-view')" class="hover:text-brand transition">Features</a>
+                    <a href="#faq" onclick="showView('home-view')" class="hover:text-brand transition">FAQ</a>
+                    <a href="javascript:void(0)" onclick="showView('about-view')" class="hover:text-brand transition">About</a>
+                    <a href="javascript:void(0)" onclick="showView('contact-view')" class="hover:text-brand transition">Contact</a>
                 </div>
 
-                <!-- Download Button (Desktop) -->
-                <div class="hidden md:block">
-                    <!-- Updated target to '#hero' to scroll to the top of the hero section where the buttons are visible -->
-                    <a href="#hero" class="gradient-main text-white px-6 py-2 rounded-xl font-semibold shadow-lg hover:shadow-xl transition duration-300">
-                        Download Now
-                    </a>
-                </div>
-
-                <!-- Mobile Menu Button (Placeholder for simplicity, links will use anchor scrolling) -->
-                <div class="md:hidden">
-                    <button class="text-gray-600 hover:color-text-primary">
-                        <i data-lucide="menu"></i>
-                    </button>
-                </div>
+                <a href="#download" class="bg-brand text-white px-6 py-2.5 rounded-full font-bold shadow-lg hover:scale-105 transition-transform">
+                    Download
+                </a>
             </nav>
         </div>
     </header>
 
-    <!-- Main View Container -->
-    <div id="home-view" class="main-content">
-        <!-- Hero Section -->
-        <section id="hero" class="pt-16 pb-24 lg:pt-24 lg:pb-32 bg-white">
-            <div class="container-wrapper mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center lg:space-x-12">
-
-                <!-- Content Left -->
-                <div class="lg:w-1/2 text-center lg:text-left mb-12 lg:mb-0">
-                    <h1 class="text-5xl lg:text-6xl font-extrabold leading-tight mb-6 text-gray-900">
-                        Your Personal Trainer, Your Nutritionist, All in One App.
-                    </h1>
-                    <p class="text-xl text-gray-600 mb-8">
-                        SparkFit delivers personalized nutrition plans, tailored workouts, and an AI trainer to help you crush your fitness goals, without the subscription fees or annoying advertisements.
-                    </p>
-
-                    <!-- Download Buttons with Official Icons (Simplified) -->
-                    <div id="download" class="flex flex-col sm:flex-row justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
-                        <a href="#" class="download-btn flex items-center justify-center w-full sm:w-auto">
-                             <!-- App Store Badge -->
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="Download on the App Store" class="download-badge">
-                        </a>
-                        <a href="#" class="download-btn flex items-center justify-center w-full sm:w-auto">
-                            <!-- Google Play Badge -->
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Get it on Google Play" class="download-badge">
-                        </a>
+    <main id="home-view" class="view-content active">
+        <section class="pt-16 pb-20">
+            <div class="max-w-7xl mx-auto px-4 flex flex-col lg:flex-row items-center gap-16">
+                <div class="lg:w-1/2 text-center lg:text-left">
+                    <h1 class="text-5xl lg:text-7xl font-extrabold mb-6">Crush Goals with your <span class="text-brand">AI Trainer.</span></h1>
+                    <p class="text-xl text-gray-600 mb-10">Personalized coaching, custom meal plans, and the Macro Monster to guide you.</p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" class="h-12 cursor-pointer">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" class="h-12 cursor-pointer">
                     </div>
                 </div>
-
-                <!-- Image Right (Stylized App Screenshots) -->
-                <div class="lg:w-1/2 relative flex justify-center">
-                    <!-- Placeholder for app screenshot array -->
-                    <div class="relative w-72 h-[450px] rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] bg-gray-200 overflow-hidden border-[10px] border-white ring-8 ring-gray-100">
-                        <img src="https://placehold.co/400x800/5A45FF/FFFFFF?text=SparkFit+App+Screens" alt="SparkFit App Screenshots" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900/10 to-transparent"></div>
+                <div class="lg:w-1/2 relative">
+                    <div class="absolute -top-10 -right-10 w-48 h-48 bg-brand rounded-full flex items-center justify-center text-white font-bold p-4 text-center shadow-2xl z-10 animate-bounce">
+                        [Macro Monster]
                     </div>
-                    <!-- Additional floating screenshots (using placeholders) -->
-                    <div class="hidden lg:block absolute w-40 h-64 rounded-2xl shadow-xl bg-gray-100 top-10 -left-10 transform rotate-6 border-4 border-white">
-                        <img src="https://placehold.co/300x500/FFFAC7/5A45FF?text=Nutrition" alt="Nutrition Screen" class="w-full h-full object-cover rounded-xl">
-                    </div>
-                     <div class="hidden lg:block absolute w-40 h-64 rounded-2xl shadow-xl bg-gray-100 bottom-10 -right-10 transform -rotate-6 border-4 border-white">
-                        <img src="https://placehold.co/300x500/D6FFD9/5A45FF?text=Workouts" alt="Workouts Screen" class="w-full h-full object-cover rounded-xl">
+                    <div class="iphone-frame w-[300px] h-[600px] mx-auto">
+                        <img src="Simulator Screenshot - iPhone 16 Pro - 2025-12-22 at 16.57.27.jpg" class="w-full h-full object-cover">
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Features Section -->
-        <section id="features" class="py-20 bg-gray-50">
-            <div class="container-wrapper mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 class="text-4xl font-extrabold mb-4">Features That Drive Results</h2>
-                <p class="text-lg text-gray-600 mb-12 max-w-3xl mx-auto">
-                    Everything you need to reach peak physical condition, designed with a focus on simplicity and personalization.
-                </p>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-
-                    <!-- Feature 1: Personalized Nutrition - Unified Card Color -->
-                    <div class="color-white-card p-6 rounded-2xl shadow-lg border-t-4 border-[#5A45FF] transition hover:shadow-xl">
-                        <div class="w-16 h-16 color-primary rounded-xl flex items-center justify-center mx-auto mb-4">
-                            <i data-lucide="apple" class="w-8 h-8 text-white"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-3">Precision Nutrition</h3>
-                        <p class="text-gray-600 text-sm">
-                            Daily caloric goals, macro breakdowns, and personalized meal ideas tailored to your specific fitness objective (Build Muscle, Lose Fat).
-                        </p>
-                    </div>
-
-                    <!-- Feature 2: AI Trainer - Unified Card Color -->
-                    <div class="color-white-card p-6 rounded-2xl shadow-lg border-t-4 border-[#5A45FF] transition hover:shadow-xl">
-                        <div class="w-16 h-16 color-primary rounded-xl flex items-center justify-center mx-auto mb-4">
-                            <i data-lucide="brain" class="w-8 h-8 text-white"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-3">24/7 AI Coach</h3>
-                        <p class="text-gray-600 text-sm">
-                            Get instant answers to your fitness, form, and nutrition questions from your dedicated AI trainer. Your personal expert is always available.
-                        </p>
-                    </div>
-
-                    <!-- Feature 3: Dynamic Workouts - Unified Card Color -->
-                    <div class="color-white-card p-6 rounded-2xl shadow-lg border-t-4 border-[#5A45FF] transition hover:shadow-xl">
-                        <div class="w-16 h-16 color-primary rounded-xl flex items-center justify-center mx-auto mb-4">
-                            <i data-lucide="dumbbell" class="w-8 h-8 text-white"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-3">Tailored Workouts</h3>
-                        <p class="text-gray-600 text-sm">
-                            Structured workout plans tailored to a set **15-minute** duration and your fitness level, designed to build strength and endurance.
-                        </p>
-                    </div>
-
-                    <!-- Feature 4: Progress Tracking - Unified Card Color -->
-                    <div class="color-white-card p-6 rounded-2xl shadow-lg border-t-4 border-[#5A45FF] transition hover:shadow-xl">
-                        <div class="w-16 h-16 color-primary rounded-xl flex items-center justify-center mx-auto mb-4">
-                            <i data-lucide="trophy" class="w-8 h-8 text-white"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-3">Track & Reward</h3>
-                        <p class="text-gray-600 text-sm">
-                            Visualize your weight progress, track workout streaks, and unlock badges to stay motivated and celebrate every milestone.
-                        </p>
-                    </div>
+        <section id="features" class="py-24 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+                <div class="text-center">
+                    <div class="iphone-frame h-[500px] mb-6"><img src="Simulator Screenshot - iPhone 16 Pro - 2025-12-22 at 16.57.43.jpg" class="w-full h-full object-cover"></div>
+                    <h3 class="text-2xl font-bold mb-2">Personalized Coaching</h3>
+                    <p class="text-gray-600">Stay consistent with your own AI fitness coach.</p>
                 </div>
-
-                <!-- Secondary Download Buttons with Official Icons (Simplified) -->
-                 <div class="mt-16 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-                    <a href="#" class="download-btn flex items-center justify-center w-full sm:w-auto">
-                        <!-- App Store Badge -->
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="Download on the App Store" class="download-badge">
-                    </a>
-                    <a href="#" class="download-btn flex items-center justify-center w-full sm:w-auto">
-                        <!-- Google Play Badge -->
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Get it on Google Play" class="download-badge">
-                    </a>
+                <div class="text-center">
+                    <div class="iphone-frame h-[500px] mb-6"><img src="Simulator Screenshot - iPhone 16 Pro - 2025-12-22 at 16.58.32.jpg" class="w-full h-full object-cover"></div>
+                    <h3 class="text-2xl font-bold mb-2">Custom Meal Plans</h3>
+                    <p class="text-gray-600">Reach your goals faster with personalized nutrition.</p>
                 </div>
-
-            </div>
-        </section>
-
-        <!-- FAQ Section -->
-        <section id="faq" class="py-20">
-            <div class="container-wrapper mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-4xl font-extrabold text-center mb-12">Frequently Asked Questions</h2>
-
-                <div class="max-w-4xl mx-auto space-y-4">
-
-                    <!-- FAQ Item 1 -->
-                    <div class="color-white-card p-6 rounded-xl shadow-md">
-                        <details class="group">
-                            <summary class="flex justify-between items-center font-semibold text-lg cursor-pointer color-text-primary">
-                                Is SparkFit truly free of subscriptions and ads?
-                                <i data-lucide="chevron-down" class="w-6 h-6 transform transition duration-200 group-open:rotate-180"></i>
-                            </summary>
-                            <p class="mt-3 text-gray-600 pl-4 border-l-2 border-gray-200">
-                                Yes. SparkFit is committed to providing a distraction-free and affordable fitness journey. We have no subscriptions and you will see no advertisements, ever. The app is offered as a one-time purchase.
-                            </p>
-                        </details>
-                    </div>
-
-                    <!-- FAQ Item 2 -->
-                    <div class="color-white-card p-6 rounded-xl shadow-md">
-                        <details class="group">
-                            <summary class="flex justify-between items-center font-semibold text-lg cursor-pointer color-text-primary">
-                                What kind of personalization does the app offer?
-                                <i data-lucide="chevron-down" class="w-6 h-6 transform transition duration-200 group-open:rotate-180"></i>
-                            </summary>
-                            <p class="mt-3 text-gray-600 pl-4 border-l-2 border-gray-200">
-                                SparkFit customizes your experience based on your current weight, desired fitness goal (e.g., Build Muscle, Lose Fat), preferred workout duration, and unit preference (Metric/Imperial). This is used to calculate your daily caloric and macro targets.
-                            </p>
-                        </details>
-                    </div>
-
-                    <!-- FAQ Item 3 (Data Persistence Correction) -->
-                    <div class="color-white-card p-6 rounded-xl shadow-md">
-                        <details class="group">
-                            <summary class="flex justify-between items-center font-semibold text-lg cursor-pointer color-text-primary">
-                                What happens to my data if I get a new phone?
-                                <i data-lucide="chevron-down" class="w-6 h-6 transform transition duration-200 group-open:rotate-180"></i>
-                            </summary>
-                            <p class="mt-3 text-red-600 font-medium pl-4 border-l-2 border-red-200">
-                                Important: Currently, all your progress data (workouts, streaks, weight logs) is stored directly on your specific device. If you delete the app or switch to a new phone, your data will be lost. Your license will still be valid via the App Store/Google Play, but your progress will not carry over. We are actively working to implement cloud sync as a future feature.
-                            </p>
-                        </details>
-                    </div>
-
-                    <!-- FAQ Item 4 -->
-                    <div class="color-white-card p-6 rounded-xl shadow-md">
-                        <details class="group">
-                            <summary class="flex justify-between items-center font-semibold text-lg cursor-pointer color-text-primary">
-                                How is the AI Trainer useful?
-                                <i data-lucide="chevron-down" class="w-6 h-6 transform transition duration-200 group-open:rotate-180"></i>
-                            </summary>
-                            <p class="mt-3 text-gray-600 pl-4 border-l-2 border-gray-200">
-                                The AI Trainer acts as an immediate resource for quick questions. It can provide context on nutrition, suggest modifications to a workout, or offer motivation and tips without the need to wait for a human response.
-                            </p>
-                        </details>
-                    </div>
+                <div class="text-center">
+                    <div class="iphone-frame h-[500px] mb-6"><img src="Simulator Screenshot - iPhone 16 Pro - 2025-12-22 at 16.58.23.jpg" class="w-full h-full object-cover"></div>
+                    <h3 class="text-2xl font-bold mb-2">Gamification</h3>
+                    <p class="text-gray-600">Earn rewards and track your progress daily.</p>
                 </div>
             </div>
         </section>
+    </main>
 
-        <!-- CTA Footer Download -->
-        <section class="py-16 gradient-main text-white">
-            <div class="container-wrapper mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 class="text-3xl font-extrabold mb-4">Ready to Spark Your Fitness Journey?</h2>
-                <p class="text-xl mb-8 opacity-90">
-                    Get SparkFit now for a one-time price and start transforming your life today. No hidden costs, no ads.
-                </p>
-                 <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-                    <a href="#" class="download-btn flex items-center justify-center w-full sm:w-auto">
-                        <!-- App Store Badge -->
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="Download on the App Store" class="download-badge">
-                    </a>
-                    <a href="#" class="download-btn flex items-center justify-center w-full sm:w-auto">
-                        <!-- Google Play Badge -->
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Get it on Google Play" class="download-badge">
-                    </a>
-                </div>
+    <section id="about-view" class="view-content py-20 px-4 max-w-4xl mx-auto">
+        <h2 class="text-4xl font-bold mb-6 text-brand">About SparkFit</h2>
+        <p class="text-lg text-gray-700 leading-relaxed">SparkFit was founded to make high-quality fitness guidance accessible without the cycle of subscriptions.</p>
+    </section>
+
+    <section id="contact-view" class="view-content py-20 px-4 max-w-xl mx-auto">
+        <h2 class="text-4xl font-bold mb-6 text-brand">Contact Us</h2>
+        <form class="space-y-4">
+            <input type="text" placeholder="Name" class="w-full p-3 border rounded-lg">
+            <input type="email" placeholder="Email" class="w-full p-3 border rounded-lg">
+            <textarea placeholder="Message" rows="4" class="w-full p-3 border rounded-lg"></textarea>
+            <button class="bg-brand text-white w-full py-3 rounded-lg font-bold">Send Message</button>
+        </form>
+    </section>
+
+    <section id="privacy-view" class="view-content py-20 px-4 max-w-4xl mx-auto">
+        <h2 class="text-4xl font-bold mb-6 text-brand">Privacy Policy</h2>
+        <p>Your data is stored locally on your device for maximum privacy.</p>
+    </section>
+
+    <footer class="bg-gray-900 text-white py-12 mt-20">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="flex justify-center space-x-6 mb-8 text-sm opacity-70">
+                <a href="javascript:void(0)" onclick="showView('privacy-view')">Privacy Policy</a>
+                <a href="javascript:void(0)" onclick="showView('about-view')">About Us</a>
+                <a href="javascript:void(0)" onclick="showView('contact-view')">Contact</a>
             </div>
-        </section>
-    </div>
-
-    <!-- ----------------- Extra Content Views (Hidden by Default) ----------------- -->
-
-    <!-- About Us View -->
-    <div id="about-view" class="extra-content py-20 min-h-screen" style="display: none;">
-        <div class="container-wrapper mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl bg-white p-8 rounded-xl shadow-lg">
-            <button onclick="showView('home-view')" class="flex items-center color-text-primary mb-8 font-semibold">
-                <i data-lucide="arrow-left" class="w-5 h-5 mr-2"></i> Back to Home
-            </button>
-            <h1 id="about-us-section" class="text-4xl font-extrabold mb-6 color-text-primary">About SparkFit</h1>
-
-            <p class="mb-6 text-gray-700">
-                SparkFit was founded on a simple principle: high-quality fitness guidance should be accessible, personalized, and free from the endless cycle of subscriptions and annoying advertisements. We believe that achieving your health and fitness goals shouldn't require paying a monthly fee or sacrificing your privacy to third-party advertisers.
-            </p>
-            <p class="mb-6 text-gray-700">
-                Our team is made up of developers, certified personal trainers, and nutritionists who collaborated to create a truly integrated platform. We saw a gap in the market for an app that combines intelligent, science-backed nutrition planning with dynamic, tailored workouts, all available for a simple, one-time purchase.
-            </p>
-            <h2 class="text-2xl font-bold mt-8 mb-4">Our Mission</h2>
-            <p class="mb-6 text-gray-700">
-                To empower millions of people to take control of their well-being by providing a powerful, personalized, and permanent fitness companion. We aim to be the last fitness app you'll ever need to buy.
-            </p>
-            <h2 class="text-2xl font-bold mt-8 mb-4">Our Core Values</h2>
-            <ul class="list-disc list-inside space-y-2 text-gray-700 ml-4">
-                <li>Transparency: Clear, honest pricing (one-time fee).</li>
-                <li>Privacy: We never sell your data or subject you to ads.</li>
-                <li>Effectiveness: Focus on scientifically proven methods for nutrition and training.</li>
-                <li>Simplicity: A clean, easy-to-use interface that focuses on your goals.</li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- Contact Form View -->
-    <div id="contact-view" class="extra-content py-20 min-h-screen" style="display: none;">
-        <div class="container-wrapper mx-auto px-4 sm:px-6 lg:px-8 max-w-xl bg-white p-8 rounded-xl shadow-lg">
-            <button onclick="showView('home-view')" class="flex items-center color-text-primary mb-8 font-semibold">
-                <i data-lucide="arrow-left" class="w-5 h-5 mr-2"></i> Back to Home
-            </button>
-            <h1 class="text-4xl font-extrabold mb-6 color-text-primary">Get In Touch</h1>
-            <p class="mb-6 text-gray-600">
-                Have a question about the app, need technical support, or want to provide feedback? Please fill out the form below.
-            </p>
-
-            <form id="contact-form" class="space-y-4">
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700">Your Name</label>
-                    <input type="text" id="name" name="name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#5A45FF] focus:border-[#5A45FF] sm:text-sm">
-                </div>
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
-                    <input type="email" id="email" name="email" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#5A45FF] focus:border-[#5A45FF] sm:text-sm">
-                </div>
-                <div>
-                    <label for="subject" class="block text-sm font-medium text-gray-700">Subject</label>
-                    <input type="text" id="subject" name="subject" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#5A45FF] focus:border-[#5A45FF] sm:text-sm">
-                </div>
-                <div>
-                    <label for="message" class="block text-sm font-medium text-gray-700">Message</label>
-                    <textarea id="message" name="message" rows="4" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#5A45FF] focus:border-[#5A45FF] sm:text-sm"></textarea>
-                </div>
-                <button type="submit" class="w-full gradient-main text-white py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium hover:opacity-90 transition duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5A45FF]">
-                    Send Message
-                </button>
-            </form>
-            <div id="contact-message" role="alert"></div>
-        </div>
-    </div>
-
-    <!-- Privacy Policy View -->
-    <div id="privacy-view" class="extra-content py-20 min-h-screen" style="display: none;">
-        <div class="container-wrapper mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl bg-white p-8 rounded-xl shadow-lg">
-            <button onclick="showView('home-view')" class="flex items-center color-text-primary mb-8 font-semibold">
-                <i data-lucide="arrow-left" class="w-5 h-5 mr-2"></i> Back to Home
-            </button>
-            <h1 class="text-4xl font-extrabold mb-6 color-text-primary">Privacy Policy for SparkFit</h1>
-            <p class="text-sm text-gray-500 mb-8">Last Updated: October 21, 2025</p>
-
-            <p class="mb-4">
-                At SparkFit, your privacy is our top priority. We are committed to protecting your personal information and your right to privacy. We do not sell your personal data. We do not display advertisements.
-            </p>
-
-            <h2 class="text-2xl font-bold mt-6 mb-3">1. Information We Collect</h2>
-            <p class="mb-4">
-                We collect personal data that you voluntarily provide to us when you register in the App, express an interest in obtaining information about us or our products, when you participate in activities in the App (like posting your weight), or otherwise contact us. The personal data that we collect depends on the context of your interactions with us and the App, and may include:
-            </p>
-            <ul class="list-disc list-inside space-y-1 text-gray-700 ml-4 mb-4">
-                <li>Identity Data: Name (optional).</li>
-                <li>Fitness Data: Current weight, height, age, fitness goals (e.g., build muscle, lose fat).</li>
-            </ul>
-            <p class="mb-4">
-                Data Automatically Collected: The App generates data regarding your usage, such as workout completion times, streaks, and achievement badges.
-            </p>
-
-            <h2 class="text-2xl font-bold mt-6 mb-3">2. How We Use Your Information</h2>
-            <p class="mb-4">
-                We use the information we collect or receive for the following purposes:
-            </p>
-            <ul class="list-disc list-inside space-y-1 text-gray-700 ml-4 mb-4">
-                <li>To personalize your experience and calculate tailored nutrition plans and workout schedules.</li>
-                <li>To track your progress and display statistics within the App (e.g., weight trends, workout streaks).</li>
-                <li>To improve our App and develop new features based on usage patterns.</li>
-            </ul>
-
-            <h2 class="text-2xl font-bold mt-6 mb-3">3. Data Storage and Security</h2>
-            <p class="mb-4">
-                Local Storage: Currently, all your personal and fitness data is stored locally on your device. This is by design to ensure maximum privacy and minimal external data sharing.
-            </p>
-            <p class="mb-4 text-red-600 font-semibold">
-                WARNING: Since data is stored locally, deleting the App or switching devices will result in the permanent loss of your progress data. Your license will still be valid via the App Store/Google Play, but your progress will not carry over. We are actively working to implement cloud sync as a future feature.
-            </p>
-            <p class="mb-4">
-                Security: We implement security measures designed to protect your information. However, please remember that no electronic transmission over the internet or information storage technology can be guaranteed to be 100% secure.
-            </p>
-
-            <h2 class="text-2xl font-bold mt-6 mb-3">4. Disclosure of Your Information</h2>
-            <p class="mb-4">
-                We do not sell, trade, or otherwise transfer your Personally Identifiable Information to outside parties. We do not use third-party analytics or advertising services that track your activity.
-            </p>
-
-        </div>
-    </div>
-
-    <!-- Terms of Service View -->
-    <div id="terms-view" class="extra-content py-20 min-h-screen" style="display: none;">
-        <div class="container-wrapper mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl bg-white p-8 rounded-xl shadow-lg">
-            <button onclick="showView('home-view')" class="flex items-center color-text-primary mb-8 font-semibold">
-                <i data-lucide="arrow-left" class="w-5 h-5 mr-2"></i> Back to Home
-            </button>
-            <h1 class="text-4xl font-extrabold mb-6 color-text-primary">Terms of Service</h1>
-            <p class="text-sm text-gray-500 mb-8">Last Updated: October 21, 2025</p>
-
-            <p class="mb-4">
-                Welcome to SparkFit, operated by [Developer Name/Company Name]. By downloading or using the SparkFit mobile application (the "App"), you agree to be bound by these Terms of Service (Terms).
-            </p>
-
-            <h2 class="text-2xl font-bold mt-6 mb-3">1. Use of the App</h2>
-            <p class="mb-4">
-                The App is provided for informational and fitness tracking purposes only. You must be at least 18 years old or have permission from a legal guardian to use the App.
-            </p>
-            <p class="mb-4 text-red-600 font-semibold">
-                Medical Disclaimer: SparkFit is not a medical organization. You should consult with your doctor or other healthcare professional before starting any new diet or fitness program. You agree that you use the App and follow its recommendations at your own risk.
-            </p>
-
-            <h2 class="text-2xl font-bold mt-6 mb-3">2. License</h2>
-            <p class="mb-4">
-                SparkFit is a one-time purchase. Upon purchase, we grant you a personal, non-exclusive, non-transferable, revocable license to use the App for your personal, non-commercial use on a device that you own or control, as permitted by the App Store or Google Play Store Terms of Service.
-            </p>
-
-            <h2 class="text-2xl font-bold mt-6 mb-3">3. User Conduct</h2>
-            <p class="mb-4">
-                You agree not to misuse the App or assist anyone else to do so. Prohibited conduct includes:
-            </p>
-            <ul class="list-disc list-inside space-y-1 text-gray-700 ml-4 mb-4">
-                <li>Attempting to gain unauthorized access to our systems or the App.</li>
-                <li>Copying, modifying, or distributing the App content without written permission.</li>
-                <li>Using the App for any illegal or unauthorized purpose.</li>
-            </ul>
-
-            <h2 class="text-2xl font-bold mt-6 mb-3">4. Intellectual Property</h2>
-            <p class="mb-4">
-                All intellectual property rights in the App, including all software and content, are owned by [Developer Name/Company Name] or its licensors.
-            </p>
-
-            <h2 class="text-2xl font-bold mt-6 mb-3">5. Limitation of Liability</h2>
-            <p class="mb-4">
-                The App is provided "as is." We make no warranties, expressed or implied, regarding the App. In no event shall SparkFit be liable for any direct, indirect, incidental, special, or consequential damages arising out of or in any way connected with the use of the App.
-            </p>
-
-        </div>
-    </div>
-
-
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-10">
-        <div class="container-wrapper mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <!-- Logo in Footer -->
-            <div class="flex items-center justify-center space-x-2 text-2xl font-extrabold mb-4">
-                <div class="w-8 h-8 rounded-xl bg-white shadow-md p-1 border border-gray-100 flex items-center justify-center">
-                    <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5A45FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="13 2 13 9 22 9 11 22 11 15 2 15 13 2" />
-                    </svg>
-                </div>
-                <span class="text-white">SparkFit</span>
-            </div>
-
-            <div class="flex flex-wrap justify-center space-x-4 text-sm font-medium mb-6">
-                <a href="#features" class="hover:text-gray-300">Features</a>
-                <a href="#faq" class="hover:text-gray-300">FAQ</a>
-                <a onclick="showView('about-view')" class="hover:text-gray-300 cursor-pointer">About Us</a>
-                <a onclick="showView('contact-view')" class="hover:text-gray-300 cursor-pointer">Contact</a>
-                <a onclick="showView('privacy-view')" class="hover:text-gray-300 cursor-pointer">Privacy Policy</a>
-                <a onclick="showView('terms-view')" class="hover:text-gray-300 cursor-pointer">Terms of Service</a>
-            </div>
-
-            <p class="text-gray-500 text-xs mt-8">
-                &copy; 2025 SparkFit. All rights reserved.
-            </p>
+            <p class="text-xs opacity-50">© 2025 SparkFit. All rights reserved.</p>
         </div>
     </footer>
 
+    <script>
+        function showView(viewId) {
+            document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+        lucide.createIcons();
+    </script>
 </body>
 </html>
