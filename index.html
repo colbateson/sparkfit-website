@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spark Fit - AI Coach, Meal Plans & 15-Minute Workouts</title>
+    <title>Spark Fit - AI Coach & 15-Minute Workouts</title>
     <link rel="icon" href="icon.png" type="image/png">
     
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
@@ -12,18 +12,19 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-        
         :root { --brand-purple: #7B3FAD; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #ffffff; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
         .bg-brand { background-color: var(--brand-purple); }
         .text-brand { color: var(--brand-purple); }
         
-        /* Peeking Monster Animation */
+        /* The Peeking Monster */
         .monster-peek {
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            /* This mix-blend-mode removes the white background from the image automatically */
+            mix-blend-mode: multiply; 
         }
         .monster-peek:hover {
-            transform: translateY(-40px) rotate(-5deg);
+            transform: translateY(-80px) translateX(-20px) rotate(-5deg);
         }
 
         section[id] { scroll-margin-top: 100px; }
@@ -31,12 +32,12 @@
 </head>
 <body class="text-gray-900 relative">
 
-    <div id="peeking-monster" class="fixed -bottom-12 -right-6 z-40 w-48 md:w-64 hidden md:block monster-peek pointer-events-auto cursor-pointer">
-        <img src="macro-monster.png" alt="Macro Monster Peeking">
+    <div id="peeking-monster" class="fixed -bottom-20 -right-10 z-40 w-64 md:w-80 hidden md:block monster-peek pointer-events-auto cursor-pointer">
+        <img src="macro-monster-peek.png" alt="Macro Monster Peeking">
     </div>
 
-    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100">
-        <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 h-20 flex items-center">
+        <div class="max-w-7xl mx-auto px-4 w-full flex items-center justify-between">
             <a href="#" class="flex items-center space-x-3">
                 <img src="icon.png" class="w-10 h-10 rounded-xl shadow-lg">
                 <span class="text-2xl font-extrabold tracking-tight">Spark<span class="text-brand">Fit</span></span>
@@ -53,99 +54,51 @@
     <section class="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden bg-gray-900 text-white">
         <div class="absolute inset-0 z-0">
             <img src="macro-monster.png" class="w-full h-full object-cover object-top opacity-60">
-            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-purple-900/30 to-gray-900/60"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-purple-900/20 to-gray-900/80"></div>
         </div>
-
-        <div class="relative z-10 max-w-5xl mx-auto px-4 text-center mt-20">
-            <h1 class="text-5xl md:text-7xl font-extrabold mb-6 leading-tight drop-shadow-2xl">Crush Your Fitness Goals</h1>
-            <p class="text-xl md:text-2xl text-gray-200 mb-10 max-w-3xl mx-auto font-light">AI Coach, Meal Plans & 15-Minute Home Workouts designed for maximum results in minimum time.</p>
+        <div class="relative z-10 max-w-5xl mx-auto px-4 text-center">
+            <h1 class="text-5xl md:text-8xl font-extrabold mb-6 leading-tight">Crush Your Goals</h1>
+            <p class="text-xl md:text-2xl text-gray-200 mb-10 max-w-2xl mx-auto font-light">AI Coach, Meal Plans & 15-Minute Home Workouts.</p>
             <div class="flex flex-col sm:flex-row gap-6 justify-center">
-                <a href="#download" class="bg-brand px-8 py-4 rounded-full font-bold text-lg shadow-xl hover:scale-105 transition">Start Your Journey</a>
-                <a href="#why-spark" class="bg-black/40 backdrop-blur-md border border-white/20 px-8 py-4 rounded-full font-bold text-lg hover:bg-black/60 transition">Learn More</a>
+                <a href="#download" class="bg-brand px-10 py-4 rounded-full font-bold text-lg shadow-xl hover:scale-105 transition">Start Now</a>
             </div>
         </div>
     </section>
 
-    <section id="why-spark" class="py-24 px-4 max-w-4xl mx-auto text-center">
-        <h2 class="text-3xl md:text-4xl font-black mb-6">Why Spark Fit is the Best for Busy People</h2>
-        <p class="text-lg text-gray-600 mb-12">Stop letting a busy schedule derail your health. Spark Fit combines hyper-efficient 15-minute home workouts with intelligent personalized meal plans to guarantee you hit your weight loss and strength targets.</p>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-            <div class="p-6 bg-purple-50 rounded-2xl border border-purple-100">
-                <i data-lucide="zap" class="text-brand mb-4"></i>
-                <h3 class="font-bold text-brand">Maximum Efficiency</h3>
-                <p class="text-sm">Workouts precisely 15 mins long.</p>
+    <section id="contact" class="py-24 bg-gray-50">
+        <div class="max-w-xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-black mb-4">Contact Us</h2>
+                <p class="text-gray-600">Have a question about your fitness journey? We're here to help.</p>
             </div>
-            <div class="p-6 bg-purple-50 rounded-2xl border border-purple-100">
-                <i data-lucide="sliders" class="text-brand mb-4"></i>
-                <h3 class="font-bold text-brand">True Personalization</h3>
-                <p class="text-sm">Custom meal plans and caloric goals.</p>
-            </div>
-            <div class="p-6 bg-purple-50 rounded-2xl border border-purple-100">
-                <i data-lucide="globe" class="text-brand mb-4"></i>
-                <h3 class="font-bold text-brand">Global Access</h3>
-                <p class="text-sm">Multilanguage support for everyone.</p>
-            </div>
+            
+            <form action="#" method="POST" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" placeholder="Full Name" required class="w-full p-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand outline-none">
+                    <input type="email" placeholder="Email Address" required class="w-full p-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand outline-none">
+                </div>
+                <input type="text" placeholder="Subject" required class="w-full p-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand outline-none">
+                <textarea placeholder="Your Message" rows="5" required class="w-full p-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand outline-none"></textarea>
+                
+                <div class="flex justify-center md:justify-start py-2">
+                    <div class="g-recaptcha" data-sitekey="6LdiLzosAAAAAMJsxxWyBSpnL55GHwx-7Ic4Ybn6"></div>
+                </div>
+
+                <button type="submit" class="w-full bg-brand text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-purple-700 transition">
+                    Send Message
+                </button>
+            </form>
         </div>
     </section>
 
-    <section id="features" class="py-24 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-                <i data-lucide="bot" class="text-brand mb-4"></i>
-                <h3 class="font-bold mb-2">AI Fitness Coach</h3>
-                <p class="text-sm text-gray-600">Real-time guidance and motivation.</p>
-            </div>
-            <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-                <i data-lucide="utensils" class="text-brand mb-4"></i>
-                <h3 class="font-bold mb-2">Personalized Meals</h3>
-                <p class="text-sm text-gray-600">Aligned to your caloric targets.</p>
-            </div>
-            <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-                <i data-lucide="timer" class="text-brand mb-4"></i>
-                <h3 class="font-bold mb-2">15-Minute Workouts</h3>
-                <p class="text-sm text-gray-600">High-impact HIIT and Strength.</p>
-            </div>
-            <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-                <i data-lucide="shopping-cart" class="text-brand mb-4"></i>
-                <h3 class="font-bold mb-2">Weekly Shopping Lists</h3>
-                <p class="text-sm text-gray-600">Effortless grocery planning.</p>
-            </div>
+    <footer class="bg-white border-t border-gray-100 py-12 text-center">
+        <div class="flex justify-center space-x-8 mb-6 font-semibold text-sm text-gray-500">
+            <a href="privacy.html" class="hover:text-brand">Privacy Policy</a>
+            <a href="terms.html" class="hover:text-brand">Terms of Use</a>
         </div>
-    </section>
-
-    <section id="download" class="py-24 bg-gray-900 text-white text-center">
-        <div class="max-w-4xl mx-auto px-4">
-            <h2 class="text-4xl font-black mb-10">Start Your Journey Today</h2>
-            <div class="flex flex-col sm:flex-row justify-center gap-6 mb-20">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" class="h-16 cursor-pointer mx-auto sm:mx-0">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" class="h-16 cursor-pointer mx-auto sm:mx-0">
-            </div>
-
-            <div id="contact" class="border-t border-gray-800 pt-16 text-left">
-                <h3 class="text-3xl font-bold mb-8 text-center">Contact Us</h3>
-                <form class="max-w-xl mx-auto space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" placeholder="Name" class="w-full p-4 rounded-xl bg-gray-800 border border-gray-700">
-                        <input type="email" placeholder="Email" class="w-full p-4 rounded-xl bg-gray-800 border border-gray-700">
-                    </div>
-                    <input type="text" placeholder="Subject" class="w-full p-4 rounded-xl bg-gray-800 border border-gray-700">
-                    <textarea placeholder="Message" rows="4" class="w-full p-4 rounded-xl bg-gray-800 border border-gray-700"></textarea>
-                    
-                    <div class="g-recaptcha" data-sitekey="6Lf1LDosAAAAADxj1O6uY_YLRKYN5_-QjoCrS5w9" data-theme="dark"></div>
-
-                    <button class="w-full bg-brand py-4 rounded-xl font-bold hover:bg-purple-600 transition">Send Message</button>
-                </form>
-            </div>
-        </div>
-    </section>
-
-    <footer class="bg-gray-950 text-gray-500 py-12 text-center text-sm">
-        <div class="flex justify-center space-x-8 mb-4">
-            <a href="privacy.html" class="hover:text-white">Privacy Policy</a>
-            <a href="terms.html" class="hover:text-white">Terms of Use</a>
-        </div>
-        <p>© 2025 Spark Fit. All rights reserved.</p>
+        <p class="text-gray-400 text-xs">© 2025 Spark Fit. All rights reserved.</p>
     </footer>
+
     <script>lucide.createIcons();</script>
 </body>
 </html>
