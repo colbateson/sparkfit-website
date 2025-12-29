@@ -21,9 +21,14 @@
         /* Peeking Monster Animation */
         .monster-peek {
             transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            mix-blend-mode: multiply; 
+            mix-blend-mode: multiply; /* Removes white background from image */
+            z-index: 9999;
         }
-        .monster-peek:hover { transform: translateY(-80px) rotate(-5deg); }
+        
+        /* Pop up further on hover */
+        .monster-peek:hover { 
+            transform: translateY(-40px) translateX(-10px) rotate(-5deg); 
+        }
 
         /* Ensure sections are reachable on mobile */
         section[id] { scroll-margin-top: 80px; }
@@ -31,7 +36,7 @@
 </head>
 <body class="text-gray-900 relative">
 
-    <div id="peeking-monster" class="fixed -bottom-24 -right-10 z-40 w-64 md:w-80 hidden md:block monster-peek pointer-events-auto cursor-pointer">
+    <div id="peeking-monster" class="fixed -bottom-10 -right-4 md:-bottom-24 md:-right-10 w-32 md:w-80 block monster-peek pointer-events-auto cursor-pointer">
         <img src="macro-monster-peek.png" alt="Macro Monster Peeking">
     </div>
 
@@ -67,7 +72,7 @@
     <section id="why-spark" class="py-20 bg-white">
         <div class="max-w-4xl mx-auto px-4 text-center">
             <h2 class="text-3xl md:text-4xl font-black mb-6">Built for Busy Lifestyles</h2>
-            <p class="text-lg text-gray-600 mb-12">Spark Fit combines hyper-efficient workouts with smart nutrition to deliver powerful results in just 15 minutes a day.</p>
+            <p class="text-lg text-gray-600 mb-12">Spark Fit delivers powerful results in just 15 minutes a day.</p>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
                 <div class="p-8 bg-purple-50 rounded-2xl border border-purple-100">
                     <i data-lucide="zap" class="text-brand mb-4"></i>
@@ -91,7 +96,7 @@
     <section id="features" class="py-20 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4">
             <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-5xl font-black mb-4">Key Features</h2>
+                <h2 class="text-3xl md:text-5xl font-black mb-4 text-gray-900">Key Features</h2>
                 <div class="h-1.5 w-24 bg-brand mx-auto rounded-full"></div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -123,17 +128,17 @@
         <div class="max-w-4xl mx-auto px-4 text-center">
             <h2 class="text-4xl md:text-5xl font-black mb-10">Get the App</h2>
             <div class="flex flex-col sm:flex-row justify-center items-center gap-6 mb-20">
-                <a href="#" class="block">
+                <a href="#" class="block hover:scale-105 transition">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" class="h-14 md:h-16" alt="App Store">
                 </a>
-                <a href="#" class="block">
+                <a href="#" class="block hover:scale-105 transition">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" class="h-14 md:h-16" alt="Play Store">
                 </a>
             </div>
 
             <div id="contact" class="border-t border-gray-800 pt-16 text-left">
                 <h3 class="text-3xl font-bold mb-4 text-center">Contact Support</h3>
-                <p class="text-gray-400 text-center mb-8 text-sm">Use the form below to reach our team securely.</p>
+                <p class="text-gray-400 text-center mb-8 text-sm">Our team typically responds within 24 hours.</p>
                 
                 <form action="https://formspree.io/f/hello@spark-fit.com" method="POST" class="max-w-xl mx-auto space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
