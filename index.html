@@ -21,16 +21,11 @@
         /* Peeking Monster Animation */
         .monster-peek {
             transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            mix-blend-mode: multiply; /* Removes white background from image */
+            mix-blend-mode: multiply; 
             z-index: 9999;
         }
-        
-        /* Pop up further on hover */
-        .monster-peek:hover { 
-            transform: translateY(-40px) translateX(-10px) rotate(-5deg); 
-        }
+        .monster-peek:hover { transform: translateY(-40px) translateX(-10px) rotate(-5deg); }
 
-        /* Ensure sections are reachable on mobile */
         section[id] { scroll-margin-top: 80px; }
     </style>
 </head>
@@ -72,22 +67,22 @@
     <section id="why-spark" class="py-20 bg-white">
         <div class="max-w-4xl mx-auto px-4 text-center">
             <h2 class="text-3xl md:text-4xl font-black mb-6">Built for Busy Lifestyles</h2>
-            <p class="text-lg text-gray-600 mb-12">Spark Fit delivers powerful results in just 15 minutes a day.</p>
+            <p class="text-lg text-gray-600 mb-12">Stop letting a busy schedule derail your health. Spark Fit combines hyper-efficient workouts with smart nutrition.</p>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
                 <div class="p-8 bg-purple-50 rounded-2xl border border-purple-100">
                     <i data-lucide="zap" class="text-brand mb-4"></i>
                     <h3 class="font-bold text-brand">15-Min Efficiency</h3>
-                    <p class="text-sm">Workouts designed to maximize fat burn in minimum time.</p>
+                    <p class="text-sm">Workouts designed to maximize results in minimum time.</p>
                 </div>
                 <div class="p-8 bg-purple-50 rounded-2xl border border-purple-100">
                     <i data-lucide="sliders" class="text-brand mb-4"></i>
-                    <h3 class="font-bold text-brand">Personalized AI</h3>
-                    <p class="text-sm">AI-driven coaching tailored specifically to your body.</p>
+                    <h3 class="font-bold text-brand">Secure SSO</h3>
+                    <p class="text-sm">Quick and secure access with Single Sign-On using Apple or Google.</p>
                 </div>
                 <div class="p-8 bg-purple-50 rounded-2xl border border-purple-100">
-                    <i data-lucide="globe" class="text-brand mb-4"></i>
-                    <h3 class="font-bold text-brand">Global Support</h3>
-                    <p class="text-sm">Available in multiple languages worldwide.</p>
+                    <i data-lucide="shield-check" class="text-brand mb-4"></i>
+                    <h3 class="font-bold text-brand">Privacy First</h3>
+                    <p class="text-sm">Your health data is stored locally and securely. You are in control.</p>
                 </div>
             </div>
         </div>
@@ -96,29 +91,29 @@
     <section id="features" class="py-20 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4">
             <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-5xl font-black mb-4 text-gray-900">Key Features</h2>
+                <h2 class="text-3xl md:text-5xl font-black mb-4">Key Features</h2>
                 <div class="h-1.5 w-24 bg-brand mx-auto rounded-full"></div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
                     <i data-lucide="bot" class="text-brand mb-4"></i>
-                    <h3 class="font-bold mb-2">AI Coach</h3>
-                    <p class="text-sm text-gray-600">Instant fitness advice and motivation.</p>
+                    <h3 class="font-bold mb-2">AI Fitness Coach</h3>
+                    <p class="text-sm text-gray-600">Real-time guidance and form motivation.</p>
                 </div>
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
                     <i data-lucide="utensils" class="text-brand mb-4"></i>
-                    <h3 class="font-bold mb-2">Smart Meals</h3>
-                    <p class="text-sm text-gray-600">Personalized macro-balanced plans.</p>
+                    <h3 class="font-bold mb-2">Personalized Meals</h3>
+                    <p class="text-sm text-gray-600">Tailored macro-balanced plans for your body.</p>
                 </div>
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
                     <i data-lucide="timer" class="text-brand mb-4"></i>
-                    <h3 class="font-bold mb-2">15-Min Workouts</h3>
-                    <p class="text-sm text-gray-600">No equipment needed. High results.</p>
+                    <h3 class="font-bold mb-2">15-Min Routines</h3>
+                    <p class="text-sm text-gray-600">No equipment workouts designed for busy people.</p>
                 </div>
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
                     <i data-lucide="shopping-cart" class="text-brand mb-4"></i>
                     <h3 class="font-bold mb-2">Shopping Lists</h3>
-                    <p class="text-sm text-gray-600">Automated lists for your meal plans.</p>
+                    <p class="text-sm text-gray-600">Automated lists to simplify your grocery run.</p>
                 </div>
             </div>
         </div>
@@ -126,27 +121,23 @@
 
     <section id="download" class="py-24 bg-gray-900 text-white">
         <div class="max-w-4xl mx-auto px-4 text-center">
-            <h2 class="text-4xl md:text-5xl font-black mb-10">Get the App</h2>
+            <h2 class="text-4xl md:text-5xl font-black mb-10">Get Spark Fit</h2>
             <div class="flex flex-col sm:flex-row justify-center items-center gap-6 mb-20">
-                <a href="#" class="block hover:scale-105 transition">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" class="h-14 md:h-16" alt="App Store">
-                </a>
-                <a href="#" class="block hover:scale-105 transition">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" class="h-14 md:h-16" alt="Play Store">
-                </a>
+                <a href="#" class="block hover:scale-105 transition"><img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" class="h-14 md:h-16"></a>
+                <a href="#" class="block hover:scale-105 transition"><img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" class="h-14 md:h-16"></a>
             </div>
 
             <div id="contact" class="border-t border-gray-800 pt-16 text-left">
-                <h3 class="text-3xl font-bold mb-4 text-center">Contact Support</h3>
-                <p class="text-gray-400 text-center mb-8 text-sm">Our team typically responds within 24 hours.</p>
+                <h3 class="text-3xl font-bold mb-4 text-center">Contact Us</h3>
+                <p class="text-gray-400 text-center mb-8 text-sm">Have questions? Send us a message and our team will get back to you.</p>
                 
                 <form action="https://formspree.io/f/hello@spark-fit.com" method="POST" class="max-w-xl mx-auto space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" name="name" placeholder="Name" required class="w-full p-4 rounded-xl bg-gray-800 border-gray-700 focus:ring-2 focus:ring-brand outline-none">
-                        <input type="email" name="email" placeholder="Email" required class="w-full p-4 rounded-xl bg-gray-800 border-gray-700 focus:ring-2 focus:ring-brand outline-none">
+                        <input type="text" name="name" placeholder="Name" required class="w-full p-4 rounded-xl bg-gray-800 border-gray-700 outline-none focus:ring-2 focus:ring-brand">
+                        <input type="email" name="email" placeholder="Email" required class="w-full p-4 rounded-xl bg-gray-800 border-gray-700 outline-none focus:ring-2 focus:ring-brand">
                     </div>
-                    <input type="text" name="subject" placeholder="Subject" required class="w-full p-4 rounded-xl bg-gray-800 border-gray-700 focus:ring-2 focus:ring-brand outline-none">
-                    <textarea name="message" placeholder="Message" rows="4" required class="w-full p-4 rounded-xl bg-gray-800 border-gray-700 focus:ring-2 focus:ring-brand outline-none"></textarea>
+                    <input type="text" name="subject" placeholder="Subject" required class="w-full p-4 rounded-xl bg-gray-800 border-gray-700 outline-none focus:ring-2 focus:ring-brand">
+                    <textarea name="message" placeholder="Message" rows="4" required class="w-full p-4 rounded-xl bg-gray-800 border-gray-700 outline-none focus:ring-2 focus:ring-brand"></textarea>
                     
                     <div class="flex justify-center md:justify-start overflow-hidden">
                         <div class="g-recaptcha origin-left scale-[0.85] md:scale-100" data-sitekey="6LdiLzosAAAAAMJsxxWyBSpnL55GHwx-7Ic4Ybn6" data-theme="dark"></div>
@@ -158,7 +149,7 @@
         </div>
     </section>
 
-    <footer class="bg-gray-950 text-gray-500 py-12 text-center text-sm">
+    <footer class="bg-gray-950 text-gray-500 py-12 text-center text-sm border-t border-gray-900">
         <div class="flex justify-center space-x-8 mb-4">
             <a href="privacy.html" class="hover:text-white">Privacy Policy</a>
             <a href="terms.html" class="hover:text-white">Terms of Use</a>
