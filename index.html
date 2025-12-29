@@ -24,14 +24,13 @@
         .bg-brand { background-color: var(--brand-purple); }
         .text-brand { color: var(--brand-purple); }
         
-        /* Smooth Scroll Behavior managed by class="scroll-smooth" on HTML tag */
-        
         .btn-hover:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px -5px rgba(123, 63, 173, 0.4);
         }
 
-        section[id] { scroll-margin-top: 80px; }
+        /* Offset scroll to account for fixed header */
+        section[id] { scroll-margin-top: 100px; }
     </style>
 </head>
 <body class="text-gray-900">
@@ -59,26 +58,26 @@
 
     <section class="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden bg-gray-900 text-white">
         <div class="absolute inset-0 z-0">
-            <img src="macro-monster.png" alt="Macro Monster Background" class="w-full h-full object-cover opacity-60">
-            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-purple-900/50 to-gray-900/60"></div>
+            <img src="macro-monster.png" alt="Macro Monster Background" class="w-full h-full object-cover object-top opacity-60">
+            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-purple-900/40 to-gray-900/60"></div>
         </div>
 
-        <div class="relative z-10 max-w-5xl mx-auto px-4 text-center mt-10">
-            <span class="inline-block py-1 px-3 rounded-full bg-purple-500/30 border border-purple-400 text-purple-100 text-sm font-bold tracking-wider mb-6">
+        <div class="relative z-10 max-w-5xl mx-auto px-4 text-center mt-20">
+            <span class="inline-block py-1 px-3 rounded-full bg-purple-500/30 border border-purple-400 text-purple-100 text-sm font-bold tracking-wider mb-6 backdrop-blur-md">
                 ALL-IN-ONE FITNESS & NUTRITION
             </span>
             <h1 class="text-5xl md:text-7xl font-extrabold mb-6 leading-tight drop-shadow-2xl">
                 Crush Your Fitness Goals
             </h1>
-            <p class="text-xl md:text-2xl text-gray-200 mb-10 max-w-3xl mx-auto leading-relaxed font-light">
+            <p class="text-xl md:text-2xl text-gray-200 mb-10 max-w-3xl mx-auto leading-relaxed font-light drop-shadow-md">
                 AI Coach, Personalized Meal Plans & 15-Minute Home Workouts designed for maximum results in minimum time.
             </p>
             
             <div class="flex flex-col sm:flex-row gap-6 justify-center">
-                <a href="#download" class="bg-brand hover:bg-purple-600 text-white px-8 py-4 rounded-full font-bold text-lg shadow-xl transition-all transform hover:scale-105">
+                <a href="#download" class="bg-brand hover:bg-purple-600 text-white px-8 py-4 rounded-full font-bold text-lg shadow-xl transition-all transform hover:scale-105 border border-transparent">
                     Start Your Journey
                 </a>
-                <a href="#why-spark" class="bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 text-white px-8 py-4 rounded-full font-bold text-lg transition-all">
+                <a href="#why-spark" class="bg-black/30 hover:bg-black/50 backdrop-blur-md border border-white/30 text-white px-8 py-4 rounded-full font-bold text-lg transition-all">
                     Learn More
                 </a>
             </div>
@@ -93,21 +92,21 @@
             </p>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-                <div class="p-6 bg-purple-50 rounded-2xl border border-purple-100">
+                <div class="p-6 bg-purple-50 rounded-2xl border border-purple-100 transition hover:shadow-lg">
                     <div class="w-12 h-12 bg-brand rounded-lg flex items-center justify-center mb-4">
                         <i data-lucide="zap" class="text-white w-6 h-6"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-2 text-brand">Maximum Efficiency</h3>
                     <p class="text-gray-700 text-sm">All workouts are precisely 15 minutes long, maximizing fat burn and muscle tone with built-in timers.</p>
                 </div>
-                <div class="p-6 bg-purple-50 rounded-2xl border border-purple-100">
+                <div class="p-6 bg-purple-50 rounded-2xl border border-purple-100 transition hover:shadow-lg">
                     <div class="w-12 h-12 bg-brand rounded-lg flex items-center justify-center mb-4">
                         <i data-lucide="sliders" class="text-white w-6 h-6"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-2 text-brand">True Personalization</h3>
                     <p class="text-gray-700 text-sm">Get meal plans and caloric goals customized to your body, whether you want to Lose Fat or Build Muscle.</p>
                 </div>
-                <div class="p-6 bg-purple-50 rounded-2xl border border-purple-100">
+                <div class="p-6 bg-purple-50 rounded-2xl border border-purple-100 transition hover:shadow-lg">
                     <div class="w-12 h-12 bg-brand rounded-lg flex items-center justify-center mb-4">
                         <i data-lucide="globe" class="text-white w-6 h-6"></i>
                     </div>
@@ -187,7 +186,7 @@
                 Download Spark Fit today because finding 15 minutes is easier than finding an hour. Results in weeks, not months!
             </p>
             
-            <div class="flex flex-col sm:flex-row justify-center items-center gap-6 mb-16">
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-6 mb-20">
                 <a href="#" class="transform hover:scale-105 transition-transform">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" class="h-16" alt="Download on App Store">
                 </a>
@@ -196,11 +195,39 @@
                 </a>
             </div>
 
-            <div id="contact" class="border-t border-gray-800 pt-16 mt-16">
-                <h3 class="text-2xl font-bold mb-8">Need Help? Contact Us</h3>
-                <form class="max-w-md mx-auto space-y-4">
-                    <input type="email" placeholder="Enter your email" class="w-full px-6 py-4 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand">
-                    <button class="w-full bg-brand hover:bg-purple-600 py-4 rounded-xl font-bold transition-colors">Get in Touch</button>
+            <div id="contact" class="border-t border-gray-800 pt-16">
+                <h3 class="text-3xl font-bold mb-8">Need Help? Contact Us</h3>
+                
+                <form class="max-w-xl mx-auto space-y-4 text-left">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Name</label>
+                            <input type="text" placeholder="Your Name" class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-1">Email</label>
+                            <input type="email" placeholder="your@email.com" class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1">Subject</label>
+                        <input type="text" placeholder="How can we help?" class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1">Message</label>
+                        <textarea rows="4" placeholder="Type your message here..." class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition"></textarea>
+                    </div>
+
+                    <div class="flex items-center space-x-3 bg-gray-800 border border-gray-700 px-4 py-3 rounded-xl w-fit">
+                        <input type="checkbox" id="captcha" class="w-5 h-5 text-brand bg-gray-700 border-gray-500 rounded focus:ring-brand focus:ring-offset-gray-800">
+                        <label for="captcha" class="text-sm text-gray-300 cursor-pointer select-none">I am not a robot</label>
+                    </div>
+
+                    <button class="w-full bg-brand hover:bg-purple-600 py-4 rounded-xl font-bold transition-all shadow-lg transform hover:scale-[1.02]">
+                        Send Message
+                    </button>
                 </form>
             </div>
         </div>
