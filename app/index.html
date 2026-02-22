@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SparkFit – Redirecting…</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- SEO: do not index -->
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="googlebot" content="noindex, nofollow, noarchive">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0b0c10;
+      color: #ffffff;
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .logo {
+      width: 140px;
+      margin-bottom: 30px;
+    }
+
+    a {
+      color: #66fcf1;
+      font-weight: bold;
+    }
+  </style>
+
+  <script>
+    // Real App Store URLs
+    const IOS_URL = "https://apps.apple.com/app/id6754826325";
+    const ANDROID_URL = "https://play.google.com/store/apps/details?id=app.sparkfit";
+    const FALLBACK_URL = "https://www.spark-fit.com";
+
+    function redirectUser() {
+      const ua = navigator.userAgent.toLowerCase();
+
+      if (/iphone|ipad|ipod/.test(ua)) {
+        window.location.replace(IOS_URL);
+      } else if (/android/.test(ua)) {
+        window.location.replace(ANDROID_URL);
+      } else {
+        window.location.replace(FALLBACK_URL);
+      }
+    }
+  </script>
+
+</head>
+
+<body onload="redirectUser()">
+
+  <!-- Replace the image below with your actual SparkFit logo if you want -->
+  <img class="logo" src="icon.png" alt="SparkFit Logo">
+
+  <h2>Redirecting you to the SparkFit App…</h2>
+  <p>If you are not redirected automatically, <a href="https://www.spark-fit.com">click here</a>.</p>
+
+</body>
+</html>
