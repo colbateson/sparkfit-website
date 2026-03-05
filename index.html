@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spark Fit | Join The Inner Circle</title>
-    <meta name="description" content="Stop training like a human. Join the inner circle for the ultimate meal and workout blueprint app before it goes live.">
+    <title>Spark Fit | AI Personal Trainer, Macro Meal Plans & 15-Min HIIT Workouts</title>
+    <meta name="description" content="Transform your body with Spark Fit. The ultimate AI-powered fitness app featuring 15-minute home workouts, personalized macro meal plans, and a smart AI coach.">
     <link rel="icon" href="icon.png" type="image/png">
     
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
@@ -33,6 +33,7 @@
             box-shadow: 0 10px 20px -5px rgba(123, 63, 173, 0.4);
         }
 
+        /* Peeking Monster Styles */
         .monster-peek {
             transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             mix-blend-mode: multiply; 
@@ -53,6 +54,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* Responsive Fix: Ensures head visibility on desktop while staying centered on mobile */
         .hero-bg-position {
             object-position: top center;
         }
@@ -60,10 +62,6 @@
             .hero-bg-position {
                 object-position: center 20%; 
             }
-        }
-
-        .glow-text {
-            text-shadow: 0 0 15px rgba(123, 63, 173, 0.5);
         }
     </style>
 </head>
@@ -82,12 +80,14 @@
                 </a>
 
                 <div class="hidden md:flex space-x-8 font-semibold text-sm text-gray-600">
-                    <a href="#features" class="hover:text-brand transition duration-300">Features</a>
+                    <a href="#about" class="hover:text-brand transition duration-300">The App</a>
                     <a href="#rule" class="hover:text-brand transition duration-300">The 15-Min Rule</a>
+                    <a href="#features" class="hover:text-brand transition duration-300">Features</a>
+                    <a href="#contact" class="hover:text-brand transition duration-300">Community</a>
                 </div>
 
-                <a href="#inner-circle" class="bg-brand text-white px-6 py-2.5 rounded-full font-bold shadow-lg btn-hover transition-all animate-pulse">
-                    Don't Miss Out
+                <a href="#download" class="bg-brand text-white px-6 py-2.5 rounded-full font-bold shadow-lg btn-hover transition-all">
+                    Get Started
                 </a>
             </nav>
         </div>
@@ -100,100 +100,84 @@
         </div>
 
         <div class="relative z-10 max-w-5xl mx-auto px-4 text-center">
-            <span class="inline-block py-1 px-4 rounded-full bg-red-600/80 border border-red-400 text-white text-xs md:text-sm font-black tracking-widest mb-6 uppercase animate-bounce">
-                Extremely Limited Access
+            <span class="inline-block py-1 px-4 rounded-full bg-brand/40 border border-purple-400 text-purple-100 text-xs md:text-sm font-bold tracking-widest mb-6 uppercase">
+                Revolutionary AI-Powered Fitness
             </span>
             <h1 class="text-4xl md:text-7xl font-extrabold mb-6 leading-tight drop-shadow-2xl">
-                The Blueprint is Closing. <br><span class="text-brand">Are You In Or Out?</span>
+                Master Your Macros. <br><span class="text-brand">Crush Your Goals.</span>
             </h1>
             <p class="text-lg md:text-2xl text-gray-200 mb-10 max-w-3xl mx-auto leading-relaxed font-light">
-                Stop training like a human. I’m building a monstrous new way to automate your fitness. Once we go live, the Inner Circle advantage disappears forever.
+                Meet the Macro Monster. Our AI-driven ecosystem delivers personalized meal plans and intense 15-minute workouts designed for busy high-performers.
             </p>
             
             <div class="flex flex-col sm:flex-row gap-6 justify-center">
-                <a href="#inner-circle" class="bg-brand hover:bg-purple-600 text-white px-10 py-4 rounded-full font-bold text-lg shadow-xl transition-all transform hover:scale-105">
-                    Secure My Spot Now
+                <a href="#download" class="bg-brand hover:bg-purple-600 text-white px-10 py-4 rounded-full font-bold text-lg shadow-xl transition-all transform hover:scale-105">
+                    Download Spark Fit
                 </a>
-                <a href="#features" class="bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 text-white px-10 py-4 rounded-full font-bold text-lg transition-all">
-                    See the Features
+                <a href="#about" class="bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 text-white px-10 py-4 rounded-full font-bold text-lg transition-all">
+                    How it Works
                 </a>
             </div>
         </div>
     </section>
 
-    <div class="bg-brand py-4 overflow-hidden whitespace-nowrap border-y border-white/10">
-        <div class="flex animate-pulse space-x-12 justify-center items-center text-white font-black italic tracking-tighter uppercase text-sm md:text-lg">
-            <span>The Revolution is Here</span>
-            <span class="opacity-40">•</span>
-            <span>Final Preparation Phase</span>
-            <span class="opacity-40">•</span>
-            <span>Get the Blueprint Before the World Does</span>
-            <span class="opacity-40">•</span>
-            <span>The AI Revolution</span>
+    <div class="bg-gray-50 py-8 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-70 grayscale hover:grayscale-0 transition-all">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl font-bold">4.9/5</span>
+                    <span class="text-xs uppercase tracking-tighter font-semibold">App Store Rating</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl font-bold">1M+</span>
+                    <span class="text-xs uppercase tracking-tighter font-semibold">Calories Tracked</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl font-bold">15-Min</span>
+                    <span class="text-xs uppercase tracking-tighter font-semibold">Average Workout</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl font-bold">100%</span>
+                    <span class="text-xs uppercase tracking-tighter font-semibold">AI Personalization</span>
+                </div>
+            </div>
         </div>
     </div>
 
-    <section id="features" class="py-24 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="text-center mb-16">
-                <h2 class="text-sm font-bold text-brand uppercase tracking-widest mb-2">The Blueprint Advantage</h2>
-                <h3 class="text-3xl md:text-5xl font-black mb-4">A Monstrous Feature Set</h3>
-                <div class="h-1.5 w-24 bg-brand mx-auto rounded-full"></div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
-                    <div class="text-4xl mb-6 group-hover:scale-110 transition-transform">🤖</div>
-                    <h3 class="text-xl font-bold mb-3">AI Fitness Coach</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">Chat with your personal AI coach for instant advice, motivation, and tailored tips on form, nutrition, and scheduling.</p>
+    <section id="about" class="py-24 bg-white">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-sm font-bold text-brand uppercase tracking-widest mb-2">The Spark Fit Experience</h2>
+                    <h3 class="text-3xl md:text-5xl font-black mb-6 leading-tight">Your Entire Health Journey, Automated by AI.</h3>
+                    <div class="space-y-4 text-lg text-gray-600 leading-relaxed">
+                        <p>
+                            Spark Fit is more than just a workout log. It is a comprehensive digital health ecosystem. We have combined cutting-edge AI Coaching with high-performance nutrition science to eliminate the guesswork from your fitness routine.
+                        </p>
+                        <p>
+                            Whether you want to build lean muscle or drop body fat, Spark Fit adapts to your needs. The app calculates your metabolic requirements, generates your shopping lists, and provides 15-minute workouts that trigger the afterburn effect. This means you keep burning calories long after you finish.
+                        </p>
+                    </div>
                 </div>
-
-                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
-                    <div class="text-4xl mb-6 group-hover:scale-110 transition-transform">🍎</div>
-                    <h3 class="text-xl font-bold mb-3">Personalized Meal Plans</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">Automatically generated meal plans customized to your fitness goals and macro targets.</p>
-                </div>
-
-                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
-                    <div class="text-4xl mb-6 group-hover:scale-110 transition-transform">💪</div>
-                    <h3 class="text-xl font-bold mb-3">15-Minute Smart Workouts</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">Efficient, high-impact routines (HIIT, Cardio, Strength) designed to fit any demanding schedule.</p>
-                </div>
-
-                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
-                    <div class="text-4xl mb-6 group-hover:scale-110 transition-transform">🛒</div>
-                    <h3 class="text-xl font-bold mb-3">Smart Shopping Lists</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">Simplify your nutrition routine with automatically generated, easy-to-use grocery lists for effortless meal prep.</p>
-                </div>
-
-                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
-                    <div class="text-4xl mb-6 group-hover:scale-110 transition-transform">🏆</div>
-                    <h3 class="text-xl font-bold mb-3">Achievement Awards</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">Stay motivated by unlocking unique badges and celebrating every milestone on your fitness journey.</p>
-                </div>
-
-                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
-                    <div class="text-4xl mb-6 group-hover:scale-110 transition-transform">🔥</div>
-                    <h3 class="text-xl font-bold mb-3">Consistency Streaks</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">Keep your momentum strong and earn rewards for staying dedicated to your daily routine.</p>
-                </div>
-
-                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
-                    <div class="text-4xl mb-6 group-hover:scale-110 transition-transform">👨‍👩‍👧‍👦</div>
-                    <h3 class="text-xl font-bold mb-3">Adjustable Family Recipes</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">Enjoy hundreds of healthy meals where you can easily adjust portion sizes for the whole family.</p>
-                </div>
-
-                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
-                    <div class="text-4xl mb-6 group-hover:scale-110 transition-transform">🌱</div>
-                    <h3 class="text-xl font-bold mb-3">All-Inclusive Diets</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">Deep support for vegans, vegetarians, pescatarians, and omnivores to fit your specific lifestyle.</p>
-                </div>
-
-                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
-                    <div class="text-4xl mb-6 group-hover:scale-110 transition-transform">🌍</div>
-                    <h3 class="text-xl font-bold mb-3">10 Global Languages</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">Access the app in English, Spanish, French, German, Italian, Portuguese, and 4 other global languages.</p>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-4">
+                        <div class="bg-purple-100 h-48 rounded-3xl flex items-center justify-center p-8">
+                            <i data-lucide="calculator" class="w-12 h-12 text-brand"></i>
+                        </div>
+                        <div class="bg-gray-900 h-64 rounded-3xl flex flex-col justify-end p-6 text-white">
+                            <span class="text-2xl font-bold">Smart Macros</span>
+                            <p class="text-sm opacity-70">Tailored to your DNA and daily activity levels.</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4 pt-8">
+                        <div class="bg-brand h-64 rounded-3xl flex flex-col justify-end p-6 text-white">
+                            <span class="text-2xl font-bold">Pro HIIT</span>
+                            <p class="text-sm opacity-70">Short bursts that deliver massive results.</p>
+                        </div>
+                        <div class="bg-purple-50 h-48 rounded-3xl flex items-center justify-center">
+                             <i data-lucide="timer" class="w-12 h-12 text-brand"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -203,29 +187,135 @@
         <div class="max-w-4xl mx-auto px-4 text-center">
             <h2 class="text-3xl md:text-5xl font-black mb-8">The 15-Minute Rule</h2>
             <p class="text-xl md:text-2xl font-light mb-12 opacity-90 leading-relaxed">
+                We believe you should not have to choose between your career and your health. Our unique rule is simple: 
                 <span class="font-bold border-b-2 border-white/40">15 minutes of hyper-efficient movement is scientifically superior to an hour of unfocused gym time.</span>
             </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="p-8 bg-white/10 rounded-2xl backdrop-blur-md">
+                    <h4 class="text-4xl font-black mb-2">0</h4>
+                    <p class="text-sm uppercase font-bold tracking-widest">Equipment Needed</p>
+                </div>
+                <div class="p-8 bg-white/10 rounded-2xl backdrop-blur-md">
+                    <h4 class="text-4xl font-black mb-2">100%</h4>
+                    <p class="text-sm uppercase font-bold tracking-widest">Mobile Optimized</p>
+                </div>
+                <div class="p-8 bg-white/10 rounded-2xl backdrop-blur-md">
+                    <h4 class="text-4xl font-black mb-2">24/7</h4>
+                    <p class="text-sm uppercase font-bold tracking-widest">AI Support</p>
+                </div>
+            </div>
         </div>
     </section>
 
-    <section id="inner-circle" class="py-24 bg-gray-900 text-white relative overflow-hidden border-t-4 border-brand">
+    <section id="features" class="py-24 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-black mb-4">Core Capabilities</h2>
+                <div class="h-1.5 w-24 bg-brand mx-auto rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
+                    <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand transition-colors">
+                        <i data-lucide="cpu" class="w-8 h-8 text-brand group-hover:text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">AI Fitness Coach</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">Get real-time feedback on your form and progress. Your coach learns your strengths and pushes you when you need it.</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
+                    <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand transition-colors">
+                        <i data-lucide="utensils-cross" class="w-8 h-8 text-brand group-hover:text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Macro-Meal Engine</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">Dynamic meal plans adjust based on your daily activity. High protein, Keto, or Vegan: the Macro Monster handles it all.</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
+                    <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand transition-colors">
+                        <i data-lucide="zap" class="text-brand group-hover:text-white w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">15-Min Workouts</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">Scientifically structured HIIT and strength sessions that maximize calorie burn in the shortest window possible.</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
+                    <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand transition-colors">
+                        <i data-lucide="shopping-cart" class="text-brand group-hover:text-white w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Smart Shopping</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">Automatic grocery lists synced to your meal plan. Save time, reduce waste, and stay on track without the effort.</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
+                    <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand transition-colors">
+                        <i data-lucide="trophy" class="text-brand group-hover:text-white w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Gamified Progress</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">Unlock unique Monster Badges and maintain streaks. Gamification is built to keep your motivation sky-high.</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
+                    <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand transition-colors">
+                        <i data-lucide="languages" class="text-brand group-hover:text-white w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Global Access</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">Full fitness support in over 10 languages. Fitness is universal; now your favorite app is too.</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
+                    <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand transition-colors">
+                        <i data-lucide="users-2" class="text-brand group-hover:text-white w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Family Portions</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">Adjust recipes instantly to feed the whole family. Healthy eating does not mean cooking separate meals.</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
+                    <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand transition-colors">
+                        <i data-lucide="leaf" class="text-brand group-hover:text-white w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Inclusive Diets</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">Deep support for Vegans, Pescatarians, and Omnivores. No restrictions, just better dietary choices.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="download" class="py-24 bg-gray-900 text-white relative overflow-hidden">
         <div class="absolute top-0 right-0 w-64 h-64 bg-brand opacity-20 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2"></div>
         <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-600 opacity-20 blur-3xl rounded-full -translate-x-1/2 translate-y-1/2"></div>
 
         <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
-            <h2 class="text-4xl md:text-6xl font-black mb-6 glow-text">Join The Inner Circle</h2>
-            <p class="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
-                We're putting the finishing touches on the app. Join the exclusive number of humans getting early access to this monstrous new blueprint. 
-                <span class="block mt-4 text-brand font-black uppercase tracking-tighter">If you miss this window, you're on your own.</span>
+            <h2 class="text-4xl md:text-6xl font-black mb-6">Unleash Your Inner Monster</h2>
+            <p class="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
+                Join over 50,000 users who have optimized their lives with 15-minute workouts. Are you ready to start your transformation?
             </p>
             
-            <p class="text-gray-400 mb-8 max-w-lg mx-auto italic">Join today to get exclusive access!</p>
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-6 mb-16">
+                <a href="#" class="transform hover:scale-110 transition-transform">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" class="h-14 md:h-16" alt="Download Spark Fit on the App Store">
+                </a>
+                
+                <div class="relative group cursor-default">
+                    <div class="h-14 md:h-16 px-6 rounded-xl bg-gray-800 border border-gray-700 flex flex-col justify-center items-start opacity-60 grayscale">
+                        <span class="text-[10px] uppercase tracking-widest font-bold text-gray-400">Android App</span>
+                        <span class="text-lg font-black text-white leading-none">COMING SOON</span>
+                    </div>
+                    <div class="absolute -top-3 -right-3 bg-brand text-white text-[10px] px-2 py-1 rounded-full font-bold shadow-lg animate-pulse">
+                        WIP
+                    </div>
+                </div>
+            </div>
 
-            <div class="border-t border-gray-800 pt-12 text-center">
+            <div id="contact" class="border-t border-gray-800 pt-16 mt-16 text-center">
+                <h3 class="text-3xl font-bold mb-4">The VIP Macro Club</h3>
+                <p class="text-gray-400 mb-8 max-w-lg mx-auto">Get early access to new HIIT routines and exclusive macro-friendly recipes.</p>
+                
                 <div id="success-message" class="bg-green-500/10 border border-green-500/50 p-8 rounded-2xl max-w-xl mx-auto">
                     <i data-lucide="sparkles" class="w-12 h-12 text-green-500 mx-auto mb-4"></i>
-                    <h4 class="text-2xl font-bold text-white mb-2">You're in the Circle!</h4>
-                    <p class="text-green-100/80">Check your inbox. Your transformation starts now.</p>
+                    <h4 class="text-2xl font-bold text-white mb-2">You are on the list!</h4>
+                    <p class="text-green-100/80">Keep an eye on your inbox for your first workout guide.</p>
                 </div>
 
                 <form id="contact-form" class="max-w-xl mx-auto space-y-4 text-left">
@@ -238,10 +328,9 @@
                         <div class="g-recaptcha origin-left scale-[0.85] md:scale-100" data-sitekey="6LdiLzosAAAAAMJsxxWyBSpnL55GHwx-7Ic4Ybn6" data-theme="dark"></div>
                     </div>
                 
-                    <button type="submit" id="submit-btn" class="w-full bg-brand hover:bg-purple-600 py-4 rounded-xl font-bold text-lg shadow-lg transition-all flex items-center justify-center space-x-2 animate-pulse">
-                        <span>CLAIM MY SPOT BEFORE IT CLOSES</span>
+                    <button type="submit" id="submit-btn" class="w-full bg-brand hover:bg-purple-600 py-4 rounded-xl font-bold text-lg shadow-lg transition-all flex items-center justify-center space-x-2">
+                        <span>Subscribe for Free Tips</span>
                     </button>
-                    <p class="text-center text-xs text-red-500 font-bold mt-4 uppercase tracking-widest">⚠️ Access is granted on a first-come basis.</p>
                 </form>
             </div>
         </div>
@@ -252,6 +341,7 @@
             <div class="flex justify-center space-x-8 mb-8">
                 <a href="privacy.html" class="hover:text-white transition-colors">Privacy Policy</a>
                 <a href="terms.html" class="hover:text-white transition-colors">Terms of Use</a>
+                <a href="#about" class="hover:text-white transition-colors">About Us</a>
             </div>
             <p>© 2026 Spark Fit. Built for the modern athlete. All rights reserved.</p>
         </div>
@@ -282,7 +372,7 @@
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <span>Securing your spot...</span>
+            <span>Joining the Team...</span>
         `;
 
         const formData = new FormData(contactForm);
@@ -291,7 +381,7 @@
             email: formData.get('email'),
             name: formData.get('name'),
             subscribed: true,
-            source: "inner_circle_fomo_v2"
+            source: "website_v2"
         };
 
         try {
@@ -310,7 +400,7 @@
             console.error("Error:", error);
             alert("Something went wrong. Please check your connection and try again.");
             submitBtn.disabled = false;
-            submitBtn.innerHTML = "Claim My Spot";
+            submitBtn.innerHTML = "Subscribe Now";
         }
     });
     </script>
