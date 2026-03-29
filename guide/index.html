@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get the SparkFit 15-Minute Blueprint | Free Guide</title>
+    <link rel="icon" href="icon.png" type="image/png">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', 'YOUR_PIXEL_ID_HERE'); 
+    fbq('track', 'PageView');
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        :root { --brand-purple: #7B3FAD; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .bg-brand { background-color: var(--brand-purple); }
+        .text-brand { color: var(--brand-purple); }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <header class="py-6 bg-white border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 flex justify-center">
+            <div class="flex items-center space-x-3">
+                <img src="icon.png" alt="Spark Fit" class="w-8 h-8 rounded-lg shadow-md">
+                <span class="text-xl font-extrabold tracking-tight">Spark<span class="text-brand">Fit</span></span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-12 md:py-20">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <span class="inline-block py-1 px-3 rounded-md bg-purple-100 text-brand text-xs font-bold uppercase tracking-widest mb-4">Free PDF Download</span>
+                <h1 class="text-4xl md:text-5xl font-black mb-6 leading-tight">How Mark Got Into Shape in <span class="text-brand">15 Minutes</span> A Day.</h1>
+                <p class="text-lg text-gray-600 mb-8">Download the exact 8-week blueprint used to lose 12 lbs of fat and build a lean, muscular frame without a gym.</p>
+                
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-center space-x-3 text-gray-700">
+                        <i data-lucide="check-circle-2" class="text-green-500 w-5 h-5"></i>
+                        <span>The "Monster Maths" Macro Roadmap</span>
+                    </li>
+                    <li class="flex items-center space-x-3 text-gray-700">
+                        <i data-lucide="check-circle-2" class="text-green-500 w-5 h-5"></i>
+                        <span>5 Essential HIIT Movements (No Gear)</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-8 md:p-10 rounded-3xl shadow-2xl border border-gray-100">
+                <form id="contact-form" class="space-y-5">
+                    <div class="text-center mb-6"><h3 class="text-xl font-bold">Where should we send your guide?</h3></div>
+                    <input type="text" name="name" placeholder="First Name" required class="w-full p-4 rounded-xl bg-gray-50 border border-gray-200 outline-none">
+                    <input type="email" name="email" placeholder="Email Address" required class="w-full p-4 rounded-xl bg-gray-50 border border-gray-200 outline-none">
+                    <div class="flex justify-center py-2"><div class="g-recaptcha" data-sitekey="6LdiLzosAAAAAMJsxxWyBSpnL55GHwx-7Ic4Ybn6"></div></div>
+                    <button type="submit" id="submit-btn" class="w-full bg-brand hover:bg-purple-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg flex items-center justify-center space-x-2 transition-all">
+                        <span>Get My Free Guide Now</span>
+                        <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+        const contactForm = document.getElementById('contact-form');
+        const submitBtn = document.getElementById('submit-btn');
+
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!grecaptcha.getResponse()) { alert("Please complete the reCAPTCHA"); return; }
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span>Sending Blueprint...</span>`;
+
+            const formData = new FormData(contactForm);
+            const payload = {
+                auth_key: "sf_prod_7a2b9e14c3f8d0a6x2j9k5mQvR4tW8zP",
+                email: formData.get('email'),
+                name: formData.get('name'),
+                subscribed: true,
+                source: "meta_ads_landing"
+            };
+
+            try {
+                await fetch("https://script.google.com/macros/s/AKfycbzASqVA2CtWEx9VULOodgEsmxulXhGFYMdL34J_a07aNM77K3srk47-d53dXjkra44-/exec", {
+                    method: 'POST', mode: 'no-cors', body: JSON.stringify(payload)
+                });
+                window.location.href = "thank-you.html"; 
+            } catch (error) {
+                alert("Error sending guide. Please try again.");
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
