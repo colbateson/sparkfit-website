@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Get the SparkFit 15-Minute Blueprint | Free Guide</title>
-    <link rel="icon" href="icon.png" type="image/png">
+    <link rel="icon" href="../icon.png" type="image/png">
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -32,7 +32,7 @@
     <header class="py-6 bg-white border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-4 flex justify-center">
             <div class="flex items-center space-x-3">
-                <img src="icon.png" alt="Spark Fit" class="w-8 h-8 rounded-lg shadow-md">
+                <img src="../icon.png" alt="Spark Fit" class="w-8 h-8 rounded-lg shadow-md">
                 <span class="text-xl font-extrabold tracking-tight">Spark<span class="text-brand">Fit</span></span>
             </div>
         </div>
@@ -75,7 +75,7 @@
 
     <footer class="py-8 border-t border-gray-100 bg-white">
         <div class="max-w-7xl mx-auto px-4 text-center">
-            <p class="text-sm text-gray-400 mb-2">© 2024 SparkFit. All rights reserved.</p>
+            <p class="text-sm text-gray-400 mb-2">© 2026 SparkFit. All rights reserved.</p>
             <a href="https://spark-fit.com/privacy.html" target="_blank" class="text-xs text-gray-400 hover:text-brand underline">Privacy Policy</a>
         </div>
     </footer>
@@ -102,7 +102,6 @@
             };
 
             try {
-                // Sending to Google Sheet Webhook
                 await fetch("https://script.google.com/macros/s/AKfycbzASqVA2CtWEx9VULOodgEsmxulXhGFYMdL34J_a07aNM77K3srk47-d53dXjkra44-/exec", {
                     method: 'POST', mode: 'no-cors', body: JSON.stringify(payload)
                 });
@@ -110,6 +109,7 @@
             } catch (error) {
                 alert("Error sending guide. Please try again.");
                 submitBtn.disabled = false;
+                submitBtn.innerHTML = "Get My Free Guide Now";
             }
         });
     </script>
