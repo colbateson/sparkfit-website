@@ -15,7 +15,7 @@
     document,'script','https://connect.facebook.net/en_US/fbevents.js');
     fbq('init', 'YOUR_PIXEL_ID_HERE'); 
     fbq('track', 'PageView');
-    fbq('track', 'Lead'); 
+    fbq('track', 'Lead'); // Conversion Tracking fired here
     </script>
 </head>
 <body class="bg-gray-50 flex items-center justify-center min-h-screen p-4">
@@ -24,19 +24,23 @@
         <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <i data-lucide="check" class="w-8 h-8 text-green-600"></i>
         </div>
-        <h1 class="text-2xl font-black mb-2">Check Your Email!</h1>
-        <p class="text-gray-600 mb-8 text-sm">We've sent the guide to your inbox, but you can also download it right now below.</p>
+        <h1 class="text-2xl font-black mb-2 text-gray-900">Success!</h1>
+        <p class="text-gray-600 mb-8 text-sm">Your guide has been sent to your inbox. You can also download it immediately below.</p>
 
-        <a href="SparkFit Fitness Guide.pdf" download class="block w-full bg-[#7B3FAD] hover:bg-purple-700 text-white font-bold py-4 rounded-xl shadow-lg flex items-center justify-center space-x-2 mb-8">
+        <a href="SparkFit Fitness Guide.pdf" download class="block w-full bg-[#7B3FAD] hover:bg-purple-700 text-white font-bold py-4 rounded-xl shadow-lg flex items-center justify-center space-x-2 mb-8 transition-transform hover:scale-[1.02]">
             <i data-lucide="download" class="w-5 h-5"></i>
             <span>Download Guide PDF</span>
         </a>
 
         <div class="pt-6 border-t border-gray-100">
-            <p class="text-xs text-gray-500 mb-4 uppercase font-bold tracking-widest">Want to automate the results?</p>
+            <p class="text-[10px] text-gray-400 mb-4 uppercase font-bold tracking-widest">Want the AI to do the work?</p>
             <a href="https://apps.apple.com/gb/app/spark-fit-15-minute-workouts/id6754826325">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" class="h-10 mx-auto" alt="App Store">
             </a>
+        </div>
+        
+        <div class="mt-8">
+            <a href="https://spark-fit.com/privacy.html" target="_blank" class="text-[10px] text-gray-300 hover:text-gray-500 underline">Privacy Policy</a>
         </div>
     </div>
 
