@@ -27,7 +27,7 @@
         .text-brand { color: var(--brand-purple); }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900">
+<body class="bg-gray-50 text-gray-900 flex flex-col min-h-screen">
 
     <header class="py-6 bg-white border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-4 flex justify-center">
@@ -38,7 +38,7 @@
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-4 py-12 md:py-20">
+    <main class="flex-grow max-w-5xl mx-auto px-4 py-12 md:py-20">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
                 <span class="inline-block py-1 px-3 rounded-md bg-purple-100 text-brand text-xs font-bold uppercase tracking-widest mb-4">Free PDF Download</span>
@@ -60,17 +60,25 @@
             <div class="bg-white p-8 md:p-10 rounded-3xl shadow-2xl border border-gray-100">
                 <form id="contact-form" class="space-y-5">
                     <div class="text-center mb-6"><h3 class="text-xl font-bold">Where should we send your guide?</h3></div>
-                    <input type="text" name="name" placeholder="First Name" required class="w-full p-4 rounded-xl bg-gray-50 border border-gray-200 outline-none">
-                    <input type="email" name="email" placeholder="Email Address" required class="w-full p-4 rounded-xl bg-gray-50 border border-gray-200 outline-none">
+                    <input type="text" name="name" placeholder="First Name" required class="w-full p-4 rounded-xl bg-gray-50 border border-gray-200 outline-none focus:ring-2 focus:ring-purple-200">
+                    <input type="email" name="email" placeholder="Email Address" required class="w-full p-4 rounded-xl bg-gray-50 border border-gray-200 outline-none focus:ring-2 focus:ring-purple-200">
                     <div class="flex justify-center py-2"><div class="g-recaptcha" data-sitekey="6LdiLzosAAAAAMJsxxWyBSpnL55GHwx-7Ic4Ybn6"></div></div>
                     <button type="submit" id="submit-btn" class="w-full bg-brand hover:bg-purple-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg flex items-center justify-center space-x-2 transition-all">
                         <span>Get My Free Guide Now</span>
                         <i data-lucide="arrow-right" class="w-5 h-5"></i>
                     </button>
+                    <p class="text-[10px] text-gray-400 text-center leading-relaxed">By clicking above, you agree to receive fitness tips via email. Unsubscribe at any time.</p>
                 </form>
             </div>
         </div>
     </main>
+
+    <footer class="py-8 border-t border-gray-100 bg-white">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-sm text-gray-400 mb-2">© 2024 SparkFit. All rights reserved.</p>
+            <a href="https://spark-fit.com/privacy.html" target="_blank" class="text-xs text-gray-400 hover:text-brand underline">Privacy Policy</a>
+        </div>
+    </footer>
 
     <script>
         lucide.createIcons();
@@ -82,7 +90,7 @@
             if (!grecaptcha.getResponse()) { alert("Please complete the reCAPTCHA"); return; }
             
             submitBtn.disabled = true;
-            submitBtn.innerHTML = `<span>Sending Blueprint...</span>`;
+            submitBtn.innerHTML = `<span>Sending...</span>`;
 
             const formData = new FormData(contactForm);
             const payload = {
@@ -94,6 +102,7 @@
             };
 
             try {
+                // Sending to Google Sheet Webhook
                 await fetch("https://script.google.com/macros/s/AKfycbzASqVA2CtWEx9VULOodgEsmxulXhGFYMdL34J_a07aNM77K3srk47-d53dXjkra44-/exec", {
                     method: 'POST', mode: 'no-cors', body: JSON.stringify(payload)
                 });
