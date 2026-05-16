@@ -3,80 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Get the SparkFit 15-Minute Blueprint | Free Guide</title>
-    <link rel="icon" href="../icon.png" type="image/png">
+    <title>Free SparkFit 15-Minute Starter Guide</title>
+    <meta name="description" content="Download the free SparkFit starter guide and learn how to build a simple 15-minute fitness routine with short workouts, easy nutrition targets and coach-led support.">
+    <link rel="icon" href="icon.png" type="image/png">
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    
+
     <script>
     !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
     n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
     n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
     t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
     document,'script','https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', 'YOUR_PIXEL_ID_HERE'); 
+    fbq('init', 'YOUR_PIXEL_ID_HERE');
     fbq('track', 'PageView');
     </script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-        :root { --brand-purple: #7B3FAD; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap');
+        :root {
+            --brand-purple: #7B3FAD;
+            --brand-purple-dark: #642d91;
+        }
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .bg-brand { background-color: var(--brand-purple); }
         .text-brand { color: var(--brand-purple); }
+        .border-brand { border-color: var(--brand-purple); }
+        .hero-card-shadow { box-shadow: 0 24px 70px rgba(17, 24, 39, 0.14); }
+        .soft-grid {
+            background-image:
+                linear-gradient(rgba(123,63,173,0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(123,63,173,0.08) 1px, transparent 1px);
+            background-size: 34px 34px;
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 flex flex-col min-h-screen">
+<body class="bg-white text-gray-900 flex flex-col min-h-screen">
 
-    <header class="py-6 bg-white border-b border-gray-100">
-        <div class="max-w-7xl mx-auto px-4 flex justify-center">
+    <header class="py-4 md:py-5 bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <img src="../icon.png" alt="Spark Fit" class="w-8 h-8 rounded-lg shadow-md">
+                <img src="icon.png" alt="SparkFit" class="w-9 h-9 rounded-xl shadow-md">
                 <span class="text-xl font-extrabold tracking-tight">Spark<span class="text-brand">Fit</span></span>
             </div>
+            <a href="https://apps.apple.com/gb/app/spark-fit-15-minute-workouts/id6754826325?pt=127457722&ct=free_guide_landing&mt=8" target="_blank" class="hidden sm:inline-flex items-center gap-2 text-sm font-bold text-brand hover:text-purple-700">
+                Download the app
+                <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+            </a>
         </div>
     </header>
 
-    <main class="flex-grow max-w-5xl mx-auto px-4 py-12 md:py-20">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-                <span class="inline-block py-1 px-3 rounded-md bg-purple-100 text-brand text-xs font-bold uppercase tracking-widest mb-4">Free PDF Download</span>
-                <h1 class="text-4xl md:text-5xl font-black mb-6 leading-tight">How Mark Got Into Shape in <span class="text-brand">15 Minutes</span> A Day.</h1>
-                <p class="text-lg text-gray-600 mb-8">Download the exact 8-week blueprint used to lose 12 lbs of fat and build a lean, muscular frame without a gym.</p>
-                
-                <ul class="space-y-4 mb-8">
-                    <li class="flex items-center space-x-3 text-gray-700">
-                        <i data-lucide="check-circle-2" class="text-green-500 w-5 h-5"></i>
-                        <span>The "Monster Maths" Macro Roadmap</span>
-                    </li>
-                    <li class="flex items-center space-x-3 text-gray-700">
-                        <i data-lucide="check-circle-2" class="text-green-500 w-5 h-5"></i>
-                        <span>5 Essential HIIT Movements (No Gear)</span>
-                    </li>
-                </ul>
-            </div>
+    <main class="flex-grow relative overflow-hidden">
+        <div class="absolute inset-0 soft-grid opacity-60"></div>
+        <div class="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-purple-100 blur-3xl"></div>
+        <div class="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-gray-100 blur-3xl"></div>
 
-            <div class="bg-white p-8 md:p-10 rounded-3xl shadow-2xl border border-gray-100">
-                <form id="contact-form" class="space-y-5">
-                    <div class="text-center mb-6"><h3 class="text-xl font-bold">Where should we send your guide?</h3></div>
-                    <input type="text" name="name" placeholder="First Name" required class="w-full p-4 rounded-xl bg-gray-50 border border-gray-200 outline-none focus:ring-2 focus:ring-purple-200">
-                    <input type="email" name="email" placeholder="Email Address" required class="w-full p-4 rounded-xl bg-gray-50 border border-gray-200 outline-none focus:ring-2 focus:ring-purple-200">
-                    <div class="flex justify-center py-2"><div class="g-recaptcha" data-sitekey="6LdiLzosAAAAAMJsxxWyBSpnL55GHwx-7Ic4Ybn6"></div></div>
-                    <button type="submit" id="submit-btn" class="w-full bg-brand hover:bg-purple-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg flex items-center justify-center space-x-2 transition-all">
-                        <span>Get My Free Guide Now</span>
-                        <i data-lucide="arrow-right" class="w-5 h-5"></i>
-                    </button>
-                    <p class="text-[10px] text-gray-400 text-center leading-relaxed">By clicking above, you agree to receive fitness tips via email. Unsubscribe at any time.</p>
-                </form>
+        <section class="relative max-w-6xl mx-auto px-4 py-10 md:py-18 lg:py-20">
+            <div class="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-10 lg:gap-12 items-center">
+                <div>
+                    <span class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-purple-100 text-brand text-xs font-extrabold uppercase tracking-widest mb-5">
+                        <i data-lucide="file-down" class="w-4 h-4"></i>
+                        Free starter guide
+                    </span>
+
+                    <h1 class="text-4xl sm:text-5xl md:text-6xl font-black mb-6 leading-[1.02] tracking-tight">
+                        Start getting fitter with <span class="text-brand">15 minutes</span> a day.
+                    </h1>
+
+                    <p class="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed max-w-2xl">
+                        Download the simple SparkFit starter guide and get a realistic way to train, eat and build consistency without needing a gym or a perfect routine.
+                    </p>
+
+                    <div class="grid grid-cols-3 gap-3 mb-8">
+                        <div class="rounded-2xl bg-white border border-gray-100 p-4 shadow-sm">
+                            <p class="text-2xl font-black text-gray-900">8</p>
+                            <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Week structure</p>
+                        </div>
+                        <div class="rounded-2xl bg-white border border-gray-100 p-4 shadow-sm">
+                            <p class="text-2xl font-black text-gray-900">15</p>
+                            <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Minute sessions</p>
+                        </div>
+                        <div class="rounded-2xl bg-white border border-gray-100 p-4 shadow-sm">
+                            <p class="text-2xl font-black text-gray-900">0</p>
+                            <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Gym required</p>
+                        </div>
+                    </div>
+
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-start space-x-3 text-gray-700">
+                            <i data-lucide="check-circle-2" class="text-green-500 w-5 h-5 mt-0.5 shrink-0"></i>
+                            <span><strong>Short home workouts</strong> you can fit around real life.</span>
+                        </li>
+                        <li class="flex items-start space-x-3 text-gray-700">
+                            <i data-lucide="check-circle-2" class="text-green-500 w-5 h-5 mt-0.5 shrink-0"></i>
+                            <span><strong>Simple macro targets</strong> without spreadsheet-level faff.</span>
+                        </li>
+                        <li class="flex items-start space-x-3 text-gray-700">
+                            <i data-lucide="check-circle-2" class="text-green-500 w-5 h-5 mt-0.5 shrink-0"></i>
+                            <span><strong>A repeatable routine</strong> that focuses on consistency before perfection.</span>
+                        </li>
+                    </ul>
+
+                    <div class="rounded-3xl bg-gray-950 text-white p-6 md:p-7 mb-6">
+                        <p class="text-sm font-bold uppercase tracking-widest text-purple-200 mb-3">Why it works</p>
+                        <p class="text-lg md:text-xl font-black leading-tight mb-3">You are not downloading motivation. You are downloading your first clear step.</p>
+                        <p class="text-gray-300 leading-relaxed">The guide is designed to turn “I should start” into a simple plan you can follow today. Then SparkFit helps you keep going with workouts, targets and guidance inside the app.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="relative bg-gray-950 rounded-[2rem] overflow-hidden hero-card-shadow min-h-[430px] md:min-h-[520px]">
+                        <img src="colin-sparkfit-trainer.png" alt="SparkFit personal trainer support" class="absolute inset-0 w-full h-full object-cover object-top opacity-92">
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/20 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-6 md:p-7 text-white">
+                            <p class="text-xs font-extrabold uppercase tracking-[0.25em] text-purple-200 mb-2">Coach-led support</p>
+                            <h2 class="text-2xl md:text-3xl font-black mb-2 leading-tight">Your goal. Your pace. Clear guidance.</h2>
+                            <p class="text-gray-200 text-sm md:text-base leading-relaxed">The guide gives you the starting structure. The app helps turn it into a routine.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 md:p-8 rounded-3xl shadow-2xl border border-gray-100" id="guide-form-card">
+                        <form id="contact-form" class="space-y-5">
+                            <div class="text-center mb-4">
+                                <h3 class="text-2xl font-black">Send me the free guide</h3>
+                                <p class="text-sm text-gray-500 mt-2">Pop your details in and I’ll send it over.</p>
+                            </div>
+                            <input type="text" name="name" placeholder="First name" required class="w-full p-4 rounded-xl bg-gray-50 border border-gray-200 outline-none focus:ring-2 focus:ring-purple-200">
+                            <input type="email" name="email" placeholder="Email address" required class="w-full p-4 rounded-xl bg-gray-50 border border-gray-200 outline-none focus:ring-2 focus:ring-purple-200">
+                            <div class="flex justify-center overflow-hidden py-2"><div class="g-recaptcha origin-center scale-[0.9] sm:scale-100" data-sitekey="6LdiLzosAAAAAMJsxxWyBSpnL55GHwx-7Ic4Ybn6"></div></div>
+                            <button type="submit" id="submit-btn" class="w-full bg-brand hover:bg-purple-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg flex items-center justify-center space-x-2 transition-all">
+                                <span>Get my free starter guide</span>
+                                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                            </button>
+                            <p class="text-[10px] text-gray-400 text-center leading-relaxed">By clicking above, you agree to receive fitness tips via email. Unsubscribe at any time.</p>
+                        </form>
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
+
+        <section class="relative max-w-6xl mx-auto px-4 pb-16 md:pb-20">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm">
+                    <i data-lucide="timer" class="w-8 h-8 text-brand mb-4"></i>
+                    <h4 class="text-lg font-black mb-2">Start small</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">A 15-minute session is easier to start and easier to repeat.</p>
+                </div>
+                <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm">
+                    <i data-lucide="target" class="w-8 h-8 text-brand mb-4"></i>
+                    <h4 class="text-lg font-black mb-2">Know the target</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">Simple nutrition guidance helps you support your goal without overcomplication.</p>
+                </div>
+                <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm">
+                    <i data-lucide="repeat" class="w-8 h-8 text-brand mb-4"></i>
+                    <h4 class="text-lg font-black mb-2">Build the habit</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">The plan is designed around momentum, not perfection.</p>
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer class="py-8 border-t border-gray-100 bg-white">
         <div class="max-w-7xl mx-auto px-4 text-center">
             <p class="text-sm text-gray-400 mb-2">© 2026 SparkFit. All rights reserved.</p>
-            <a href="https://spark-fit.com/privacy.html" target="_blank" class="text-xs text-gray-400 hover:text-brand underline">Privacy Policy</a>
+            <div class="flex justify-center gap-5 text-xs">
+                <a href="https://spark-fit.com/privacy.html" target="_blank" class="text-gray-400 hover:text-brand underline">Privacy Policy</a>
+                <a href="https://apps.apple.com/gb/app/spark-fit-15-minute-workouts/id6754826325?pt=127457722&ct=free_guide_footer&mt=8" target="_blank" class="text-gray-400 hover:text-brand underline">Download the app</a>
+            </div>
         </div>
     </footer>
 
@@ -88,7 +182,7 @@
         contactForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!grecaptcha.getResponse()) { alert("Please complete the reCAPTCHA"); return; }
-            
+
             submitBtn.disabled = true;
             submitBtn.innerHTML = `<span>Sending...</span>`;
 
@@ -98,18 +192,18 @@
                 email: formData.get('email'),
                 name: formData.get('name'),
                 subscribed: true,
-                source: "meta_ads_landing"
+                source: "free_guide_user_first_funnel"
             };
 
             try {
                 await fetch("https://script.google.com/macros/s/AKfycbxl_8XzJkNufEwAJ4WZWb2_Jejl4mkPDCpNPmH-Vu0WOFTplC2T5B3ZbCN74Iw97UM/exec", {
                     method: 'POST', mode: 'no-cors', body: JSON.stringify(payload)
                 });
-                window.location.href = "thank-you.html"; 
+                window.location.href = "thank-you.html";
             } catch (error) {
                 alert("Error sending guide. Please try again.");
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = "Get My Free Guide Now";
+                submitBtn.innerHTML = "Get my free starter guide";
             }
         });
     </script>
