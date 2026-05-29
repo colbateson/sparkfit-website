@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SparkFit | 15-Minute Workouts, Simple Macros & Real Coach Support</title>
-    <meta name="description" content="Build a fitness routine that fits real life. SparkFit gives you 15-minute workouts, simple macro guidance and personal-trainer support to help you stay consistent.">
+    <title>SparkFit | 15-Minute Workouts & Simple Macros</title>
+    <meta name="description" content="Get fitter in 15 minutes a day with short home workouts, simple macro targets and a clear plan to follow. SparkFit is free to start on iPhone.">
+    <meta property="og:title" content="SparkFit | Get fitter in 15 minutes a day">
+    <meta property="og:description" content="Short home workouts, simple macro targets and a clear plan to follow, built for busy people who want real results without overcomplicating fitness.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="icon.png">
+    <meta name="theme-color" content="#7B3FAD">
     <link rel="icon" href="icon.png" type="image/png">
 
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
@@ -57,14 +62,36 @@
             background-size: 34px 34px;
         }
 
-        .phone-safe-photo {
-            object-position: center top;
+        .phone-shell {
+            border: 10px solid #111827;
+            border-radius: 2.4rem;
+            box-shadow: 0 28px 80px rgba(17, 24, 39, 0.28);
         }
 
-        @media (max-width: 640px) {
-            .phone-safe-photo {
-                object-position: center top;
-            }
+        .phone-notch {
+            width: 94px;
+            height: 24px;
+            border-radius: 0 0 18px 18px;
+            background: #111827;
+            position: absolute;
+            left: 50%;
+            top: 0;
+            transform: translateX(-50%);
+            z-index: 20;
+        }
+
+        .app-store-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sticky-mobile-cta {
+            box-shadow: 0 -12px 34px rgba(17, 24, 39, 0.18);
+        }
+
+        @media (max-width: 767px) {
+            body { padding-bottom: 86px; }
         }
     </style>
 </head>
@@ -73,25 +100,26 @@
     <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <nav class="flex items-center justify-between h-16 md:h-20">
-                <a href="#" class="flex items-center space-x-3">
+                <a href="#" class="flex items-center space-x-3" aria-label="SparkFit home">
                     <img src="icon.png" alt="SparkFit App Icon" class="w-9 h-9 md:w-10 md:h-10 rounded-xl shadow-lg">
                     <span class="text-xl md:text-2xl font-extrabold tracking-tight">Spark<span class="text-brand">Fit</span></span>
                 </a>
 
                 <div class="hidden md:flex space-x-8 font-semibold text-sm text-gray-600">
-                    <a href="#why" class="hover:text-brand transition duration-300">Why it works</a>
-                    <a href="#method" class="hover:text-brand transition duration-300">The plan</a>
-                    <a href="#features" class="hover:text-brand transition duration-300">Features</a>
-                    <a href="#contact" class="hover:text-brand transition duration-300">Free tips</a>
+                    <a href="#how" class="hover:text-brand transition duration-300">How it works</a>
+                    <a href="#screens" class="hover:text-brand transition duration-300">App preview</a>
+                    <a href="#proof" class="hover:text-brand transition duration-300">Reviews</a>
+                    <a href="#contact" class="hover:text-brand transition duration-300">Free guide</a>
                 </div>
 
-                <a href="#download" class="bg-brand text-white px-4 md:px-6 py-2.5 rounded-full font-bold shadow-lg btn-hover transition-all text-sm md:text-base">
-                    Get started
+                <a href="https://apps.apple.com/gb/app/sparkfit-ai-home-workout/id6754826325?pt=127457722&ct=website_header&mt=8" target="_blank" rel="noopener" class="bg-brand text-white px-4 md:px-6 py-2.5 rounded-full font-bold shadow-lg btn-hover transition-all text-sm md:text-base">
+                    Download free
                 </a>
             </nav>
         </div>
     </header>
 
+    <!-- HERO -->
     <section class="relative overflow-hidden bg-white">
         <div class="absolute inset-0 soft-grid opacity-70"></div>
         <div class="absolute top-0 right-0 w-[34rem] h-[34rem] bg-purple-100 rounded-full blur-3xl translate-x-1/3 -translate-y-1/3"></div>
@@ -106,21 +134,27 @@
                     </span>
 
                     <h1 class="text-4xl sm:text-5xl md:text-7xl font-black mb-5 leading-[1.02] tracking-tight">
-                        Your next <span class="text-brand">15 minutes</span> can change your routine.
+                        Get fitter in <span class="text-brand">15 minutes</span> a day.
                     </h1>
 
                     <p class="text-lg md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto lg:mx-0 leading-relaxed">
-                        SparkFit gives you short workouts, simple nutrition targets and real coach guidance, so you always know what to do next and can build momentum without living in the gym.
+                        Short home workouts, simple macro targets and a clear plan to follow, built for busy people who want real results without overcomplicating fitness.
                     </p>
 
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
-                        <a href="https://apps.apple.com/gb/app/spark-fit-15-minute-workouts/id6754826325?pt=127457722&ct=website_landing_page&mt=8" target="_blank" class="bg-brand hover:bg-purple-600 text-white px-8 md:px-10 py-4 rounded-full font-bold text-lg shadow-xl transition-all transform hover:scale-105 inline-flex justify-center items-center gap-2">
-                            Download SparkFit
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-6">
+                        <a href="https://apps.apple.com/gb/app/sparkfit-ai-home-workout/id6754826325?pt=127457722&ct=website_hero_primary&mt=8" target="_blank" rel="noopener" class="bg-brand hover:bg-purple-600 text-white px-8 md:px-10 py-4 rounded-full font-bold text-lg shadow-xl transition-all transform hover:scale-105 inline-flex justify-center items-center gap-2">
+                            Download SparkFit free
                             <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
                         </a>
                         <a href="#contact" class="bg-gray-900 hover:bg-gray-800 text-white px-8 md:px-10 py-4 rounded-full font-bold text-lg transition-all inline-flex justify-center items-center gap-2">
-                            Get free tips
+                            Get the free 15-minute fitness guide
                             <i data-lucide="mail" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+
+                    <div class="flex justify-center lg:justify-start mb-8">
+                        <a href="https://apps.apple.com/gb/app/sparkfit-ai-home-workout/id6754826325?pt=127457722&ct=website_hero_badge&mt=8" target="_blank" rel="noopener" class="app-store-badge transform hover:scale-105 transition-transform" aria-label="Download SparkFit on the App Store">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" class="h-12 md:h-14" alt="Download on the App Store">
                         </a>
                     </div>
 
@@ -130,8 +164,8 @@
                             <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Minute sessions</p>
                         </div>
                         <div class="rounded-2xl bg-white border border-gray-100 p-4 shadow-sm">
-                            <p class="text-2xl font-black">0</p>
-                            <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Gym required</p>
+                            <p class="text-2xl font-black">Free</p>
+                            <p class="text-xs font-bold uppercase tracking-wider text-gray-500">To start</p>
                         </div>
                         <div class="rounded-2xl bg-white border border-gray-100 p-4 shadow-sm">
                             <p class="text-2xl font-black">1</p>
@@ -140,15 +174,80 @@
                     </div>
                 </div>
 
-                <div class="relative">
+                <!-- Above-fold app preview, not lifestyle imagery -->
+                <div class="relative" id="screens">
                     <div class="absolute -inset-3 bg-brand/10 rounded-[2rem] md:rounded-[2.5rem] rotate-2"></div>
-                    <div class="relative rounded-[2rem] md:rounded-[2.5rem] overflow-hidden bg-gray-950 hero-card-shadow min-h-[470px] sm:min-h-[560px] lg:min-h-[640px]">
-                        <img src="colin-sparkfit-trainer.png" alt="SparkFit personal trainer support" class="absolute inset-0 w-full h-full object-cover phone-safe-photo opacity-95">
-                        <div class="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/20 to-transparent"></div>
-                        <div class="absolute left-4 right-4 bottom-4 md:left-8 md:right-8 md:bottom-8 bg-white/95 backdrop-blur-md rounded-3xl p-5 md:p-6 shadow-2xl">
-                            <p class="text-xs font-extrabold uppercase tracking-[0.22em] text-brand mb-2">Real guidance behind the app</p>
-                            <h2 class="text-xl md:text-3xl font-black leading-tight text-gray-950 mb-2">Not just workouts. A simple path to follow.</h2>
-                            <p class="text-sm md:text-base text-gray-600 leading-relaxed">Get the structure, nudges and support you need to keep showing up, even when life gets busy.</p>
+                    <div class="relative rounded-[2rem] md:rounded-[2.5rem] overflow-hidden bg-gray-950 hero-card-shadow p-5 md:p-8">
+                        <div class="grid grid-cols-2 gap-4 items-end">
+                            <div class="phone-shell relative bg-white overflow-hidden h-[430px] md:h-[560px]">
+                                <div class="phone-notch"></div>
+                                <div class="bg-gray-950 text-white h-full p-5 pt-10">
+                                    <div class="flex items-center justify-between mb-6">
+                                        <div>
+                                            <p class="text-xs text-purple-200 font-bold uppercase tracking-widest">Today</p>
+                                            <h2 class="text-2xl font-black">15 min HIIT</h2>
+                                        </div>
+                                        <div class="w-10 h-10 rounded-full bg-brand flex items-center justify-center">
+                                            <i data-lucide="flame" class="w-5 h-5"></i>
+                                        </div>
+                                    </div>
+                                    <div class="bg-white/10 rounded-3xl p-4 mb-4 border border-white/10">
+                                        <p class="text-sm text-gray-300 mb-2">Next exercise</p>
+                                        <p class="text-xl font-black">Squat to press</p>
+                                        <div class="h-2 bg-white/10 rounded-full mt-4 overflow-hidden">
+                                            <div class="h-full bg-brand rounded-full w-2/3"></div>
+                                        </div>
+                                        <p class="text-xs text-gray-400 mt-2">08:42 remaining</p>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3 mb-4">
+                                        <div class="bg-white/10 rounded-2xl p-3">
+                                            <p class="text-xl font-black">124</p>
+                                            <p class="text-xs text-gray-400">kcal</p>
+                                        </div>
+                                        <div class="bg-white/10 rounded-2xl p-3">
+                                            <p class="text-xl font-black">7</p>
+                                            <p class="text-xs text-gray-400">day streak</p>
+                                        </div>
+                                    </div>
+                                    <button class="w-full bg-brand py-3 rounded-2xl font-black">Start workout</button>
+                                </div>
+                            </div>
+
+                            <div class="phone-shell relative bg-white overflow-hidden h-[390px] md:h-[510px] translate-y-8">
+                                <div class="phone-notch"></div>
+                                <div class="bg-white h-full p-5 pt-10">
+                                    <p class="text-xs text-brand font-bold uppercase tracking-widest mb-1">Nutrition</p>
+                                    <h2 class="text-2xl font-black mb-5">Simple macros</h2>
+                                    <div class="rounded-3xl bg-purple-50 p-4 mb-4 border border-purple-100">
+                                        <p class="text-sm text-gray-600 mb-1">Daily target</p>
+                                        <p class="text-3xl font-black text-gray-950">1,950 kcal</p>
+                                        <p class="text-xs text-gray-500">Built around your goal</p>
+                                    </div>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <div class="flex justify-between text-sm font-bold mb-1"><span>Protein</span><span>150g</span></div>
+                                            <div class="h-2 bg-gray-100 rounded-full"><div class="h-full bg-brand rounded-full w-4/5"></div></div>
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between text-sm font-bold mb-1"><span>Carbs</span><span>180g</span></div>
+                                            <div class="h-2 bg-gray-100 rounded-full"><div class="h-full bg-gray-900 rounded-full w-3/5"></div></div>
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between text-sm font-bold mb-1"><span>Fat</span><span>55g</span></div>
+                                            <div class="h-2 bg-gray-100 rounded-full"><div class="h-full bg-gray-400 rounded-full w-1/2"></div></div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-5 p-4 rounded-2xl bg-gray-950 text-white">
+                                        <p class="text-sm font-bold">Today's simple focus</p>
+                                        <p class="text-xs text-gray-300">Hit protein and complete 15 minutes.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-10 text-white text-center">
+                            <p class="text-xs font-extrabold uppercase tracking-[0.22em] text-purple-200 mb-2">App preview</p>
+                            <h2 class="text-2xl md:text-4xl font-black leading-tight mb-2">See the workout, the food target and the next step.</h2>
+                            <p class="text-sm md:text-base text-gray-300 leading-relaxed max-w-xl mx-auto">Replace these mock screens with real App Store screenshots when you export them.</p>
                         </div>
                     </div>
                 </div>
@@ -156,6 +255,7 @@
         </div>
     </section>
 
+    <!-- Trust strip -->
     <div class="bg-gray-50 py-7 border-y border-gray-100">
         <div class="max-w-7xl mx-auto px-4">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-5 text-center">
@@ -165,111 +265,185 @@
                 </div>
                 <div>
                     <span class="text-xl md:text-2xl font-black">No plan?</span>
-                    <p class="text-xs uppercase tracking-wider font-bold text-gray-500 mt-1">Follow your next session</p>
+                    <p class="text-xs uppercase tracking-wider font-bold text-gray-500 mt-1">Follow the next session</p>
                 </div>
                 <div>
                     <span class="text-xl md:text-2xl font-black">Food confused?</span>
-                    <p class="text-xs uppercase tracking-wider font-bold text-gray-500 mt-1">Use simple macro targets</p>
+                    <p class="text-xs uppercase tracking-wider font-bold text-gray-500 mt-1">Use simple macros</p>
                 </div>
                 <div>
-                    <span class="text-xl md:text-2xl font-black">Motivation dips?</span>
-                    <p class="text-xs uppercase tracking-wider font-bold text-gray-500 mt-1">Get coach-led support</p>
+                    <span class="text-xl md:text-2xl font-black">Just browsing?</span>
+                    <p class="text-xs uppercase tracking-wider font-bold text-gray-500 mt-1">Free to start</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <section id="why" class="py-20 md:py-24 bg-white">
+    <!-- HOW IT WORKS -->
+    <section id="how" class="py-20 md:py-24 bg-white">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center max-w-3xl mx-auto mb-14">
+                <h2 class="text-sm font-bold text-brand uppercase tracking-widest mb-3">How it works</h2>
+                <h3 class="text-3xl md:text-5xl font-black mb-5 leading-tight">Three steps. No overthinking.</h3>
+                <p class="text-lg text-gray-600 leading-relaxed">SparkFit is designed to get you from “I need to start” to “I know exactly what to do today”.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+                <div class="bg-gray-50 rounded-3xl p-8 border border-gray-100 shadow-sm">
+                    <p class="text-white bg-brand rounded-full w-12 h-12 flex items-center justify-center font-black mb-6">1</p>
+                    <h4 class="text-2xl font-black mb-3">Choose your goal</h4>
+                    <p class="text-gray-600 leading-relaxed">Set the direction: lose fat, build consistency or feel fitter and stronger.</p>
+                </div>
+                <div class="bg-gray-950 text-white rounded-3xl p-8 border border-gray-900 shadow-xl">
+                    <p class="text-brand bg-white rounded-full w-12 h-12 flex items-center justify-center font-black mb-6">2</p>
+                    <h4 class="text-2xl font-black mb-3">Do 15 minutes</h4>
+                    <p class="text-gray-300 leading-relaxed">Open the app, follow the short session and get a win without needing the gym.</p>
+                </div>
+                <div class="bg-purple-50 rounded-3xl p-8 border border-purple-100 shadow-sm">
+                    <p class="text-white bg-brand rounded-full w-12 h-12 flex items-center justify-center font-black mb-6">3</p>
+                    <h4 class="text-2xl font-black mb-3">Follow simple macros</h4>
+                    <p class="text-gray-600 leading-relaxed">Use clear calorie and macro targets so food supports the work you are putting in.</p>
+                </div>
+            </div>
+
+            <div class="mt-12 text-center">
+                <p class="text-sm font-bold text-gray-500 mb-4">Start with one short session today.</p>
+                <a href="https://apps.apple.com/gb/app/sparkfit-ai-home-workout/id6754826325?pt=127457722&ct=website_how_badge&mt=8" target="_blank" rel="noopener" class="app-store-badge transform hover:scale-105 transition-transform" aria-label="Download SparkFit on the App Store">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" class="h-14" alt="Download on the App Store">
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FREE TO START -->
+    <section class="py-16 md:py-20 bg-gray-950 text-white relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-72 h-72 bg-brand opacity-20 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2"></div>
+        <div class="relative max-w-6xl mx-auto px-4">
+            <div class="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-10 items-center">
+                <div>
+                    <p class="text-sm font-bold text-purple-200 uppercase tracking-widest mb-3">Free to start</p>
+                    <h2 class="text-3xl md:text-5xl font-black leading-tight mb-5">Try SparkFit before you commit.</h2>
+                    <p class="text-lg text-gray-300 leading-relaxed mb-7">Download the app, see the plan and start with a short workout. Upgrade later only when you are ready to keep the full plan going.</p>
+                    <a href="https://apps.apple.com/gb/app/sparkfit-ai-home-workout/id6754826325?pt=127457722&ct=website_free_to_start&mt=8" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 bg-white text-gray-950 hover:bg-gray-100 px-8 py-4 rounded-full font-black shadow-xl transition-all">
+                        Download SparkFit free
+                        <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+                    </a>
+                </div>
+                <div class="grid sm:grid-cols-3 gap-4">
+                    <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+                        <i data-lucide="smartphone" class="w-8 h-8 text-purple-200 mb-4"></i>
+                        <h3 class="font-black text-xl mb-2">Install</h3>
+                        <p class="text-sm text-gray-300">Get the app on iPhone in seconds.</p>
+                    </div>
+                    <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+                        <i data-lucide="play-circle" class="w-8 h-8 text-purple-200 mb-4"></i>
+                        <h3 class="font-black text-xl mb-2">Start</h3>
+                        <p class="text-sm text-gray-300">Do one 15-minute workout today.</p>
+                    </div>
+                    <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+                        <i data-lucide="repeat-2" class="w-8 h-8 text-purple-200 mb-4"></i>
+                        <h3 class="font-black text-xl mb-2">Repeat</h3>
+                        <p class="text-sm text-gray-300">Build a routine you can stick to.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROOF / REVIEW -->
+    <section id="proof" class="py-20 md:py-24 bg-white">
+        <div class="max-w-5xl mx-auto px-4 text-center">
+            <p class="text-sm font-bold text-brand uppercase tracking-widest mb-3">Real App Store review</p>
+            <h2 class="text-3xl md:text-5xl font-black mb-8">Straightforward, quick and easy to stick to.</h2>
+            <div class="rounded-[2rem] bg-gray-50 border border-gray-100 p-8 md:p-12 shadow-sm text-left">
+                <div class="flex items-center gap-1 text-yellow-500 mb-5" aria-label="5 star review">
+                    <i data-lucide="star" class="w-6 h-6 fill-current"></i>
+                    <i data-lucide="star" class="w-6 h-6 fill-current"></i>
+                    <i data-lucide="star" class="w-6 h-6 fill-current"></i>
+                    <i data-lucide="star" class="w-6 h-6 fill-current"></i>
+                    <i data-lucide="star" class="w-6 h-6 fill-current"></i>
+                </div>
+                <blockquote class="text-2xl md:text-3xl font-black leading-tight text-gray-950 mb-5">
+                    “I’ve been using this for a few weeks now and it’s made a noticeable difference.”
+                </blockquote>
+                <p class="text-lg text-gray-600 leading-relaxed mb-6">
+                    “The workouts are straightforward, quick to follow and easy to stick to. The meal plans are also really flexible and there are recipes that all the family can enjoy.”
+                </p>
+                <p class="text-sm font-bold text-gray-500">— Jimbo67890, App Store review</p>
+            </div>
+
+            <div class="mt-12">
+                <a href="https://apps.apple.com/gb/app/sparkfit-ai-home-workout/id6754826325?pt=127457722&ct=website_review_badge&mt=8" target="_blank" rel="noopener" class="app-store-badge transform hover:scale-105 transition-transform" aria-label="Download SparkFit on the App Store">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" class="h-14" alt="Download on the App Store">
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- WHY IT WORKS -->
+    <section id="why" class="py-20 md:py-24 bg-gray-50">
         <div class="max-w-6xl mx-auto px-4">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-center">
                 <div>
                     <h2 class="text-sm font-bold text-brand uppercase tracking-widest mb-2">Why most plans fail</h2>
                     <h3 class="text-3xl md:text-5xl font-black mb-6 leading-tight">You do not need another perfect plan. You need one you will repeat.</h3>
                     <div class="space-y-4 text-lg text-gray-600 leading-relaxed">
-                        <p>Long sessions, strict meal plans and all-or-nothing routines sound good on day one. Then work gets busy, the kids need something, energy drops and the plan disappears.</p>
-                        <p>SparkFit is built around consistency first. Short workouts remove the time excuse. Simple macros remove the food confusion. Coach guidance keeps the focus on the next useful action.</p>
+                        <p>Long sessions, strict meal plans and all-or-nothing routines sound good on day one. Then work gets busy, family needs something, energy drops and the plan disappears.</p>
+                        <p>SparkFit is built around consistency first. Short workouts remove the time excuse. Simple macros remove the food confusion. Coach-style guidance keeps the focus on the next useful action.</p>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div class="bg-gray-50 rounded-3xl p-7 border border-gray-100">
+                    <div class="bg-white rounded-3xl p-7 border border-gray-100 shadow-sm">
                         <div class="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center mb-5">
                             <i data-lucide="timer" class="w-6 h-6 text-brand"></i>
                         </div>
                         <h4 class="text-xl font-black mb-2">Make it short</h4>
-                        <p class="text-gray-600 text-sm leading-relaxed">Fit the workout around your day instead of trying to rebuild your day around fitness.</p>
+                        <p class="text-gray-600 text-sm leading-relaxed">Fit the workout around your day instead of rebuilding your day around fitness.</p>
                     </div>
-                    <div class="bg-gray-900 text-white rounded-3xl p-7 border border-gray-800">
+                    <div class="bg-gray-900 text-white rounded-3xl p-7 border border-gray-800 shadow-sm">
                         <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mb-5">
                             <i data-lucide="target" class="w-6 h-6 text-purple-200"></i>
                         </div>
                         <h4 class="text-xl font-black mb-2">Make it clear</h4>
                         <p class="text-gray-300 text-sm leading-relaxed">Open the app and know the session, the target and the next action.</p>
                     </div>
-                    <div class="bg-brand text-white rounded-3xl p-7 border border-purple-700">
+                    <div class="bg-brand text-white rounded-3xl p-7 border border-purple-700 shadow-sm">
                         <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mb-5">
                             <i data-lucide="utensils" class="w-6 h-6 text-purple-100"></i>
                         </div>
                         <h4 class="text-xl font-black mb-2">Make food simple</h4>
                         <p class="text-purple-50 text-sm leading-relaxed">Use calorie and macro guidance without turning meals into a maths project.</p>
                     </div>
-                    <div class="bg-gray-50 rounded-3xl p-7 border border-gray-100">
+                    <div class="bg-white rounded-3xl p-7 border border-gray-100 shadow-sm">
                         <div class="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center mb-5">
                             <i data-lucide="heart-handshake" class="w-6 h-6 text-brand"></i>
                         </div>
                         <h4 class="text-xl font-black mb-2">Make it supported</h4>
-                        <p class="text-gray-600 text-sm leading-relaxed">Use guidance that feels practical, human and focused on helping you keep going.</p>
+                        <p class="text-gray-600 text-sm leading-relaxed">Get practical support that helps you keep going on normal busy days.</p>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <section id="method" class="py-20 md:py-24 bg-gray-950 text-white relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-72 h-72 bg-brand opacity-20 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2"></div>
-        <div class="absolute bottom-0 left-0 w-72 h-72 bg-blue-600 opacity-10 blur-3xl rounded-full -translate-x-1/2 translate-y-1/2"></div>
-        <div class="relative max-w-6xl mx-auto px-4">
-            <div class="text-center max-w-3xl mx-auto mb-14">
-                <h2 class="text-sm font-bold text-purple-200 uppercase tracking-widest mb-3">The SparkFit funnel</h2>
-                <h3 class="text-3xl md:text-5xl font-black mb-5 leading-tight">From “I need to start” to “I am the type of person who trains.”</h3>
-                <p class="text-lg text-gray-300 leading-relaxed">The app is designed to move you through a simple loop: decide your goal, do the next short session, track the basics and build proof that you can stick with it.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
-                <div class="bg-white/10 border border-white/10 rounded-3xl p-6 backdrop-blur-md">
-                    <p class="text-brand bg-white rounded-full w-10 h-10 flex items-center justify-center font-black mb-5">1</p>
-                    <h4 class="text-xl font-black mb-2">Choose your goal</h4>
-                    <p class="text-sm text-gray-300 leading-relaxed">Lose body fat, build lean muscle or improve your routine.</p>
-                </div>
-                <div class="bg-white/10 border border-white/10 rounded-3xl p-6 backdrop-blur-md">
-                    <p class="text-brand bg-white rounded-full w-10 h-10 flex items-center justify-center font-black mb-5">2</p>
-                    <h4 class="text-xl font-black mb-2">Get your targets</h4>
-                    <p class="text-sm text-gray-300 leading-relaxed">Use simple nutrition guidance so meals support the goal.</p>
-                </div>
-                <div class="bg-white/10 border border-white/10 rounded-3xl p-6 backdrop-blur-md">
-                    <p class="text-brand bg-white rounded-full w-10 h-10 flex items-center justify-center font-black mb-5">3</p>
-                    <h4 class="text-xl font-black mb-2">Do 15 minutes</h4>
-                    <p class="text-sm text-gray-300 leading-relaxed">Complete a focused session at home with no gym barrier.</p>
-                </div>
-                <div class="bg-white/10 border border-white/10 rounded-3xl p-6 backdrop-blur-md">
-                    <p class="text-brand bg-white rounded-full w-10 h-10 flex items-center justify-center font-black mb-5">4</p>
-                    <h4 class="text-xl font-black mb-2">Keep the streak</h4>
-                    <p class="text-sm text-gray-300 leading-relaxed">Track progress and keep stacking small wins.</p>
-                </div>
+            <div class="mt-12 text-center">
+                <a href="https://apps.apple.com/gb/app/sparkfit-ai-home-workout/id6754826325?pt=127457722&ct=website_why_badge&mt=8" target="_blank" rel="noopener" class="app-store-badge transform hover:scale-105 transition-transform" aria-label="Download SparkFit on the App Store">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" class="h-14" alt="Download on the App Store">
+                </a>
             </div>
         </div>
     </section>
 
-    <section id="features" class="py-20 md:py-24 bg-gray-50">
+    <!-- FEATURES -->
+    <section id="features" class="py-20 md:py-24 bg-white">
         <div class="max-w-7xl mx-auto px-4">
             <div class="text-center mb-14">
                 <h2 class="text-3xl md:text-5xl font-black mb-4">Everything you need to keep moving</h2>
-                <p class="text-lg text-gray-600 max-w-2xl mx-auto">A practical toolkit for busy people who want structure, accountability and progress without overcomplication.</p>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">A practical toolkit for busy people who want structure, simple nutrition and progress without overcomplication.</p>
                 <div class="h-1.5 w-24 bg-brand mx-auto rounded-full mt-6"></div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-                <div class="bg-white p-7 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
+                <div class="bg-gray-50 p-7 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
                     <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand transition-colors">
                         <i data-lucide="dumbbell" class="w-8 h-8 text-brand group-hover:text-white"></i>
                     </div>
@@ -277,7 +451,7 @@
                     <p class="text-gray-600 text-sm leading-relaxed">Short, structured sessions designed to remove the time excuse and help you train consistently.</p>
                 </div>
 
-                <div class="bg-white p-7 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
+                <div class="bg-gray-50 p-7 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
                     <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand transition-colors">
                         <i data-lucide="calculator" class="w-8 h-8 text-brand group-hover:text-white"></i>
                     </div>
@@ -285,91 +459,32 @@
                     <p class="text-gray-600 text-sm leading-relaxed">Calorie and macro guidance that gives direction without making nutrition feel like a second job.</p>
                 </div>
 
-                <div class="bg-white p-7 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
+                <div class="bg-gray-50 p-7 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
                     <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand transition-colors">
                         <i data-lucide="clipboard-check" class="w-8 h-8 text-brand group-hover:text-white"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-3">Clear daily plan</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">Know exactly what to do today, rather than scrolling through endless options and losing momentum.</p>
+                    <p class="text-gray-600 text-sm leading-relaxed">Know exactly what to do today instead of scrolling through endless options and losing momentum.</p>
                 </div>
 
-                <div class="bg-white p-7 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
+                <div class="bg-gray-50 p-7 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
                     <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand transition-colors">
                         <i data-lucide="message-circle-heart" class="w-8 h-8 text-brand group-hover:text-white"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-3">Coach-style support</h3>
                     <p class="text-gray-600 text-sm leading-relaxed">Practical guidance, encouragement and reminders that keep the focus on small wins.</p>
                 </div>
+            </div>
 
-                <div class="bg-white p-7 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
-                    <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand transition-colors">
-                        <i data-lucide="trending-up" class="w-8 h-8 text-brand group-hover:text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3">Progress tracking</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">Track your routine, weight and habits so you can see the proof building over time.</p>
-                </div>
-
-                <div class="bg-white p-7 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
-                    <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand transition-colors">
-                        <i data-lucide="bell-ring" class="w-8 h-8 text-brand group-hover:text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3">Routine nudges</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">Helpful prompts to bring you back to the plan before a missed day becomes a missed week.</p>
-                </div>
-
-                <div class="bg-white p-7 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
-                    <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand transition-colors">
-                        <i data-lucide="home" class="w-8 h-8 text-brand group-hover:text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3">Home-friendly</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">Train without a gym commute, complicated equipment or an hour blocked out in the diary.</p>
-                </div>
-
-                <div class="bg-white p-7 rounded-3xl shadow-sm hover:shadow-xl transition-all border border-gray-100 group">
-                    <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand transition-colors">
-                        <i data-lucide="sparkles" class="w-8 h-8 text-brand group-hover:text-white"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3">Built for consistency</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">The goal is not perfection. It is building a routine you can repeat, even on normal busy days.</p>
-                </div>
+            <div class="mt-12 text-center">
+                <a href="https://apps.apple.com/gb/app/sparkfit-ai-home-workout/id6754826325?pt=127457722&ct=website_features_badge&mt=8" target="_blank" rel="noopener" class="app-store-badge transform hover:scale-105 transition-transform" aria-label="Download SparkFit on the App Store">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" class="h-14" alt="Download on the App Store">
+                </a>
             </div>
         </div>
     </section>
 
-    <section class="py-20 md:py-24 bg-white">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="rounded-[2rem] md:rounded-[2.5rem] bg-gray-950 text-white overflow-hidden grid grid-cols-1 lg:grid-cols-[0.95fr_1.05fr]">
-                <div class="relative min-h-[420px] lg:min-h-full">
-                    <img src="colin-sparkfit-trainer.png" alt="Personal trainer support for SparkFit" class="absolute inset-0 w-full h-full object-cover object-top opacity-90">
-                    <div class="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/15 to-transparent lg:bg-gradient-to-r"></div>
-                </div>
-                <div class="p-8 md:p-12 lg:p-16 flex flex-col justify-center">
-                    <p class="text-sm font-bold text-purple-200 uppercase tracking-widest mb-3">Human support, app convenience</p>
-                    <h2 class="text-3xl md:text-5xl font-black leading-tight mb-6">The plan is about you. The guidance is there when you need it.</h2>
-                    <p class="text-lg text-gray-300 leading-relaxed mb-8">SparkFit should feel like having someone in your corner, not someone shouting over your shoulder. You get structure, encouragement and practical direction, while the focus stays on your goal, your routine and your progress.</p>
-                    <div class="grid sm:grid-cols-2 gap-4">
-                        <div class="bg-white/10 rounded-2xl p-5 border border-white/10">
-                            <h4 class="font-black mb-1">For beginners</h4>
-                            <p class="text-sm text-gray-300">Start with clear sessions and small wins.</p>
-                        </div>
-                        <div class="bg-white/10 rounded-2xl p-5 border border-white/10">
-                            <h4 class="font-black mb-1">For returners</h4>
-                            <p class="text-sm text-gray-300">Rebuild momentum without overthinking it.</p>
-                        </div>
-                        <div class="bg-white/10 rounded-2xl p-5 border border-white/10">
-                            <h4 class="font-black mb-1">For busy people</h4>
-                            <p class="text-sm text-gray-300">Fit training into the gaps you actually have.</p>
-                        </div>
-                        <div class="bg-white/10 rounded-2xl p-5 border border-white/10">
-                            <h4 class="font-black mb-1">For consistency</h4>
-                            <p class="text-sm text-gray-300">Keep going with simple daily direction.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
+    <!-- DOWNLOAD / GUIDE -->
     <section id="download" class="py-20 md:py-24 bg-gray-900 text-white relative overflow-hidden">
         <div class="absolute top-0 right-0 w-64 h-64 bg-brand opacity-20 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2"></div>
         <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-600 opacity-20 blur-3xl rounded-full -translate-x-1/2 translate-y-1/2"></div>
@@ -378,30 +493,21 @@
             <span class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-white/10 border border-white/10 text-purple-100 text-xs font-extrabold tracking-widest mb-5 uppercase">
                 Start today
             </span>
-            <h2 class="text-4xl md:text-6xl font-black mb-6">Open the app. Do the next 15 minutes.</h2>
+            <h2 class="text-4xl md:text-6xl font-black mb-6">Start your first 15-minute workout today.</h2>
             <p class="text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-                Start with a simple session, set your targets and build a routine that feels realistic from day one.
+                Download SparkFit free, follow the next session and build a routine that feels realistic from day one.
             </p>
 
-            <div class="flex flex-col sm:flex-row justify-center items-center gap-6 mb-14">
-                <a href="https://apps.apple.com/gb/app/spark-fit-15-minute-workouts/id6754826325?pt=127457722&ct=website_landing_page&mt=8" target="_blank" class="transform hover:scale-110 transition-transform">
+            <div class="flex flex-col justify-center items-center gap-6 mb-14">
+                <a href="https://apps.apple.com/gb/app/sparkfit-ai-home-workout/id6754826325?pt=127457722&ct=website_download_badge&mt=8" target="_blank" rel="noopener" class="transform hover:scale-110 transition-transform" aria-label="Download SparkFit on the App Store">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" class="h-14 md:h-16" alt="Download SparkFit on the App Store">
                 </a>
-
-                <div class="relative group cursor-default">
-                    <div class="h-14 md:h-16 px-6 rounded-xl bg-gray-800 border border-gray-700 flex flex-col justify-center items-start opacity-70 grayscale">
-                        <span class="text-[10px] uppercase tracking-widest font-bold text-gray-400">Android app</span>
-                        <span class="text-lg font-black text-white leading-none">COMING SOON</span>
-                    </div>
-                    <div class="absolute -top-3 -right-3 bg-brand text-white text-[10px] px-2 py-1 rounded-full font-bold shadow-lg animate-pulse">
-                        WIP
-                    </div>
-                </div>
+                <p class="text-sm text-gray-500">Free to start. In-app purchases available.</p>
             </div>
 
             <div id="contact" class="border-t border-gray-800 pt-14 mt-10 text-center">
-                <h3 class="text-3xl md:text-4xl font-black mb-4">Want the simple starter tips?</h3>
-                <p class="text-gray-400 mb-8 max-w-lg mx-auto">Join the free list for short workout ideas, macro tips and practical consistency nudges.</p>
+                <h3 class="text-3xl md:text-4xl font-black mb-4">Get the free 15-minute fitness guide</h3>
+                <p class="text-gray-400 mb-8 max-w-lg mx-auto">A simple starter guide with short workout ideas, macro tips and practical consistency nudges.</p>
 
                 <div id="success-message" class="bg-green-500/10 border border-green-500/50 p-8 rounded-2xl max-w-xl mx-auto">
                     <i data-lucide="sparkles" class="w-12 h-12 text-green-500 mx-auto mb-4"></i>
@@ -420,7 +526,7 @@
                     </div>
 
                     <button type="submit" id="submit-btn" class="w-full bg-brand hover:bg-purple-600 py-4 rounded-xl font-bold text-lg shadow-lg transition-all flex items-center justify-center space-x-2">
-                        <span>Send me free fitness tips</span>
+                        <span>Send me the free guide</span>
                     </button>
                     <p class="text-[10px] text-gray-500 text-center leading-relaxed">By signing up, you agree to receive fitness tips by email. Unsubscribe at any time.</p>
                 </form>
@@ -433,11 +539,20 @@
             <div class="flex flex-wrap justify-center gap-6 md:gap-8 mb-8">
                 <a href="privacy.html" class="hover:text-white transition-colors">Privacy Policy</a>
                 <a href="terms.html" class="hover:text-white transition-colors">Terms of Use</a>
-                <a href="#why" class="hover:text-white transition-colors">About SparkFit</a>
+                <a href="#how" class="hover:text-white transition-colors">How it works</a>
+                <a href="#contact" class="hover:text-white transition-colors">Free guide</a>
             </div>
             <p>© 2026 SparkFit. Built for real-life fitness. All rights reserved.</p>
         </div>
     </footer>
+
+    <!-- Mobile sticky download banner -->
+    <div class="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white border-t border-gray-200 sticky-mobile-cta px-4 py-3">
+        <a href="https://apps.apple.com/gb/app/sparkfit-ai-home-workout/id6754826325?pt=127457722&ct=website_mobile_sticky&mt=8" target="_blank" rel="noopener" class="w-full bg-brand text-white rounded-2xl px-4 py-3 font-black flex items-center justify-center gap-2 text-sm">
+            Start your first 15-minute workout today
+            <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+        </a>
+    </div>
 
     <script>
     lucide.createIcons();
@@ -464,7 +579,7 @@
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <span>Joining...</span>
+            <span>Sending...</span>
         `;
 
         const formData = new FormData(contactForm);
@@ -473,7 +588,7 @@
             email: formData.get('email'),
             name: formData.get('name'),
             subscribed: true,
-            source: "website_user_first_download_funnel"
+            source: "website_free_15_minute_guide_funnel"
         };
 
         try {
@@ -492,7 +607,7 @@
             console.error("Error:", error);
             alert("Something went wrong. Please check your connection and try again.");
             submitBtn.disabled = false;
-            submitBtn.innerHTML = "Send me free fitness tips";
+            submitBtn.innerHTML = "Send me the free guide";
         }
     });
     </script>
