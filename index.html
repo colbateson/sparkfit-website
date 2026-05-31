@@ -93,6 +93,282 @@
         @media (max-width: 767px) {
             body { padding-bottom: 86px; }
         }
+
+        /* --- Mobile conversion fixes --- */
+        .mobile-hero-preview { display: none; }
+
+        @media (max-width: 767px) {
+            html, body {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+
+            body {
+                padding-bottom: 78px;
+                background: #fff;
+            }
+
+            header nav {
+                height: 58px !important;
+            }
+
+            header img {
+                width: 34px !important;
+                height: 34px !important;
+            }
+
+            header span {
+                font-size: 1.1rem !important;
+            }
+
+            header a.bg-brand {
+                padding: 0.55rem 0.8rem !important;
+                font-size: 0.8rem !important;
+                white-space: nowrap;
+            }
+
+            section {
+                overflow: hidden;
+            }
+
+            .soft-grid {
+                background-size: 24px 24px;
+            }
+
+            .hero-card-shadow,
+            .phone-shell {
+                box-shadow: none;
+            }
+
+            /* Hero needs to sell in 5 seconds on mobile */
+            section.relative.overflow-hidden.bg-white > div.relative.z-10 {
+                padding-top: 1.75rem !important;
+                padding-bottom: 2.25rem !important;
+            }
+
+            .hero-mobile-tight {
+                max-width: 420px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            h1 {
+                font-size: clamp(2.25rem, 12vw, 3.25rem) !important;
+                line-height: 0.98 !important;
+                letter-spacing: -0.055em !important;
+                margin-bottom: 1rem !important;
+            }
+
+            .hero-lead-mobile {
+                font-size: 1rem !important;
+                line-height: 1.55 !important;
+                margin-bottom: 1.25rem !important;
+            }
+
+            .hero-cta-stack a {
+                width: 100%;
+                padding: 0.95rem 1.1rem !important;
+                font-size: 0.95rem !important;
+                border-radius: 1rem !important;
+            }
+
+            .hero-cta-stack {
+                margin-bottom: 0.9rem !important;
+            }
+
+            /* Hide the complex two-phone mockup on mobile. It looks cramped. */
+            #screens {
+                display: none !important;
+            }
+
+            .mobile-hero-preview {
+                display: block;
+                margin: 1.15rem auto 1.15rem;
+                max-width: 360px;
+                border-radius: 1.75rem;
+                padding: 1rem;
+                background:
+                    radial-gradient(circle at top left, rgba(123,63,173,.45), transparent 35%),
+                    linear-gradient(135deg, #111827 0%, #2b0a4d 55%, #7B3FAD 100%);
+                color: #fff;
+                box-shadow: 0 22px 55px rgba(17, 24, 39, 0.24);
+                border: 1px solid rgba(255,255,255,0.12);
+            }
+
+            .mobile-hero-preview-top {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: .75rem;
+                margin-bottom: .9rem;
+            }
+
+            .mobile-hero-preview-title {
+                font-size: .78rem;
+                font-weight: 900;
+                letter-spacing: .12em;
+                text-transform: uppercase;
+                color: rgba(255,255,255,.72);
+            }
+
+            .mobile-hero-preview-time {
+                background: rgba(255,255,255,.12);
+                border: 1px solid rgba(255,255,255,.14);
+                border-radius: 999px;
+                padding: .35rem .65rem;
+                font-size: .75rem;
+                font-weight: 900;
+                white-space: nowrap;
+            }
+
+            .mobile-hero-card {
+                background: #fff;
+                color: #111827;
+                border-radius: 1.25rem;
+                padding: 1rem;
+                box-shadow: 0 18px 44px rgba(0,0,0,.22);
+            }
+
+            .mobile-hero-card h2 {
+                font-size: 1.05rem;
+                line-height: 1.1;
+                font-weight: 900;
+                margin-bottom: .35rem;
+            }
+
+            .mobile-hero-card p {
+                font-size: .8rem;
+                color: #6b7280;
+                line-height: 1.35;
+            }
+
+            .mobile-progress-bar {
+                height: .55rem;
+                border-radius: 999px;
+                background: #ede9fe;
+                margin: .85rem 0;
+                overflow: hidden;
+            }
+
+            .mobile-progress-bar > div {
+                width: 68%;
+                height: 100%;
+                background: var(--brand-purple);
+                border-radius: 999px;
+            }
+
+            .mobile-hero-mini-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: .55rem;
+                margin-top: .75rem;
+            }
+
+            .mobile-hero-mini-grid div {
+                background: #f8fafc;
+                border-radius: .85rem;
+                padding: .65rem .35rem;
+                text-align: center;
+            }
+
+            .mobile-hero-mini-grid strong {
+                display: block;
+                font-size: .95rem;
+                font-weight: 900;
+            }
+
+            .mobile-hero-mini-grid span {
+                display: block;
+                color: #6b7280;
+                font-size: .62rem;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: .04em;
+            }
+
+            /* Stat cards were too dense on mobile */
+            .hero-stats-mobile {
+                grid-template-columns: 1fr !important;
+                gap: .6rem !important;
+                margin-top: .75rem;
+            }
+
+            .hero-stats-mobile > div {
+                padding: .85rem 1rem !important;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .hero-stats-mobile p:first-child {
+                font-size: 1.25rem !important;
+            }
+
+            .hero-stats-mobile p:last-child {
+                text-align: right;
+                max-width: 150px;
+            }
+
+            .app-store-badge img {
+                height: 46px !important;
+            }
+
+            /* Reduce vertical bloat from repeated sections */
+            section.py-20,
+            section.md\:py-24 {
+                padding-top: 3.5rem !important;
+                padding-bottom: 3.5rem !important;
+            }
+
+            .text-3xl.md\:text-5xl,
+            .text-4xl.md\:text-6xl {
+                font-size: 2rem !important;
+                line-height: 1.05 !important;
+            }
+
+            .rounded-\[2rem\] {
+                border-radius: 1.35rem !important;
+            }
+
+            .grid.grid-cols-2.md\:grid-cols-4 {
+                grid-template-columns: 1fr 1fr !important;
+            }
+
+            #proof blockquote {
+                font-size: 1.35rem !important;
+            }
+
+            #contact form {
+                padding-left: .25rem;
+                padding-right: .25rem;
+            }
+
+            #contact input {
+                padding: .9rem 1rem !important;
+                font-size: .95rem !important;
+            }
+
+            footer {
+                padding-bottom: 6rem !important;
+            }
+        }
+
+        @media (max-width: 390px) {
+            h1 {
+                font-size: 2.15rem !important;
+            }
+
+            .mobile-hero-preview {
+                max-width: 330px;
+                padding: .85rem;
+            }
+
+            .hero-cta-stack a {
+                font-size: .88rem !important;
+            }
+        }
+
     </style>
 </head>
 <body class="text-gray-900 relative">
@@ -127,7 +403,7 @@
 
         <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-20 lg:py-24">
             <div class="grid grid-cols-1 lg:grid-cols-[1.02fr_0.98fr] gap-10 lg:gap-14 items-center">
-                <div class="text-center lg:text-left">
+                <div class="text-center lg:text-left hero-mobile-tight">
                     <span class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-purple-100 text-brand text-xs md:text-sm font-extrabold tracking-widest mb-5 uppercase">
                         <i data-lucide="zap" class="w-4 h-4"></i>
                         Fitness that fits your actual life
@@ -137,11 +413,11 @@
                         Get fitter in <span class="text-brand">15 minutes</span> a day.
                     </h1>
 
-                    <p class="text-lg md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto lg:mx-0 leading-relaxed">
+                    <p class="text-lg md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto lg:mx-0 leading-relaxed hero-lead-mobile">
                         Short home workouts, simple macro targets and a clear plan to follow, built for busy people who want real results without overcomplicating fitness.
                     </p>
 
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-6">
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-6 hero-cta-stack">
                         <a href="https://apps.apple.com/gb/app/sparkfit-ai-home-workout/id6754826325?pt=127457722&ct=website_hero_primary&mt=8" target="_blank" rel="noopener" class="bg-brand hover:bg-purple-600 text-white px-8 md:px-10 py-4 rounded-full font-bold text-lg shadow-xl transition-all transform hover:scale-105 inline-flex justify-center items-center gap-2">
                             Download SparkFit free
                             <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
@@ -158,7 +434,27 @@
                         </a>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-3 max-w-xl mx-auto lg:mx-0 text-left">
+                    <div class="mobile-hero-preview" aria-label="SparkFit mobile app preview">
+                        <div class="mobile-hero-preview-top">
+                            <div>
+                                <div class="mobile-hero-preview-title">Today’s SparkFit plan</div>
+                                <div class="font-black text-lg">15-Min Full Body</div>
+                            </div>
+                            <div class="mobile-hero-preview-time">15 min</div>
+                        </div>
+                        <div class="mobile-hero-card">
+                            <h2>Know exactly what to do today</h2>
+                            <p>Your workout, macro target and next step in one simple plan.</p>
+                            <div class="mobile-progress-bar"><div></div></div>
+                            <div class="mobile-hero-mini-grid">
+                                <div><strong>1,950</strong><span>kcal</span></div>
+                                <div><strong>150g</strong><span>protein</span></div>
+                                <div><strong>7</strong><span>streak</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3 max-w-xl mx-auto lg:mx-0 text-left hero-stats-mobile">
                         <div class="rounded-2xl bg-white border border-gray-100 p-4 shadow-sm">
                             <p class="text-2xl font-black">15</p>
                             <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Minute sessions</p>
