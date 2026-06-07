@@ -94,6 +94,105 @@
             body { padding-bottom: 86px; }
         }
 
+
+
+        .screenshot-card {
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid rgba(17,24,39,0.08);
+            box-shadow: 0 22px 70px rgba(17,24,39,0.12);
+        }
+
+        .screenshot-image {
+            border-radius: 1.55rem;
+            box-shadow: 0 18px 46px rgba(17,24,39,0.22);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .proof-pill {
+            background: rgba(123,63,173,0.08);
+            border: 1px solid rgba(123,63,173,0.14);
+        }
+
+
+        .social-proof-carousel {
+            --card-width: 320px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .social-proof-carousel::before,
+        .social-proof-carousel::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            width: 72px;
+            height: 100%;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .social-proof-carousel::before {
+            left: 0;
+            background: linear-gradient(90deg, #f9fafb 0%, rgba(249,250,251,0) 100%);
+        }
+
+        .social-proof-carousel::after {
+            right: 0;
+            background: linear-gradient(270deg, #f9fafb 0%, rgba(249,250,251,0) 100%);
+        }
+
+        .social-proof-track {
+            display: flex;
+            gap: 1rem;
+            width: max-content;
+            animation: proofScroll 70s linear infinite;
+            will-change: transform;
+        }
+
+        .social-proof-carousel:hover .social-proof-track {
+            animation-play-state: paused;
+        }
+
+        @keyframes proofScroll {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+
+        .social-proof-card {
+            width: var(--card-width);
+            flex: 0 0 var(--card-width);
+            min-height: 250px;
+            background: #fff;
+            border: 1px solid rgba(17,24,39,0.08);
+            box-shadow: 0 18px 45px rgba(17,24,39,0.08);
+            border-radius: 1.5rem;
+            padding: 1.35rem;
+        }
+
+        .proof-stars {
+            display: flex;
+            align-items: center;
+            gap: .12rem;
+            color: #eab308;
+            margin-bottom: .85rem;
+        }
+
+        .proof-stars svg { width: 1rem; height: 1rem; fill: currentColor; }
+
+        .social-proof-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: .32rem .65rem;
+            border-radius: 999px;
+            background: rgba(123,63,173,0.08);
+            color: var(--brand-purple);
+            font-size: .68rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-bottom: .85rem;
+        }
+
         /* --- Mobile conversion fixes --- */
         .mobile-hero-preview { display: none; }
 
@@ -130,6 +229,38 @@
 
             section {
                 overflow: hidden;
+            }
+
+
+            .social-proof-carousel {
+                overflow-x: auto;
+                overflow-y: hidden;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                padding: 0 1rem 1.25rem;
+                margin-left: -1rem;
+                margin-right: -1rem;
+            }
+
+            .social-proof-carousel::before,
+            .social-proof-carousel::after {
+                display: none;
+            }
+
+            .social-proof-track {
+                animation: none !important;
+                width: max-content;
+                gap: .85rem;
+            }
+
+            .social-proof-card {
+                width: 82vw;
+                max-width: 330px;
+                flex-basis: 82vw;
+                min-height: 230px;
+                scroll-snap-align: center;
+                padding: 1.1rem;
+                border-radius: 1.25rem;
             }
 
             .soft-grid {
@@ -383,7 +514,7 @@
 
                 <div class="hidden md:flex space-x-8 font-semibold text-sm text-gray-600">
                     <a href="#how" class="hover:text-brand transition duration-300">How it works</a>
-                    <a href="#screens" class="hover:text-brand transition duration-300">App preview</a>
+                    <a href="#app-screenshots" class="hover:text-brand transition duration-300">App screenshots</a>
                     <a href="#proof" class="hover:text-brand transition duration-300">Reviews</a>
                     <a href="#contact" class="hover:text-brand transition duration-300">Free guide</a>
                 </div>
@@ -543,7 +674,7 @@
                         <div class="mt-10 text-white text-center">
                             <p class="text-xs font-extrabold uppercase tracking-[0.22em] text-purple-200 mb-2">App preview</p>
                             <h2 class="text-2xl md:text-4xl font-black leading-tight mb-2">See the workout, the food target and the next step.</h2>
-                            <p class="text-sm md:text-base text-gray-300 leading-relaxed max-w-xl mx-auto">Replace these mock screens with real App Store screenshots when you export them.</p>
+                            <p class="text-sm md:text-base text-gray-300 leading-relaxed max-w-xl mx-auto">Real SparkFit screens show the daily plan, workouts, macros and consistency tracking in action.</p>
                         </div>
                     </div>
                 </div>
@@ -575,103 +706,191 @@
         </div>
     </div>
 
-    <!-- HOW IT WORKS -->
-    <section id="how" class="py-20 md:py-24 bg-white">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="text-center max-w-3xl mx-auto mb-14">
-                <h2 class="text-sm font-bold text-brand uppercase tracking-widest mb-3">How it works</h2>
-                <h3 class="text-3xl md:text-5xl font-black mb-5 leading-tight">Three steps. No overthinking.</h3>
-                <p class="text-lg text-gray-600 leading-relaxed">SparkFit is designed to get you from “I need to start” to “I know exactly what to do today”.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-                <div class="bg-gray-50 rounded-3xl p-8 border border-gray-100 shadow-sm">
-                    <p class="text-white bg-brand rounded-full w-12 h-12 flex items-center justify-center font-black mb-6">1</p>
-                    <h4 class="text-2xl font-black mb-3">Choose your goal</h4>
-                    <p class="text-gray-600 leading-relaxed">Set the direction: lose fat, build consistency or feel fitter and stronger.</p>
-                </div>
-                <div class="bg-gray-950 text-white rounded-3xl p-8 border border-gray-900 shadow-xl">
-                    <p class="text-brand bg-white rounded-full w-12 h-12 flex items-center justify-center font-black mb-6">2</p>
-                    <h4 class="text-2xl font-black mb-3">Do 15 minutes</h4>
-                    <p class="text-gray-300 leading-relaxed">Open the app, follow the short session and get a win without needing the gym.</p>
-                </div>
-                <div class="bg-purple-50 rounded-3xl p-8 border border-purple-100 shadow-sm">
-                    <p class="text-white bg-brand rounded-full w-12 h-12 flex items-center justify-center font-black mb-6">3</p>
-                    <h4 class="text-2xl font-black mb-3">Follow simple macros</h4>
-                    <p class="text-gray-600 leading-relaxed">Use clear calorie and macro targets so food supports the work you are putting in.</p>
-                </div>
-            </div>
-
-            <div class="mt-12 text-center">
-                <p class="text-sm font-bold text-gray-500 mb-4">Start with one short session today.</p>
-                <a href="https://apps.apple.com/gb/app/sparkfit-ai-home-workout/id6754826325?pt=127457722&ct=website_how_badge&mt=8" target="_blank" rel="noopener" class="app-store-badge transform hover:scale-105 transition-transform" aria-label="Download SparkFit on the App Store">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" class="h-14" alt="Download on the App Store">
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- FREE TO START -->
-    <section class="py-16 md:py-20 bg-gray-950 text-white relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-72 h-72 bg-brand opacity-20 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2"></div>
-        <div class="relative max-w-6xl mx-auto px-4">
-            <div class="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-10 items-center">
+    <!-- REAL APP STORE SCREENSHOTS -->
+    <section id="app-screenshots" class="py-20 md:py-24 bg-white overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-14 items-center mb-14">
                 <div>
-                    <p class="text-sm font-bold text-purple-200 uppercase tracking-widest mb-3">Free to start</p>
-                    <h2 class="text-3xl md:text-5xl font-black leading-tight mb-5">Try SparkFit before you commit.</h2>
-                    <p class="text-lg text-gray-300 leading-relaxed mb-7">Download the app, see the plan and start with a short workout. Upgrade later only when you are ready to keep the full plan going.</p>
-                    <a href="https://apps.apple.com/gb/app/sparkfit-ai-home-workout/id6754826325?pt=127457722&ct=website_free_to_start&mt=8" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 bg-white text-gray-950 hover:bg-gray-100 px-8 py-4 rounded-full font-black shadow-xl transition-all">
+                    <p class="text-sm font-bold text-brand uppercase tracking-widest mb-3">Inside SparkFit</p>
+                    <h2 class="text-3xl md:text-5xl font-black mb-5 leading-tight">Show people the app before asking them to download.</h2>
+                    <p class="text-lg text-gray-600 leading-relaxed mb-7">These are the real App Store screens: fast home workouts, a clear daily plan, simple macros, healthy recipes, coach-style support and streak tracking.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
+                        <div class="proof-pill rounded-2xl p-4">
+                            <p class="font-black text-gray-950">15-minute workouts</p>
+                            <p class="text-sm text-gray-600">Clear, short sessions for busy days.</p>
+                        </div>
+                        <div class="proof-pill rounded-2xl p-4">
+                            <p class="font-black text-gray-950">Nutrition included</p>
+                            <p class="text-sm text-gray-600">Macros, recipes and shopping-list support.</p>
+                        </div>
+                        <div class="proof-pill rounded-2xl p-4">
+                            <p class="font-black text-gray-950">Coach-style guidance</p>
+                            <p class="text-sm text-gray-600">Support when motivation dips.</p>
+                        </div>
+                        <div class="proof-pill rounded-2xl p-4">
+                            <p class="font-black text-gray-950">Consistency tracking</p>
+                            <p class="text-sm text-gray-600">Streaks and progress that keep people coming back.</p>
+                        </div>
+                    </div>
+                    <a href="https://apps.apple.com/gb/app/sparkfit-ai-home-workout/id6754826325?pt=127457722&ct=website_real_screens&mt=8" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 bg-brand hover:bg-purple-600 text-white px-8 py-4 rounded-full font-black shadow-xl transition-all">
                         Download SparkFit free
                         <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
                     </a>
                 </div>
-                <div class="grid sm:grid-cols-3 gap-4">
-                    <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
-                        <i data-lucide="smartphone" class="w-8 h-8 text-purple-200 mb-4"></i>
-                        <h3 class="font-black text-xl mb-2">Install</h3>
-                        <p class="text-sm text-gray-300">Get the app on iPhone in seconds.</p>
-                    </div>
-                    <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
-                        <i data-lucide="play-circle" class="w-8 h-8 text-purple-200 mb-4"></i>
-                        <h3 class="font-black text-xl mb-2">Start</h3>
-                        <p class="text-sm text-gray-300">Do one 15-minute workout today.</p>
-                    </div>
-                    <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
-                        <i data-lucide="repeat-2" class="w-8 h-8 text-purple-200 mb-4"></i>
-                        <h3 class="font-black text-xl mb-2">Repeat</h3>
-                        <p class="text-sm text-gray-300">Build a routine you can stick to.</p>
+
+                <div class="screenshot-card rounded-[2rem] p-4 md:p-6 bg-gray-50">
+                    <div class="grid grid-cols-2 gap-4">
+                        <img src="screenshots/sparkfit-01-workout.png" alt="SparkFit workout timer screen showing get fitter in 15 minutes" class="screenshot-image w-full">
+                        <img src="screenshots/sparkfit-02-daily-plan.png" alt="SparkFit daily plan screen showing calories, macros, meals and workout" class="screenshot-image w-full translate-y-8">
                     </div>
                 </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
+                <img src="screenshots/sparkfit-03-macros.png" alt="SparkFit simple macros and nutrition plan screenshot" class="screenshot-image w-full">
+                <img src="screenshots/sparkfit-04-streak.png" alt="SparkFit streak tracking screenshot" class="screenshot-image w-full md:translate-y-8">
+                <img src="screenshots/sparkfit-05-coach.png" alt="SparkFit coach-style support chat screenshot" class="screenshot-image w-full">
+                <img src="screenshots/sparkfit-06-recipes.png" alt="SparkFit healthy recipes screenshot" class="screenshot-image w-full md:translate-y-8">
+                <img src="screenshots/sparkfit-07-nutrition-goal.png" alt="SparkFit smart nutrition and recipe browsing screenshot" class="screenshot-image w-full md:col-start-2">
+                <img src="screenshots/sparkfit-08-results.png" alt="SparkFit real results from home screenshot" class="screenshot-image w-full md:col-start-3 md:translate-y-8">
             </div>
         </div>
     </section>
 
-    <!-- PROOF / REVIEW -->
-    <section id="proof" class="py-20 md:py-24 bg-white">
-        <div class="max-w-5xl mx-auto px-4 text-center">
-            <p class="text-sm font-bold text-brand uppercase tracking-widest mb-3">Real App Store review</p>
-            <h2 class="text-3xl md:text-5xl font-black mb-8">Straightforward, quick and easy to stick to.</h2>
-            <div class="rounded-[2rem] bg-gray-50 border border-gray-100 p-8 md:p-12 shadow-sm text-left">
-                <div class="flex items-center gap-1 text-yellow-500 mb-5" aria-label="5 star review">
-                    <i data-lucide="star" class="w-6 h-6 fill-current"></i>
-                    <i data-lucide="star" class="w-6 h-6 fill-current"></i>
-                    <i data-lucide="star" class="w-6 h-6 fill-current"></i>
-                    <i data-lucide="star" class="w-6 h-6 fill-current"></i>
-                    <i data-lucide="star" class="w-6 h-6 fill-current"></i>
-                </div>
-                <blockquote class="text-2xl md:text-3xl font-black leading-tight text-gray-950 mb-5">
-                    “I’ve been using this for a few weeks now and it’s made a noticeable difference.”
-                </blockquote>
-                <p class="text-lg text-gray-600 leading-relaxed mb-6">
-                    “The workouts are straightforward, quick to follow and easy to stick to. The meal plans are also really flexible and there are recipes that all the family can enjoy.”
-                </p>
-                <p class="text-sm font-bold text-gray-500">— Jimbo67890, App Store review</p>
+    <!-- APP STORE / BENEFIT CAROUSEL -->
+    <section class="py-16 md:py-20 bg-gray-50 border-y border-gray-100 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center max-w-3xl mx-auto mb-10">
+                <p class="text-sm font-bold text-brand uppercase tracking-widest mb-3">Why people stick with SparkFit</p>
+                <h2 class="text-3xl md:text-5xl font-black mb-4 leading-tight">Short workouts. Simple food. One clear plan.</h2>
+                <p class="text-lg text-gray-600">Swipe through the reasons SparkFit feels easy to start and realistic to keep using.</p>
             </div>
 
-            <div class="mt-12">
-                <a href="https://apps.apple.com/gb/app/sparkfit-ai-home-workout/id6754826325?pt=127457722&ct=website_review_badge&mt=8" target="_blank" rel="noopener" class="app-store-badge transform hover:scale-105 transition-transform" aria-label="Download SparkFit on the App Store">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" class="h-14" alt="Download on the App Store">
-                </a>
+            <div class="max-w-4xl mx-auto mb-10 rounded-[2rem] bg-white border border-gray-100 p-6 md:p-8 shadow-sm text-center">
+                <div class="proof-stars justify-center mb-4" aria-label="5 star App Store review"><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i></div>
+                <blockquote class="text-2xl md:text-3xl font-black leading-tight text-gray-950 mb-3">“Straightforward, quick and easy to stick to.”</blockquote>
+                <p class="text-sm font-bold text-gray-500">— Jimbo67890, App Store</p>
+            </div>
+        </div>
+
+        <div class="social-proof-carousel" aria-label="SparkFit feature benefits carousel">
+            <div class="social-proof-track">
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">15-minute workouts</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">Train when life is busy, not when your calendar is empty.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">Short sessions make it easier to start today instead of waiting for the perfect week.</p>
+                </article>
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">At home</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">No commute, no waiting for equipment, no complicated setup.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">Open the app, choose the session and get moving wherever you are.</p>
+                </article>
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">Clear daily plan</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">Know exactly what to do today without scrolling endlessly.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">Your workout, calories, macros and meals are pulled into one simple view.</p>
+                </article>
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">Simple nutrition</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">Turn vague food advice into clear calories and macros.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">Stay focused on the numbers that matter without making food feel like homework.</p>
+                </article>
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">Meal plans</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">Healthy recipes you would actually eat.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">Use meal ideas, swaps and a weekly shopping list to make the food side easier.</p>
+                </article>
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">Streaks</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">Build a tiny win you want to protect.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">The streak system helps make consistency visible, simple and satisfying.</p>
+                </article>
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">Coach-style support</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">Get guidance when your schedule gets messy.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">Ask for workout ideas, nutrition tips or help setting a realistic weekly goal.</p>
+                </article>
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">Low friction</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">Open the app, press start, finish the workout.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">SparkFit is designed around momentum, not overthinking.</p>
+                </article>
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">Beginner friendly</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">Clear instructions make starting again less intimidating.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">You do not need to be fit before you start. The plan gives you the next step.</p>
+                </article>
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">Realistic routine</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">No perfect schedule required.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">SparkFit helps you repeat something realistic on normal busy days.</p>
+                </article>
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">Free to start</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">Try the app before you commit.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">Download free, see the plan and start your first short workout.</p>
+                </article>
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">Progress tracking</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">See your effort adding up.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">Workouts, hours trained, badges and calendar progress keep momentum visible.</p>
+                </article>
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">Family-friendly food</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">Meals that can fit around real homes.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">Flexible recipes help when you are cooking for more than just yourself.</p>
+                </article>
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">Back into fitness</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">A simple way back after time away.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">Short sessions and clear targets reduce the mental effort of restarting.</p>
+                </article>
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">Daily reasons</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">Workout, food, streak and progress all work together.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">Multiple small nudges give you more reasons to come back.</p>
+                </article>
+
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">15-minute workouts</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">Train when life is busy, not when your calendar is empty.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">Short sessions make it easier to start today instead of waiting for the perfect week.</p>
+                </article>
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">At home</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">No commute, no waiting for equipment, no complicated setup.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">Open the app, choose the session and get moving wherever you are.</p>
+                </article>
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">Clear daily plan</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">Know exactly what to do today without scrolling endlessly.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">Your workout, calories, macros and meals are pulled into one simple view.</p>
+                </article>
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">Simple nutrition</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">Turn vague food advice into clear calories and macros.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">Stay focused on the numbers that matter without making food feel like homework.</p>
+                </article>
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">Meal plans</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">Healthy recipes you would actually eat.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">Use meal ideas, swaps and a weekly shopping list to make the food side easier.</p>
+                </article>
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">Streaks</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">Build a tiny win you want to protect.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">The streak system helps make consistency visible, simple and satisfying.</p>
+                </article>
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">Coach-style support</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">Get guidance when your schedule gets messy.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">Ask for workout ideas, nutrition tips or help setting a realistic weekly goal.</p>
+                </article>
+                <article class="social-proof-card">
+                    <span class="social-proof-tag">Low friction</span>
+                    <p class="text-lg font-black leading-tight text-gray-950 mb-4">Open the app, press start, finish the workout.</p>
+                    <p class="text-sm text-gray-500 leading-relaxed">SparkFit is designed around momentum, not overthinking.</p>
+                </article>
             </div>
         </div>
     </section>
