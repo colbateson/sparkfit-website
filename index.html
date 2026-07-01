@@ -521,6 +521,141 @@
             }
         }
 
+
+
+        /* --- Clean responsive screenshot showcase --- */
+        .screens-layout {
+            display: grid;
+            grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .phone-flow-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .phone-flow-card,
+        .poster-card {
+            border-radius: 1.65rem;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid rgba(17,24,39,.08);
+            box-shadow: 0 22px 60px rgba(17,24,39,.12);
+            padding: .65rem;
+            overflow: hidden;
+        }
+
+        .phone-flow-card img,
+        .poster-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 1.1rem;
+        }
+
+        .phone-flow-card:nth-child(2) { transform: translateY(2.25rem); }
+        .phone-flow-card:nth-child(3) { transform: translateY(.7rem); }
+
+        .screenshot-feature-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: .85rem;
+        }
+
+        .screenshot-feature-list > div {
+            border-radius: 1.25rem;
+            background: rgba(123,63,173,.075);
+            border: 1px solid rgba(123,63,173,.13);
+            padding: 1rem;
+        }
+
+        .poster-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 1.25rem;
+            align-items: start;
+        }
+
+        .poster-card {
+            transition: transform .25s ease, box-shadow .25s ease;
+        }
+
+        .poster-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 30px 75px rgba(17,24,39,.18);
+        }
+
+        .screenshot-shell {
+            border-radius: 2rem;
+            background:
+                radial-gradient(circle at 18% 20%, rgba(123,63,173,.22), transparent 35%),
+                linear-gradient(135deg, #f8fafc 0%, #ffffff 52%, #f3e8ff 100%);
+            border: 1px solid rgba(17,24,39,.08);
+            box-shadow: 0 26px 80px rgba(17,24,39,.10);
+            padding: 1.25rem;
+        }
+
+        @media (max-width: 1023px) {
+            .screens-layout {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            .poster-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 767px) {
+            .phone-flow-grid {
+                display: flex;
+                overflow-x: auto;
+                gap: .85rem;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                padding: .25rem 1rem 1.25rem;
+                margin-left: -1rem;
+                margin-right: -1rem;
+            }
+
+            .phone-flow-card {
+                flex: 0 0 68vw;
+                max-width: 290px;
+                scroll-snap-align: center;
+                transform: none !important;
+                border-radius: 1.35rem;
+                padding: .45rem;
+            }
+
+            .screenshot-feature-list {
+                grid-template-columns: 1fr;
+            }
+
+            .poster-grid {
+                display: flex;
+                overflow-x: auto;
+                gap: .85rem;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                padding: .25rem 1rem 1.25rem;
+                margin-left: -1rem;
+                margin-right: -1rem;
+            }
+
+            .poster-card {
+                flex: 0 0 76vw;
+                max-width: 330px;
+                scroll-snap-align: center;
+                border-radius: 1.35rem;
+                padding: .45rem;
+            }
+
+            .screenshot-shell {
+                padding: 1rem;
+                border-radius: 1.5rem;
+            }
+        }
+
     </style>
 </head>
 <body class="text-gray-900 relative">
@@ -783,55 +918,76 @@
         </div>
     </section>
 
-    <!-- REAL APP STORE SCREENSHOTS -->
+    <!-- REAL APP + APP STORE SCREENSHOTS -->
     <section id="app-screenshots" class="py-20 md:py-24 bg-white overflow-hidden">
         <div class="max-w-7xl mx-auto px-4">
-            <div class="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-14 items-center mb-14">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <p class="text-sm font-bold text-brand uppercase tracking-widest mb-3">Inside SparkFit</p>
+                <h2 class="text-3xl md:text-5xl font-black mb-5 leading-tight">A cleaner look at the app, without the clutter.</h2>
+                <p class="text-lg text-gray-600 leading-relaxed">SparkFit now supports quick bodyweight workouts and practical one-zone gym circuits, alongside simple macros, recipes, coach-style support and streak tracking.</p>
+            </div>
+
+            <div class="screens-layout mb-16">
                 <div>
-                    <p class="text-sm font-bold text-brand uppercase tracking-widest mb-3">Inside SparkFit</p>
-                    <h2 class="text-3xl md:text-5xl font-black mb-5 leading-tight">Show the new home-or-gym app experience.</h2>
-                    <p class="text-lg text-gray-600 leading-relaxed mb-7">SparkFit now supports fast bodyweight sessions and practical one-zone gym circuits, alongside simple macros, healthy recipes, coach-style support and streak tracking.</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
-                        <div class="proof-pill rounded-2xl p-4">
-                            <p class="font-black text-gray-950">Home or gym</p>
-                            <p class="text-sm text-gray-600">Pick bodyweight or equipment-based circuits.</p>
+                    <p class="text-sm font-bold text-brand uppercase tracking-widest mb-3">New workout flow</p>
+                    <h3 class="text-3xl md:text-4xl font-black mb-4 leading-tight">Choose home or gym. Then follow one clear 15-minute plan.</h3>
+                    <p class="text-lg text-gray-600 leading-relaxed mb-6">The gym option is built around equipment zones, so the workout is realistic in a busy gym. No sprinting from bench press to lat pulldown to leg press.</p>
+
+                    <div class="screenshot-feature-list mb-8">
+                        <div>
+                            <p class="font-black text-gray-950">Bodyweight</p>
+                            <p class="text-sm text-gray-600">Fast no-equipment circuits.</p>
                         </div>
-                        <div class="proof-pill rounded-2xl p-4">
-                            <p class="font-black text-gray-950">One-zone gym mode</p>
-                            <p class="text-sm text-gray-600">No sprinting across the gym between sets.</p>
+                        <div>
+                            <p class="font-black text-gray-950">Gym mode</p>
+                            <p class="text-sm text-gray-600">One-zone strength circuits.</p>
                         </div>
-                        <div class="proof-pill rounded-2xl p-4">
-                            <p class="font-black text-gray-950">Coach-style guidance</p>
-                            <p class="text-sm text-gray-600">Support when motivation dips.</p>
+                        <div>
+                            <p class="font-black text-gray-950">40/20 format</p>
+                            <p class="text-sm text-gray-600">40s work, 20s rest.</p>
                         </div>
-                        <div class="proof-pill rounded-2xl p-4">
-                            <p class="font-black text-gray-950">Consistency tracking</p>
-                            <p class="text-sm text-gray-600">Streaks and progress that keep people coming back.</p>
+                        <div>
+                            <p class="font-black text-gray-950">3 rounds</p>
+                            <p class="text-sm text-gray-600">Simple, repeatable, realistic.</p>
                         </div>
                     </div>
+
                     <a href="https://apps.apple.com/gb/app/sparkfit-ai-home-workout/id6754826325?pt=127457722&ct=website_real_screens&mt=8" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 bg-brand hover:bg-purple-600 text-white px-8 py-4 rounded-full font-black shadow-xl transition-all">
                         Download SparkFit free
                         <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
                     </a>
                 </div>
 
-                <div class="screenshot-card rounded-[2rem] p-4 md:p-6 bg-gray-50">
-                    <div class="grid grid-cols-2 gap-4">
-                        <img src="screenshots/sparkfit-gym-workout-card.png" alt="SparkFit gym workout card showing one-zone circuit details" class="screenshot-image w-full">
-                        <img src="screenshots/sparkfit-gym-timer.png" alt="SparkFit gym workout timer showing round and exercise progress" class="screenshot-image w-full translate-y-8">
+                <div class="screenshot-shell">
+                    <div class="phone-flow-grid" aria-label="SparkFit workout flow screenshots">
+                        <div class="phone-flow-card">
+                            <img src="screenshots/sparkfit-gym-type-selector.png" alt="SparkFit choose bodyweight or gym workout screen">
+                        </div>
+                        <div class="phone-flow-card">
+                            <img src="screenshots/sparkfit-gym-workout-card.png" alt="SparkFit one-zone gym workout preview">
+                        </div>
+                        <div class="phone-flow-card">
+                            <img src="screenshots/sparkfit-gym-timer.png" alt="SparkFit gym workout timer with rounds">
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
-                <img src="screenshots/sparkfit-gym-equipment-selector.png" alt="SparkFit gym equipment selector screenshot" class="screenshot-image w-full">
-                <img src="screenshots/sparkfit-gym-workout-overview.png" alt="SparkFit gym workout overview screenshot" class="screenshot-image w-full md:translate-y-8">
-                <img src="screenshots/sparkfit-03-macros.png" alt="SparkFit simple macros and nutrition plan screenshot" class="screenshot-image w-full">
-                <img src="screenshots/sparkfit-04-streak.png" alt="SparkFit streak tracking screenshot" class="screenshot-image w-full md:translate-y-8">
-                <img src="screenshots/sparkfit-05-coach.png" alt="SparkFit coach-style support chat screenshot" class="screenshot-image w-full">
-                <img src="screenshots/sparkfit-06-recipes.png" alt="SparkFit healthy recipes screenshot" class="screenshot-image w-full md:translate-y-8">
-                <img src="screenshots/sparkfit-07-nutrition-goal.png" alt="SparkFit smart nutrition and recipe browsing screenshot" class="screenshot-image w-full md:col-start-2">
-                <img src="screenshots/sparkfit-08-results.png" alt="SparkFit real results from home screenshot" class="screenshot-image w-full md:col-start-3 md:translate-y-8">
+            <div class="text-center max-w-3xl mx-auto mb-10">
+                <p class="text-sm font-bold text-brand uppercase tracking-widest mb-3">App Store style previews</p>
+                <h3 class="text-3xl md:text-4xl font-black mb-4 leading-tight">The full SparkFit story at a glance.</h3>
+                <p class="text-gray-600 leading-relaxed">A tidy responsive gallery for desktop, tablet and mobile. On mobile, swipe sideways instead of scrolling through a massive wall of screenshots.</p>
+            </div>
+
+            <div class="poster-grid" aria-label="SparkFit app screenshot gallery">
+                <div class="poster-card"><img src="screenshots/sparkfit-01-workout.png" alt="SparkFit get fitter in 15 minutes app screenshot"></div>
+                <div class="poster-card"><img src="screenshots/sparkfit-02-daily-plan.png" alt="SparkFit daily plan app screenshot"></div>
+                <div class="poster-card"><img src="screenshots/sparkfit-03-macros.png" alt="SparkFit simple macros screenshot"></div>
+                <div class="poster-card"><img src="screenshots/sparkfit-04-streak.png" alt="SparkFit streak tracking screenshot"></div>
+                <div class="poster-card"><img src="screenshots/sparkfit-05-coach.png" alt="SparkFit coach-style support screenshot"></div>
+                <div class="poster-card"><img src="screenshots/sparkfit-06-recipes.png" alt="SparkFit healthy recipes screenshot"></div>
+                <div class="poster-card"><img src="screenshots/sparkfit-07-nutrition-goal.png" alt="SparkFit smart nutrition screenshot"></div>
+                <div class="poster-card"><img src="screenshots/sparkfit-08-results.png" alt="SparkFit results screenshot"></div>
             </div>
         </div>
     </section>
