@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guide Ready | SparkFit</title>
-    <meta name="description" content="Your free SparkFit 15-minute fitness guide is ready to download.">
-    <link rel="icon" href="/icon.png?v=2" type="image/png">
+    <title>Your SparkFit Guide is Ready | SparkFit</title>
+    <meta name="description" content="Your free SparkFit 15-minute home or gym fitness guide is ready to download.">
+    <link rel="icon" href="/icon.png?v=3" type="image/png">
+    <link rel="preload" href="icon.png" as="image">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
@@ -29,6 +30,10 @@
         .text-brand { color: var(--brand-purple); }
         .btn-primary { background-color: var(--brand-purple); }
         .btn-primary:hover { background-color: var(--brand-purple-dark); }
+        /* Critical first-paint fixes: prevents oversized image/icon flash before Tailwind CDN loads */
+        img { max-width: 100%; height: auto; }
+        .brand-icon { width: 2.25rem; height: 2.25rem; min-width: 2.25rem; min-height: 2.25rem; object-fit: cover; border-radius: .75rem; display: block; }
+        .app-store-badge img { width: auto; max-width: 190px; }
         .soft-grid {
             background-image:
                 linear-gradient(rgba(123,63,173,0.08) 1px, transparent 1px),
@@ -45,7 +50,7 @@
     <main class="relative min-h-screen flex items-center justify-center p-4">
         <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 text-center border border-gray-100">
             <div class="flex items-center justify-center space-x-3 mb-8">
-                <img src="icon.png" alt="SparkFit" class="w-9 h-9 rounded-xl shadow-md">
+                <img src="icon.png" alt="SparkFit" width="40" height="40" class="brand-icon shadow-md">
                 <span class="text-xl font-extrabold tracking-tight">Spark<span class="text-brand">Fit</span></span>
             </div>
 
@@ -55,7 +60,7 @@
 
             <p class="text-xs font-extrabold uppercase tracking-[0.25em] text-brand mb-3">You are on the list</p>
             <h1 class="text-3xl font-black mb-3 text-gray-900 leading-tight">Your free guide is ready.</h1>
-            <p class="text-gray-600 mb-8 text-sm leading-relaxed">I’ve sent the guide to your inbox. You can also download it now and then start your first 15-minute workout in the app.</p>
+            <p class="text-gray-600 mb-8 text-sm leading-relaxed">I’ve sent the guide to your inbox. You can also download it now and then start your first 15-minute home or gym workout in the app.</p>
 
             <a href="SparkFit Fitness Guide.pdf" download class="block w-full btn-primary text-white font-bold py-4 rounded-xl shadow-lg flex items-center justify-center space-x-2 mb-4 transition-transform hover:scale-[1.02]">
                 <i data-lucide="download" class="w-5 h-5"></i>
@@ -74,7 +79,7 @@
                 </div>
                 <div class="rounded-2xl bg-gray-50 p-3 border border-gray-100">
                     <p class="text-lg font-black text-gray-900">2</p>
-                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Do 15 mins</p>
+                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Train 15 mins</p>
                 </div>
                 <div class="rounded-2xl bg-gray-50 p-3 border border-gray-100">
                     <p class="text-lg font-black text-gray-900">3</p>
