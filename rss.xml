@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>SparkFit Blog</title>
+    <link>https://spark-fit.com/blog/</link>
+    <description>Fitness, workouts and simple nutrition from SparkFit.</description>
+    <language>en-gb</language>
+    <item>
+      <title>15-Minute Full-Body Workouts for Busy Schedules</title>
+      <link>https://spark-fit.com/blog/15-minute-full-body-workouts-busy-schedules.html</link>
+      <guid>https://spark-fit.com/blog/15-minute-full-body-workouts-busy-schedules.html</guid>
+      <description>Discover effective 15-minute full-body workouts designed for busy people. Quick routines, expert tips, and time-saving strategies to help you stay fit—no matter how packed your day gets.</description>
+      <pubDate>Sat, 04 Jul 2026 00:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>
