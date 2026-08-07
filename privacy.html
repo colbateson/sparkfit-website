@@ -1,70 +1,167 @@
-<div style="min-height: 100vh; background-color: #f9fafb;">
-    <div
-        style="
-            max-width: 1140px;
-            min-height: 100vh;
-            margin: 0 auto;
-            padding: 84px 32px 48px 32px;
-            background-color: #ffffff;
-            color: #1f2937;
-            box-sizing: border-box;
-        "
-    >
+<style>
+    .privacy-page {
+        min-height: 100vh;
+        background: #f9fafb;
+        font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        color: #1f2937;
+        font-size: 16px;
+        line-height: 1.65;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
 
-        <a
-            href="/"
-            style="
-                display: inline-block;
-                margin-bottom: 42px;
-                color: #7B3FAD;
-                font-weight: 700;
-                text-decoration: none;
-            "
-        >
+    .privacy-container {
+        max-width: 1140px;
+        min-height: 100vh;
+        margin: 0 auto;
+        padding: 84px 32px 48px;
+        background: #ffffff;
+        box-sizing: border-box;
+    }
+
+    .privacy-back {
+        display: inline-block;
+        margin-bottom: 38px;
+        color: #7b3fad;
+        font-size: 16px;
+        line-height: 1.5;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .privacy-back:hover {
+        text-decoration: underline;
+    }
+
+    .privacy-title {
+        margin: 0 0 14px;
+        color: #1f2937;
+        font-size: 36px;
+        line-height: 1.15;
+        font-weight: 900;
+        letter-spacing: -0.03em;
+    }
+
+    .privacy-updated {
+        margin: 0 0 46px;
+        color: #6b7280;
+        font-size: 16px;
+        line-height: 1.5;
+        font-weight: 400;
+    }
+
+    .privacy-section {
+        margin: 0 0 44px;
+    }
+
+    .privacy-section h2 {
+        margin: 0 0 18px;
+        color: #7b3fad;
+        font-size: 24px;
+        line-height: 1.3;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+
+    .privacy-section p {
+        margin: 0 0 16px;
+        font-size: 16px;
+        line-height: 1.65;
+        font-weight: 400;
+    }
+
+    .privacy-section ul {
+        margin: 0;
+        padding-left: 28px;
+        font-size: 16px;
+        line-height: 1.65;
+    }
+
+    .privacy-section li {
+        margin-bottom: 8px;
+        padding-left: 1px;
+    }
+
+    .privacy-section li:last-child {
+        margin-bottom: 0;
+    }
+
+    .privacy-section strong {
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .privacy-section a {
+        color: #7b3fad;
+        font-weight: 600;
+        text-decoration: underline;
+    }
+
+    .privacy-divider {
+        margin: 48px 0 36px;
+        border: 0;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .privacy-footer {
+        padding-bottom: 10px;
+        color: #6b7280;
+        font-size: 14px;
+        line-height: 1.6;
+        font-weight: 400;
+    }
+
+    .privacy-footer p {
+        margin: 0;
+    }
+
+    @media (max-width: 640px) {
+        .privacy-container {
+            padding: 48px 24px 36px;
+        }
+
+        .privacy-back {
+            margin-bottom: 32px;
+        }
+
+        .privacy-title {
+            font-size: 32px;
+        }
+
+        .privacy-section h2 {
+            font-size: 22px;
+        }
+    }
+</style>
+
+<div class="privacy-page">
+    <div class="privacy-container">
+
+        <a href="/" class="privacy-back">
             ← Back to Home
         </a>
 
-        <h1
-            style="
-                margin: 0 0 16px 0;
-                font-size: 36px;
-                line-height: 1.2;
-                font-weight: 900;
-                color: #1f2937;
-            "
-        >
-            Privacy Policy
-        </h1>
+        <h1 class="privacy-title">Privacy Policy</h1>
 
-        <p style="margin: 0 0 44px 0; color: #6b7280;">
+        <p class="privacy-updated">
             Last Updated: August 7, 2026
         </p>
 
 
-        <section style="margin-bottom: 42px;">
-            <h2
-                style="
-                    margin: 0 0 20px 0;
-                    font-size: 24px;
-                    line-height: 1.3;
-                    font-weight: 700;
-                    color: #7B3FAD;
-                "
-            >
-                1. Data Collection &amp; Usage
-            </h2>
+        <section class="privacy-section">
+            <h2>1. Data Collection &amp; Usage</h2>
 
-            <p style="margin: 0 0 18px 0;">
+            <p>
                 To provide the SparkFit fitness experience, we collect and process certain information depending on how you use the app:
             </p>
 
-            <ul style="margin: 0 0 0 28px; padding: 0; line-height: 1.7;">
-                <li style="margin-bottom: 8px;">
+            <ul>
+                <li>
                     <strong>Account Information:</strong>
                     We may collect your <strong>email address</strong> and an associated account identifier to create and manage your SparkFit account and allow you to access the app across supported devices.
                 </li>
 
-                <li style="margin-bottom: 8px;">
+                <li>
                     <strong>Fitness Data:</strong>
                     SparkFit processes information such as workout logs, awards earned, meal plans, weight history, fitness preferences and other information you provide in the app in order to provide progress tracking, workout recommendations and personalised coaching.
                 </li>
@@ -77,30 +174,20 @@
         </section>
 
 
-        <section style="margin-bottom: 42px;">
-            <h2
-                style="
-                    margin: 0 0 20px 0;
-                    font-size: 24px;
-                    line-height: 1.3;
-                    font-weight: 700;
-                    color: #7B3FAD;
-                "
-            >
-                2. Cloud Syncing &amp; Backups
-            </h2>
+        <section class="privacy-section">
+            <h2>2. Cloud Syncing &amp; Backups</h2>
 
-            <p style="margin: 0 0 18px 0;">
+            <p>
                 SparkFit uses your device and supported cloud services to help store and synchronise your fitness information:
             </p>
 
-            <ul style="margin: 0 0 0 28px; padding: 0; line-height: 1.7;">
-                <li style="margin-bottom: 8px;">
+            <ul>
+                <li>
                     <strong>iOS Users:</strong>
                     Fitness data and app settings may be backed up and synchronised using <strong>Apple iCloud</strong>, where this functionality is enabled and available.
                 </li>
 
-                <li style="margin-bottom: 8px;">
+                <li>
                     <strong>Android Users:</strong>
                     Fitness data and app settings may be backed up and synchronised using <strong>Google Drive</strong>, where this functionality is enabled and available.
                 </li>
@@ -113,100 +200,64 @@
         </section>
 
 
-        <section style="margin-bottom: 42px;">
-            <h2
-                style="
-                    margin: 0 0 20px 0;
-                    font-size: 24px;
-                    line-height: 1.3;
-                    font-weight: 700;
-                    color: #7B3FAD;
-                "
-            >
-                3. AI Processing
-            </h2>
+        <section class="privacy-section">
+            <h2>3. AI Processing</h2>
 
-            <p style="margin: 0 0 16px 0;">
+            <p>
                 SparkFit may use artificial intelligence services to provide features such as personalised workouts, fitness guidance and AI Coach responses. Information necessary to generate a response may be securely transmitted for processing. This may include your query and relevant fitness information where required to provide a personalised response.
             </p>
 
-            <p style="margin: 0;">
+            <p>
                 We do not sell your AI Coach conversations or fitness information to third-party advertisers. Information sent for AI processing is limited to what is reasonably necessary to provide the requested functionality.
             </p>
         </section>
 
 
-        <section style="margin-bottom: 42px;">
-            <h2
-                style="
-                    margin: 0 0 20px 0;
-                    font-size: 24px;
-                    line-height: 1.3;
-                    font-weight: 700;
-                    color: #7B3FAD;
-                "
-            >
-                4. Third-Party Services
-            </h2>
+        <section class="privacy-section">
+            <h2>4. Third-Party Services</h2>
 
-            <p style="margin: 0 0 16px 0;">
+            <p>
                 SparkFit may use trusted third-party service providers to operate, maintain and improve the app. These may include services for app distribution, authentication, subscriptions, analytics, crash reporting, cloud storage and artificial intelligence processing.
             </p>
 
-            <p style="margin: 0;">
+            <p>
                 These providers may process limited device, account, diagnostic or usage information where necessary to provide their services. Any third-party processing is subject to the applicable provider's privacy policy and data protection obligations.
             </p>
         </section>
 
 
-        <section style="margin-bottom: 42px;">
-            <h2
-                style="
-                    margin: 0 0 20px 0;
-                    font-size: 24px;
-                    line-height: 1.3;
-                    font-weight: 700;
-                    color: #7B3FAD;
-                "
-            >
-                5. Data Retention &amp; Deletion
-            </h2>
+        <section class="privacy-section">
+            <h2>5. Data Retention &amp; Deletion</h2>
 
-            <p style="margin: 0 0 18px 0;">
+            <p>
                 SparkFit retains personal data only for as long as it is necessary to provide the app and its services, fulfil the purposes described in this Privacy Policy, comply with legal obligations, resolve disputes and enforce our agreements.
             </p>
 
-            <ul style="margin: 0 0 0 28px; padding: 0; line-height: 1.7;">
-
-                <li style="margin-bottom: 10px;">
+            <ul>
+                <li>
                     <strong>Account Information:</strong>
                     Your SparkFit account information, including your email address and account identifier, is retained for as long as your SparkFit account remains active. If you request deletion of your account, we will delete or anonymise the personal data associated with your SparkFit account within <strong>30 days</strong> of receiving and processing the deletion request, unless we are legally required to retain specific information for longer.
                 </li>
 
-                <li style="margin-bottom: 10px;">
+                <li>
                     <strong>Fitness Data Stored on Your Device:</strong>
                     Fitness data stored locally on your device is retained until you delete the relevant data, delete your SparkFit account where applicable, clear the app's data, or uninstall the app. Uninstalling the app may permanently remove locally stored information that has not been backed up.
                 </li>
 
-                <li style="margin-bottom: 10px;">
+                <li>
                     <strong>Cloud Backup Data:</strong>
                     Fitness information backed up to your personal Apple iCloud or Google Drive account is retained according to your cloud account settings and the retention policies of Apple or Google. You can manage or delete these backup files through the relevant cloud service. SparkFit does not control how long Apple or Google retain information within your personal cloud account after you request its deletion from those services.
                 </li>
 
-                <li style="margin-bottom: 10px;">
+                <li>
                     <strong>Marketing Information:</strong>
                     If you have opted in to marketing communications, your email address and marketing preferences are retained until you unsubscribe or request deletion. After you unsubscribe, we may retain a minimal suppression record where necessary to ensure that we honour your request and do not send further marketing communications.
                 </li>
 
-                <li style="margin-bottom: 10px;">
+                <li>
                     <strong>Account Deletion:</strong>
                     You may request deletion of your SparkFit account and the personal data associated with it at any time using the account deletion option within the app, through the account deletion method provided on our website, or by contacting us at
-                    <a
-                        href="mailto:hello@spark-fit.com"
-                        style="color: #7B3FAD; font-weight: 600; text-decoration: underline;"
-                    >
-                        hello@spark-fit.com
-                    </a>.
+                    <a href="mailto:hello@spark-fit.com">hello@spark-fit.com</a>.
                     Once an account deletion request has been completed, the associated personal data controlled by SparkFit will be permanently deleted or anonymised, subject only to information we are required to retain for legal, security, fraud-prevention, accounting or regulatory purposes.
                 </li>
 
@@ -218,138 +269,66 @@
         </section>
 
 
-        <section style="margin-bottom: 42px;">
-            <h2
-                style="
-                    margin: 0 0 20px 0;
-                    font-size: 24px;
-                    line-height: 1.3;
-                    font-weight: 700;
-                    color: #7B3FAD;
-                "
-            >
-                6. Security
-            </h2>
+        <section class="privacy-section">
+            <h2>6. Security</h2>
 
-            <p style="margin: 0;">
+            <p>
                 We take reasonable technical and organisational measures designed to protect personal information against unauthorised access, loss, misuse, alteration or disclosure. Where information is transmitted between SparkFit and external services, we use secure encrypted connections where supported.
             </p>
         </section>
 
 
-        <section style="margin-bottom: 42px;">
-            <h2
-                style="
-                    margin: 0 0 20px 0;
-                    font-size: 24px;
-                    line-height: 1.3;
-                    font-weight: 700;
-                    color: #7B3FAD;
-                "
-            >
-                7. Your Privacy Rights
-            </h2>
+        <section class="privacy-section">
+            <h2>7. Your Privacy Rights</h2>
 
-            <p style="margin: 0 0 16px 0;">
+            <p>
                 Depending on where you live, you may have rights relating to your personal information, including the right to request access to, correction of, or deletion of your personal information and the right to withdraw consent where processing is based on consent.
             </p>
 
-            <p style="margin: 0;">
+            <p>
                 You can exercise applicable rights through the controls provided within SparkFit or by contacting us at
-                <a
-                    href="mailto:hello@spark-fit.com"
-                    style="color: #7B3FAD; font-weight: 600; text-decoration: underline;"
-                >
-                    hello@spark-fit.com
-                </a>.
+                <a href="mailto:hello@spark-fit.com">hello@spark-fit.com</a>.
             </p>
         </section>
 
 
-        <section style="margin-bottom: 42px;">
-            <h2
-                style="
-                    margin: 0 0 20px 0;
-                    font-size: 24px;
-                    line-height: 1.3;
-                    font-weight: 700;
-                    color: #7B3FAD;
-                "
-            >
-                8. Children's Privacy
-            </h2>
+        <section class="privacy-section">
+            <h2>8. Children's Privacy</h2>
 
-            <p style="margin: 0;">
+            <p>
                 SparkFit is not intended for children under the minimum age required to consent to the processing of personal data in their country without parental or guardian authorisation. We do not knowingly collect personal information from children in circumstances where parental or guardian consent is legally required.
             </p>
         </section>
 
 
-        <section style="margin-bottom: 42px;">
-            <h2
-                style="
-                    margin: 0 0 20px 0;
-                    font-size: 24px;
-                    line-height: 1.3;
-                    font-weight: 700;
-                    color: #7B3FAD;
-                "
-            >
-                9. Changes to This Privacy Policy
-            </h2>
+        <section class="privacy-section">
+            <h2>9. Changes to This Privacy Policy</h2>
 
-            <p style="margin: 0;">
+            <p>
                 We may update this Privacy Policy from time to time to reflect changes to SparkFit, our data practices, legal requirements or third-party services. When we make changes, we will update the "Last Updated" date at the top of this page.
             </p>
         </section>
 
 
-        <section style="margin-bottom: 42px;">
-            <h2
-                style="
-                    margin: 0 0 20px 0;
-                    font-size: 24px;
-                    line-height: 1.3;
-                    font-weight: 700;
-                    color: #7B3FAD;
-                "
-            >
-                10. Contact Us
-            </h2>
+        <section class="privacy-section">
+            <h2>10. Contact Us</h2>
 
-            <p style="margin: 0 0 16px 0;">
+            <p>
                 If you have any questions about this Privacy Policy, how SparkFit handles your information, or you would like to make a privacy or deletion request, please contact us:
             </p>
 
-            <p style="margin: 0;">
+            <p>
                 <strong>SparkFit</strong><br>
                 Email:
-                <a
-                    href="mailto:hello@spark-fit.com"
-                    style="color: #7B3FAD; font-weight: 600; text-decoration: underline;"
-                >
-                    hello@spark-fit.com
-                </a>
+                <a href="mailto:hello@spark-fit.com">hello@spark-fit.com</a>
             </p>
         </section>
 
 
-        <hr
-            style="
-                margin: 48px 0 38px 0;
-                border: 0;
-                border-top: 1px solid #e5e7eb;
-            "
-        >
+        <hr class="privacy-divider">
 
-        <footer
-            style="
-                padding-bottom: 10px;
-                font-size: 14px;
-                color: #6b7280;
-            "
-        >
-            <p style="margin: 0;">
+        <footer class="privacy-footer">
+            <p>
                 &copy; 2026 SparkFit. All rights reserved. Fitness data is processed locally and synced via your chosen cloud provider.
             </p>
         </footer>
