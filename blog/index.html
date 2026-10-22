@@ -5,10 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SparkFit Blog | Fitness, workouts and simple nutrition</title>
   <meta name="description" content="Evidence-based SparkFit articles on fitness, workouts, nutrition and building a routine that fits real life.">
+  <meta property="og:title" content="SparkFit Blog | Fitness, workouts and simple nutrition">
+  <meta property="og:description" content="Evidence-based fitness guidance for busy people.">
+  <meta property="og:image" content="https://spark-fit.com/icon.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SparkFit Blog | Fitness, workouts and simple nutrition">
+  <meta name="twitter:image" content="https://spark-fit.com/icon.png">
   <link rel="canonical" href="https://spark-fit.com/blog/">
   <link rel="icon" href="/icon.png" type="image/png">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap'); body{font-family:'Plus Jakarta Sans',sans-serif}.text-brand{color:#7B3FAD}</style>
+  <script type="module">
+    import { analytics } from "https://esm.sh/@heycatch/sdk@0.8.3";
+    analytics.init({ projectKey: "hck_pk_w84wxUafMFQ46nRsMg9I9Qz5b6tc-jtf", install: { framework: "web", agent: "codex" }, requestBatching: false });
+  </script>
 </head>
 <body class="bg-white text-gray-900">
   <header class="py-5 bg-white border-b border-gray-100">
@@ -595,5 +605,10 @@
     </a>
   </div>
   </main>
+  <footer class="py-8 border-t border-gray-100 bg-white">
+    <div class="max-w-6xl mx-auto px-4 flex flex-wrap justify-center gap-5 text-sm text-gray-500">
+      <a href="/about.html">About</a><a href="/contact.html">Contact</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a>
+    </div>
+  </footer>
 </body>
 </html>

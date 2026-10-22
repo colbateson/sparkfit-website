@@ -1,0 +1,23 @@
+# SparkFit
+
+SparkFit is a fitness app for busy professionals and parents. It combines 15-minute home or one-zone gym workouts with simple macro targets, family-friendly meal plans, shopping lists, progress tracking and a 24/7 AI fitness and nutrition coach.
+
+## Main pages
+
+- Homepage and product overview: https://spark-fit.com/
+- Pricing and trial: https://spark-fit.com/#pricing
+- Frequently asked questions: https://spark-fit.com/#faq
+- Free 15-minute starter guide: https://spark-fit.com/guide/
+- iPhone app: https://apps.apple.com/gb/app/sparkfit-15-min-workouts/id6754826325
+- Android app: https://play.google.com/store/apps/details?id=app.spark.fit
+
+## Comparisons
+
+- SparkFit vs Sweat: https://spark-fit.com/vs/sweat/
+- SparkFit vs Peloton: https://spark-fit.com/vs/peloton/
+- SparkFit vs 15 Minutes Fitness: https://spark-fit.com/vs/15-minutes-fitness/
+
+## Policies
+
+- Privacy: https://spark-fit.com/privacy.html
+- Terms: https://spark-fit.com/terms.html

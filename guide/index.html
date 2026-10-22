@@ -10,6 +10,10 @@
     <meta property="og:title" content="Free SparkFit 15-Minute Home or Gym Starter Guide">
     <meta property="og:description" content="A simple starter plan for busy people: 15-minute workouts, home or gym options, easy macros and consistency habits.">
     <meta property="og:image" content="/icon.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free SparkFit 15-Minute Home or Gym Starter Guide">
+    <meta name="twitter:description" content="A simple starter plan for busy people: short workouts, easy nutrition targets and consistency habits.">
+    <meta name="twitter:image" content="https://spark-fit.com/icon.png">
     <meta name="theme-color" content="#7B3FAD">
     <script type="module">
         import { analytics } from 'https://esm.sh/@heycatch/sdk@0.8.3';
@@ -86,10 +90,10 @@
                 <img src="./icon.png" alt="SparkFit" width="40" height="40" class="brand-icon shadow-md">
                 <span class="text-xl font-extrabold tracking-tight">Spark<span class="text-brand">Fit</span></span>
             </a>
-            <a href="https://apps.apple.com/gb/app/spark-fit-15-minute-workouts/id6754826325?pt=127457722&ct=free_guide_landing&mt=8" target="_blank" class="hidden sm:inline-flex items-center gap-2 text-sm font-bold text-brand hover:text-purple-700">
-                Download free
-                <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
-            </a>
+            <div class="hidden sm:flex items-center gap-4 text-sm font-bold">
+                <a href="https://apps.apple.com/gb/app/spark-fit-15-minute-workouts/id6754826325?pt=127457722&ct=free_guide_landing&mt=8" target="_blank" class="text-brand hover:text-purple-700">iPhone</a>
+                <a href="https://play.google.com/store/apps/details?id=app.spark.fit" target="_blank" class="text-gray-900 hover:text-brand">Android</a>
+            </div>
         </div>
     </header>
 
@@ -147,7 +151,7 @@
                     <div class="rounded-3xl bg-gray-950 text-white p-6 md:p-7 mb-6">
                         <p class="text-sm font-bold uppercase tracking-widest text-purple-200 mb-3">Why it works</p>
                         <p class="text-lg md:text-xl font-black leading-tight mb-3">You are not downloading motivation. You are downloading a simple plan you can actually start.</p>
-                        <p class="text-gray-300 leading-relaxed">The guide turns “I should start” into a clear first step. Then SparkFit helps you keep going with 15-minute home workouts, practical one-zone gym circuits, simple targets and coach-style support inside the app.</p>
+                            <p class="text-gray-300 leading-relaxed">The guide turns “I should start” into a clear first step. Then SparkFit helps you keep going with 15-minute home workouts, practical one-zone gym circuits, simple targets and a 24/7 AI coach inside the app.</p>
                     </div>
                 </div>
 
@@ -183,6 +187,13 @@
         </section>
 
         <section class="relative max-w-6xl mx-auto px-4 pb-16 md:pb-20">
+            <a href="https://spark-fit.com/#founder" class="flex flex-col sm:flex-row gap-5 items-center rounded-3xl bg-purple-50 border border-purple-100 p-6 md:p-8 hover:border-purple-300 transition-colors">
+                <img src="colin-sparkfit-trainer.png" alt="Colin, creator of SparkFit" class="w-24 h-24 rounded-2xl object-cover object-top shadow-md shrink-0">
+                <span><strong class="block text-xl font-black text-gray-950 mb-2">Meet Colin, the person behind SparkFit</strong><span class="text-gray-600 leading-relaxed">Read why I built SparkFit around busy days, family life and realistic 15-minute plans.</span></span>
+            </a>
+        </section>
+
+        <section class="relative max-w-6xl mx-auto px-4 pb-16 md:pb-20">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm">
                     <i data-lucide="timer" class="w-8 h-8 text-brand mb-4"></i>
@@ -208,7 +219,8 @@
             <p class="text-sm text-gray-400 mb-2">© 2026 SparkFit. All rights reserved.</p>
             <div class="flex justify-center gap-5 text-xs">
                 <a href="https://spark-fit.com/privacy.html" target="_blank" class="text-gray-400 hover:text-brand underline">Privacy Policy</a>
-                <a href="https://apps.apple.com/gb/app/spark-fit-15-minute-workouts/id6754826325?pt=127457722&ct=free_guide_footer&mt=8" target="_blank" class="text-gray-400 hover:text-brand underline">Download the app</a>
+                <a href="https://spark-fit.com/#founder" class="text-gray-400 hover:text-brand underline">Meet the founder</a>
+                <a href="https://spark-fit.com/#pricing" class="text-gray-400 hover:text-brand underline">Pricing</a>
             </div>
         </div>
     </footer>
@@ -251,5 +263,6 @@
             }
         });
     </script>
+    <footer class="bg-gray-950 text-gray-400 py-8 text-sm"><div class="max-w-5xl mx-auto px-5 flex flex-wrap justify-center gap-6"><a href="/about.html">About</a><a href="/contact.html">Contact</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a></div></footer>
 </body>
 </html>
