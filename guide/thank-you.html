@@ -7,6 +7,18 @@
     <meta name="description" content="Your free SparkFit 15-minute home or gym fitness guide is ready to download.">
     <link rel="icon" href="/icon.png?v=3" type="image/png">
     <link rel="preload" href="icon.png" as="image">
+    <script type="module">
+        import { analytics } from 'https://esm.sh/@heycatch/sdk@0.8.3';
+
+        analytics.init({
+            projectKey: 'hck_pk_w84wxUafMFQ46nRsMg9I9Qz5b6tc-jtf',
+            install: {
+                framework: 'web',
+                agent: 'codex',
+            },
+            requestBatching: false,
+        });
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 

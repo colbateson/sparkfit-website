@@ -9,6 +9,19 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <meta name="googlebot" content="noindex, nofollow, noarchive">
 
+  <script type="module">
+    import { analytics } from 'https://esm.sh/@heycatch/sdk@0.8.3';
+
+    analytics.init({
+      projectKey: 'hck_pk_w84wxUafMFQ46nRsMg9I9Qz5b6tc-jtf',
+      install: {
+        framework: 'web',
+        agent: 'codex',
+      },
+      requestBatching: false,
+    });
+  </script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
