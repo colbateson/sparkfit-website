@@ -39,7 +39,7 @@ TITLE_OVERRIDES = {
     "how-to-build-strength-at-home-with-minimal-equipment-15-minute-dumbbell-workouts.html": "15-Minute Dumbbell Strength with Minimal Equipment",
     "simple-meal-prep-ideas-for-busy-adults-5-ingredients-or-less.html": "Five-Ingredient Meal Prep for Busy Adults",
     "simple-meal-prep-ideas-for-busy-adults-15-minute-high-protein-recipes.html": "15-Minute High-Protein Meal Prep Recipes",
-    "simple-meal-prep-ideas-for-busy-adults-5-quick-recipes-to-support-fat-loss.html": "Five Quick Meal-Prep Recipes for Fat Loss",
+    "simple-meal-prep-ideas-for-busy-adults-5-quick-recipes-to-support-fat-loss.html": "Five Quick Meal-Prep Recipes for Busy Adults",
     "15-minute-dumbbell-workouts-for-strength-at-home.html": "15-Minute Dumbbell Workouts for Home Strength",
     "15-minute-dumbbell-workouts-strength-at-home.html": "Build Strength at Home with 15-Minute Dumbbell Workouts",
     "simple-meal-prep-ideas-for-fat-loss-quick-recipes-for-busy-adults.html": "Quick Fat-Loss Meal Prep for Busy Adults",
@@ -72,11 +72,22 @@ def fit_title(headline: str) -> str:
 def fit_description(source: str) -> str:
     text = plain(source)
     text = re.sub(r"^(Discover|Learn)\s+", "", text, flags=re.I)
-    if len(text) < 110:
-        text += " The guide includes clear steps you can use at home or in the gym."
-    if len(text) > 160:
-        text = text[:157].rsplit(" ", 1)[0].rstrip(" ,;:") + "."
-    return text
+    sentences = re.split(r"(?<=[.!?])\s+", text)
+    first_sentence = sentences[0].strip()
+    if len(first_sentence) < 80 and len(sentences) > 1:
+        first_sentence += " " + sentences[1].strip()
+    if len(first_sentence) > 160:
+        first_sentence = first_sentence[:157].rsplit(" ", 1)[0].rstrip(" ,;:") + "."
+    if len(first_sentence) < 110:
+        suffix = " Get practical steps, useful examples and a clear starting point for a busy week."
+        base = first_sentence.rstrip(".!?")
+        limit = 160 - len(suffix) - 1
+        if len(base) > limit:
+            base = base[:limit].rsplit(" ", 1)[0].rstrip(" ,;:")
+        first_sentence = base + "." + suffix
+    if len(first_sentence) < 110:
+        first_sentence = first_sentence.rstrip(".") + ". Use the plan to begin today."
+    return first_sentence
 
 
 def update_article(path: Path) -> None:
@@ -125,9 +136,11 @@ def update_article(path: Path) -> None:
     intro_pattern = r'(<h2[^>]*>Introduction</h2>\s*)<p>.*?</p>'
     source = re.sub(intro_pattern, r"\1<p>" + html.escape(direct_answer) + "</p>", source, count=1, flags=re.S)
 
-    source = re.sub(r"<p>\s*This\s+", "<p>The approach ", source)
-    source = re.sub(r"<p>\s*They\s+", "<p>The exercises ", source)
-    source = re.sub(r"<p>\s*Such an approach\s+", "<p>A practical approach ", source, flags=re.I)
+    source = re.sub(r"(<p>(?:<(?:em|strong)>)*?)This guide\s+", r"\1The SparkFit guide ", source)
+    source = re.sub(r"(<p>(?:<(?:em|strong)>)*?)This article\s+", r"\1The SparkFit article ", source)
+    source = re.sub(r"(<p>(?:<(?:em|strong)>)*?)This approach\s+", r"\1The approach ", source)
+    source = re.sub(r"(<p>(?:<(?:em|strong)>)*?)Such an approach\s+", r"\1A practical approach ", source, flags=re.I)
+    source = source.replace("<p>They’re not essential, but they are convenient", "<p>Protein supplements are not essential, but they are convenient")
 
     # Repair an empty nested JSON-LD block left by an earlier generator.
     source = re.sub(
