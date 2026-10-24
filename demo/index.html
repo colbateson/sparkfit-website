@@ -1,0 +1,761 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <title>SparkFit Interactive Demo</title>
+  <style>
+    :root {
+      --purple: #4f46e5;
+      --purple-soft: #eef2ff;
+      --green: #10b981;
+      --orange: #f59e0b;
+      --pink: #a855f7;
+      --ink: #171717;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --surface: #f8f9fb;
+      --white: #fff;
+      --shadow: 0 7px 24px rgba(15, 23, 42, .07);
+      --safe-top: max(14px, env(safe-area-inset-top));
+      --safe-bottom: max(8px, env(safe-area-inset-bottom));
+    }
+
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body {
+      background: #e9ecf2;
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+      letter-spacing: 0;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    button { font: inherit; color: inherit; }
+
+    .ad-shell {
+      position: relative;
+      width: min(100%, 430px);
+      height: 100%;
+      margin: 0 auto;
+      overflow: hidden;
+      background: var(--surface);
+      box-shadow: 0 0 48px rgba(15, 23, 42, .16);
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      background: var(--surface);
+    }
+    .screen.active { display: flex; animation: fade-in .2s ease-out; }
+    @keyframes fade-in { from { opacity: .55; } to { opacity: 1; } }
+
+    .status-bar {
+      height: calc(var(--safe-top) + 26px);
+      padding: var(--safe-top) 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex: 0 0 auto;
+      background: var(--surface);
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .status-icons { display: flex; align-items: center; gap: 7px; }
+    .signal { display: flex; gap: 2px; align-items: end; height: 13px; }
+    .signal i { width: 3px; border-radius: 2px; background: #111; display: block; }
+    .signal i:nth-child(1) { height: 5px; }
+    .signal i:nth-child(2) { height: 8px; }
+    .signal i:nth-child(3) { height: 11px; }
+    .battery { width: 24px; height: 12px; border: 1.5px solid #111; border-radius: 3px; padding: 1.5px; position: relative; }
+    .battery::after { content: ""; position: absolute; right: -3px; top: 3px; width: 2px; height: 5px; border-radius: 0 2px 2px 0; background: #111; }
+    .battery span { display: block; width: 78%; height: 100%; border-radius: 1px; background: #22c55e; }
+
+    .scroll {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: none;
+      padding: 16px 20px 28px;
+    }
+    .scroll::-webkit-scrollbar { display: none; }
+    .page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: 30px; line-height: 1.05; font-weight: 800; }
+    .subtitle { margin-top: 6px; color: #737373; font-size: 18px; line-height: 1.25; }
+    .icon-text-button {
+      border: 0;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--purple);
+      padding: 11px 14px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      box-shadow: var(--shadow);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .icon { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .icon.sm { width: 17px; height: 17px; }
+    .icon.lg { width: 34px; height: 34px; }
+
+    .quick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+    .quick-card {
+      min-width: 0;
+      min-height: 112px;
+      border: 2px solid;
+      border-radius: 16px;
+      padding: 12px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .quick-card.green { border-color: #10b981; background: #ecfdf5; }
+    .quick-card.orange { border-color: #f59e0b; background: #fffbeb; }
+    .quick-card.purple { border-color: #a855f7; background: #faf5ff; }
+    .quick-icon { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; margin-bottom: 8px; }
+    .green .quick-icon { color: #10b981; background: #d1fae5; }
+    .orange .quick-icon { color: #f59e0b; background: #fef3c7; }
+    .purple .quick-icon { color: #a855f7; background: #f3e8ff; }
+    .quick-card strong { font-size: 14px; line-height: 1.12; }
+    .quick-card span { color: #666; font-size: 11px; margin-top: 3px; }
+
+    .checkin {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      border-radius: 14px;
+      padding: 13px 12px;
+      background: var(--orange);
+      color: #fff;
+      box-shadow: 0 7px 18px rgba(245, 158, 11, .22);
+      margin-bottom: 26px;
+    }
+    .checkin-copy { min-width: 0; }
+    .checkin-copy strong, .checkin-copy span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .checkin-copy strong { font-size: 13px; }
+    .checkin-copy span { font-size: 11px; opacity: .9; margin-top: 2px; }
+    .checkin-cta { background: #fff; color: var(--orange); border: 1px solid var(--orange); padding: 7px 9px; border-radius: 999px; font-size: 11px; font-weight: 800; white-space: nowrap; }
+
+    .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .heading-copy { display: flex; align-items: center; gap: 7px; }
+    .section-heading h2 { font-size: 22px; line-height: 1.15; font-weight: 800; }
+    .round-icon {
+      width: 40px; height: 40px; border: 0; border-radius: 50%; display: grid; place-items: center;
+      color: var(--purple); background: #fff; box-shadow: var(--shadow); cursor: pointer;
+    }
+    .progress-card, .meal-card, .streak-card, .workout-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+    .progress-card { padding: 16px; margin-bottom: 14px; }
+    .progress-head { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 800; }
+    .progress-head span { color: #6b7280; }
+    .track { height: 10px; background: #f0f1f4; border-radius: 999px; overflow: hidden; margin-top: 12px; }
+    .track-fill { height: 100%; width: 0%; background: var(--green); border-radius: inherit; transition: width .25s ease; }
+    .shopping-button, .primary-button {
+      width: 100%; min-height: 58px; border: 0; border-radius: 16px; background: var(--green); color: #fff;
+      display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 17px; font-weight: 800;
+      box-shadow: 0 8px 20px rgba(16, 185, 129, .25); cursor: pointer;
+    }
+    .shopping-button { margin-bottom: 14px; }
+    .meals-list { display: grid; gap: 12px; }
+    .meal-card { padding: 16px; transition: opacity .2s ease, border .2s ease; }
+    .meal-card.eaten { opacity: .58; border: 1px solid var(--green); background: #f9fafb; }
+    .meal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+    .meal-type { display: flex; align-items: center; gap: 8px; color: var(--purple); font-size: 12px; font-weight: 800; text-transform: uppercase; }
+    .meal-check { border: 0; padding: 0; background: none; color: #d1d5db; width: 22px; height: 22px; cursor: pointer; }
+    .meal-card.eaten .meal-check { color: var(--green); }
+    .meal-actions { display: flex; align-items: center; gap: 7px; }
+    .calories { border-radius: 8px; padding: 5px 8px; background: #f3f4f6; color: #666; font-size: 11px; font-weight: 700; }
+    .swap { border: 0; border-radius: 8px; padding: 7px 11px; background: var(--green); color: #fff; font-size: 11px; font-weight: 800; cursor: pointer; }
+    .meal-name { font-size: 17px; line-height: 1.25; font-weight: 750; margin-bottom: 6px; }
+    .meal-card.eaten .meal-name { text-decoration: line-through; color: #9ca3af; }
+    .ingredients { color: #666; font-size: 13px; line-height: 1.42; }
+    .macros { display: grid; grid-template-columns: 1fr 1px 1fr 1px 1fr; align-items: center; margin-top: 15px; padding-top: 13px; border-top: 1px solid #eceef1; }
+    .macro { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .macro-dot { width: 25px; height: 25px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-size: 10px; font-weight: 800; }
+    .macro strong { font-size: 15px; }
+    .macro small { color: #777; font-size: 10px; }
+    .divider { width: 1px; height: 42px; background: #e5e7eb; }
+    .nutrition-summary { display: grid; gap: 14px; margin-top: 16px; }
+    .total-card { border-radius: 16px; padding: 18px; background: #fff; box-shadow: var(--shadow); }
+    .total-card h3 { margin-bottom: 15px; text-align: center; font-size: 16px; }
+    .total-stats { display: grid; grid-template-columns: repeat(4, 1fr); align-items: center; }
+    .total-stat { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; border-right: 1px solid #e5e7eb; }
+    .total-stat:last-child { border: 0; }
+    .total-stat strong { font-size: 16px; }
+    .total-stat small { color: #666; font-size: 10px; font-weight: 650; }
+    .total-stat .macro-dot { width: 23px; height: 23px; font-size: 9px; }
+    .last-checkin { border-radius: 16px; padding: 18px; background: #fff; box-shadow: var(--shadow); margin-bottom: 6px; }
+    .last-checkin h3 { margin-bottom: 14px; text-align: center; font-size: 16px; }
+    .checkin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .checkin-grid-item { border-radius: 12px; padding: 13px; background: #f9fafb; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+    .checkin-grid-item span:first-child { font-size: 18px; }
+    .checkin-grid-item strong { font-size: 14px; }
+    .checkin-grid-item small { color: #6b7280; font-size: 10px; font-weight: 650; }
+
+    .tab-bar {
+      height: calc(75px + var(--safe-bottom));
+      padding: 8px 9px var(--safe-bottom);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      flex: 0 0 auto;
+      background: #fff;
+      border-top: 1px solid #e5e7eb;
+      z-index: 8;
+    }
+    .tab { border: 0; background: transparent; color: #9ca3af; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 10px; font-weight: 700; cursor: pointer; }
+    .tab.active { color: var(--purple); }
+    .tab .icon { width: 24px; height: 24px; }
+
+    .streak-card { padding: 22px; margin: 16px 0; }
+    .streak-number { display: flex; align-items: center; gap: 12px; color: #f87171; font-size: 48px; line-height: 1; font-weight: 800; }
+    .streak-card h3 { margin-top: 14px; font-size: 20px; }
+    .streak-card p { color: #737373; margin-top: 5px; font-size: 15px; }
+    .workout-card { padding: 20px; }
+    .empty-workout { min-height: 292px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 12px; }
+    .empty-workout h2 { font-size: 20px; }
+    .empty-workout p { max-width: 300px; color: #737373; font-size: 14px; line-height: 1.45; }
+    .new-workout-button { max-width: 280px; margin-top: 5px; }
+    .button-disc { width: 33px; height: 33px; border-radius: 50%; display: grid; place-items: center; background: #fff; color: var(--green); }
+
+    .sheet-backdrop { position: absolute; inset: 0; z-index: 30; display: none; align-items: flex-end; background: rgba(0, 0, 0, .55); }
+    .sheet-backdrop.open { display: flex; animation: shade-in .18s ease-out; }
+    @keyframes shade-in { from { background: rgba(0,0,0,0); } }
+    .sheet {
+      width: 100%; max-height: 89%; overflow-y: auto; background: #fff; border-radius: 24px 24px 0 0;
+      padding: 20px 20px calc(24px + var(--safe-bottom)); transform: translateY(0); animation: sheet-up .24s ease-out;
+    }
+    @keyframes sheet-up { from { transform: translateY(60px); opacity: .7; } }
+    .sheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+    .sheet-head h2 { font-size: 23px; line-height: 1.25; max-width: 315px; }
+    .close { width: 36px; height: 36px; border: 0; border-radius: 50%; background: #f5f5f5; display: grid; place-items: center; cursor: pointer; }
+    .type-grid { display: grid; gap: 12px; }
+    .type-option { position: relative; border: 2px solid #e5e7eb; border-radius: 16px; padding: 16px; background: #fafafa; text-align: left; cursor: pointer; }
+    .type-option.active { border-color: var(--purple); background: var(--purple); color: #fff; }
+    .type-option h3 { font-size: 18px; margin-bottom: 6px; }
+    .type-option p { color: #737373; font-size: 13px; line-height: 1.4; }
+    .type-option.active p { color: rgba(255,255,255,.8); }
+    .equipment-section { display: none; margin-top: 18px; }
+    .equipment-section.visible { display: block; animation: fade-in .2s ease-out; }
+    .equipment-section h3 { font-size: 16px; margin-bottom: 12px; }
+    .equipment-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+    .equipment { border: 1px solid #e5e7eb; border-radius: 14px; padding: 11px 14px; background: #fafafa; font-size: 14px; font-weight: 750; cursor: pointer; }
+    .equipment.active { border-color: var(--purple); background: var(--purple); color: #fff; }
+    .equipment-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0 10px; }
+    .outline-button { min-height: 44px; border: 1px solid var(--purple); border-radius: 12px; background: var(--purple-soft); color: var(--purple); font-size: 14px; font-weight: 800; cursor: pointer; }
+    .validation { min-height: 20px; margin-bottom: 6px; color: #ff6b6b; font-size: 13px; font-weight: 700; }
+    .primary-button:disabled { opacity: .42; cursor: default; }
+
+    .generated-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .generated-head h2 { font-size: 22px; }
+    .generated-head p { color: #737373; margin-top: 5px; font-size: 13px; line-height: 1.4; }
+    .duration { border-radius: 999px; padding: 7px 10px; color: var(--purple); background: var(--purple-soft); font-size: 12px; font-weight: 800; white-space: nowrap; }
+    .meta-row { display: flex; flex-wrap: wrap; gap: 7px; margin: 15px 0; }
+    .meta-pill { border-radius: 999px; padding: 6px 9px; background: #f3f4f6; color: #555; font-size: 11px; font-weight: 750; }
+    .gym-info { border-radius: 12px; padding: 12px; background: var(--purple-soft); color: #3730a3; font-size: 12px; line-height: 1.4; margin-bottom: 14px; }
+    .gym-info strong { display: block; }
+    .exercise-list { display: grid; gap: 14px; margin: 2px 0 18px; }
+    .exercise-row { display: grid; grid-template-columns: 35px minmax(0, 1fr); gap: 12px; align-items: start; }
+    .exercise-number { width: 35px; height: 35px; border-radius: 50%; background: var(--purple-soft); color: var(--purple); display: grid; place-items: center; font-weight: 800; }
+    .exercise-row h3 { font-size: 15px; margin-bottom: 2px; }
+    .exercise-row .time { color: #737373; font-size: 12px; }
+    .exercise-row p { color: #737373; margin-top: 5px; font-size: 12px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .secondary-button { width: 100%; min-height: 48px; border: 1px solid var(--purple); border-radius: 16px; background: var(--purple-soft); color: var(--purple); display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px; font-weight: 800; margin-bottom: 12px; cursor: pointer; }
+
+    .workout-full { background: #fff; z-index: 50; }
+    .workout-full .status-bar { background: #fff; }
+    .workout-header { height: 66px; padding: 8px 16px 14px; display: grid; grid-template-columns: 42px 1fr 42px; align-items: center; }
+    .workout-header h2 { text-align: center; font-size: 18px; }
+    .header-action { width: 40px; height: 40px; border: 0; background: transparent; display: grid; place-items: center; cursor: pointer; }
+    .workout-progress { height: 5px; background: #ececec; }
+    .workout-progress span { display: block; width: 8%; height: 100%; background: var(--purple); transition: width .3s ease; }
+    .prep-content { flex: 1; padding: 34px 26px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; overflow-y: auto; }
+    .prep-content h1 { font-size: 37px; }
+    .prep-content > p { color: #737373; font-size: 17px; line-height: 1.4; margin-top: 14px; }
+    .stats { width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); background: #fff; border-radius: 16px; box-shadow: var(--shadow); margin: 28px 0 24px; padding: 18px 4px; }
+    .stat { padding: 0 5px; border-right: 1px solid #e5e7eb; }
+    .stat:last-child { border: 0; }
+    .stat strong { display: block; color: var(--purple); font-size: 28px; line-height: 1; }
+    .stat small { display: block; color: #737373; margin-top: 8px; font-size: 10px; line-height: 1.15; }
+    .first-exercise { width: 100%; border: 2px solid var(--purple); border-radius: 16px; padding: 20px; }
+    .first-exercise small { color: var(--purple); text-transform: uppercase; font-weight: 800; }
+    .first-exercise h2 { margin-top: 9px; font-size: 22px; }
+    .workout-footer { padding: 14px 24px calc(22px + var(--safe-bottom)); }
+
+    .live-content { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 24px 18px; display: flex; flex-direction: column; align-items: center; }
+    .exercise-count { color: var(--purple); text-transform: uppercase; font-size: 13px; font-weight: 800; }
+    .live-content h1 { font-size: 26px; text-align: center; margin: 7px 0 12px; }
+    .exercise-media { width: min(100%, 305px); aspect-ratio: 1; border-radius: 20px; object-fit: cover; background: #f4f4f5; }
+    .live-lower { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 126px; gap: 12px; margin-top: 14px; }
+    .instructions { border: 2px solid var(--purple); border-radius: 16px; padding: 13px; min-height: 126px; }
+    .instructions strong { display: block; color: var(--purple); font-size: 12px; margin-bottom: 6px; }
+    .instructions p { font-size: 12px; line-height: 1.42; color: #353535; }
+    .timer { border: 6px solid var(--orange); border-radius: 20px; min-height: 126px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .timer.work { border-color: var(--purple); }
+    .timer span { color: var(--orange); font-size: 11px; font-weight: 800; text-transform: uppercase; }
+    .timer.work span, .timer.work strong { color: var(--purple); }
+    .timer strong { color: var(--orange); display: block; font-size: 46px; line-height: 1; margin-top: 5px; }
+    .live-actions { width: 100%; display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 12px; }
+    .live-actions button { min-height: 46px; border-radius: 13px; font-size: 14px; font-weight: 800; cursor: pointer; }
+    .pause { color: var(--purple); border: 2px solid var(--purple); background: #fff; }
+    .next { color: #fff; border: 0; background: var(--purple); }
+
+    .finish-screen { justify-content: center; align-items: center; text-align: center; padding: 34px; background: #fff; z-index: 60; }
+    .brand-mark { width: 80px; height: 80px; border-radius: 22px; display: grid; place-items: center; background: linear-gradient(145deg, #7c3aed, #4f46e5); color: #fff; box-shadow: 0 14px 30px rgba(79,70,229,.3); font-size: 42px; }
+    .finish-screen h1 { margin-top: 22px; font-size: 34px; }
+    .finish-screen p { color: #737373; font-size: 17px; line-height: 1.45; margin: 13px 0 26px; }
+    .install-button { max-width: 340px; }
+    .replay { margin-top: 14px; border: 0; background: none; color: var(--purple); font-weight: 800; padding: 10px; cursor: pointer; }
+    .feature-overlay { position: absolute; inset: 0; z-index: 45; display: none; align-items: flex-end; background: rgba(0,0,0,.55); }
+    .feature-overlay.open { display: flex; animation: shade-in .18s ease-out; }
+    .feature-sheet { width: 100%; max-height: 88%; overflow-y: auto; border-radius: 24px 24px 0 0; background: #fff; padding: 20px 20px calc(24px + var(--safe-bottom)); animation: sheet-up .24s ease-out; }
+    .feature-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+    .feature-head h2 { font-size: 23px; line-height: 1.2; }
+    .feature-head p { margin-top: 5px; color: var(--muted); font-size: 13px; line-height: 1.4; }
+    .tip-list { display: grid; gap: 12px; }
+    .tip-card { display: grid; grid-template-columns: 42px minmax(0,1fr); gap: 12px; border: 1px solid var(--line); border-radius: 16px; padding: 15px; background: #fafafa; }
+    .tip-card .tip-icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 13px; background: var(--purple-soft); color: var(--purple); font-size: 21px; }
+    .tip-card h3 { font-size: 15px; margin-bottom: 4px; }
+    .tip-card p { color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .shopping-groups { display: grid; gap: 17px; }
+    .shopping-group h3 { color: var(--purple); font-size: 13px; text-transform: uppercase; margin-bottom: 8px; }
+    .shopping-items { display: grid; border: 1px solid var(--line); border-radius: 15px; overflow: hidden; }
+    .shopping-item { min-height: 48px; border: 0; border-bottom: 1px solid var(--line); background: #fff; display: flex; align-items: center; gap: 11px; padding: 10px 13px; text-align: left; cursor: pointer; }
+    .shopping-item:last-child { border-bottom: 0; }
+    .shopping-box { width: 22px; height: 22px; flex: 0 0 auto; border: 2px solid #d1d5db; border-radius: 7px; display: grid; place-items: center; color: #fff; }
+    .shopping-item.checked { color: #9ca3af; text-decoration: line-through; }
+    .shopping-item.checked .shopping-box { border-color: var(--green); background: var(--green); }
+    .shopping-copy { display: flex; justify-content: space-between; align-items: center; gap: 8px; width: 100%; font-size: 14px; font-weight: 700; }
+    .shopping-copy small { color: #9ca3af; font-size: 11px; font-weight: 600; text-decoration: none; }
+    .chat-sheet { height: min(88%, 690px); display: flex; flex-direction: column; overflow: hidden; }
+    .chat-messages { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 2px 2px 14px; }
+    .message { max-width: 84%; border-radius: 15px; padding: 11px 13px; font-size: 13px; line-height: 1.45; }
+    .message.coach { align-self: flex-start; background: var(--purple-soft); color: #312e81; border-bottom-left-radius: 5px; }
+    .message.user { align-self: flex-end; background: var(--purple); color: #fff; border-bottom-right-radius: 5px; }
+    .coach-name { display: block; margin-bottom: 4px; color: var(--purple); font-size: 10px; font-weight: 800; text-transform: uppercase; }
+    .chat-prompts { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 4px 0 12px; }
+    .chat-prompts::-webkit-scrollbar { display: none; }
+    .chat-prompt { flex: 0 0 auto; border: 1px solid var(--purple); border-radius: 999px; padding: 9px 12px; background: #fff; color: var(--purple); font-size: 12px; font-weight: 750; cursor: pointer; }
+    .chat-compose { display: grid; grid-template-columns: minmax(0,1fr) 48px; gap: 9px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .chat-compose input { min-width: 0; height: 48px; border: 1px solid #d1d5db; border-radius: 14px; padding: 0 14px; font: inherit; font-size: 14px; outline: none; }
+    .chat-compose input:focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(79,70,229,.1); }
+    .chat-send { width: 48px; height: 48px; border: 0; border-radius: 14px; background: var(--purple); color: #fff; display: grid; place-items: center; cursor: pointer; }
+    .intro-overlay { position: absolute; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; padding: 42px 28px; text-align: center; color: #fff; background: radial-gradient(circle at 50% 12%, #6d28d9 0, #30126f 37%, #160437 72%, #0d0220 100%); cursor: pointer; transition: opacity .3s ease, visibility .3s ease; }
+    .intro-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .intro-glow { position: absolute; width: 340px; height: 340px; border-radius: 50%; background: rgba(168,85,247,.18); filter: blur(2px); top: -105px; }
+    .intro-tap-banner { position: absolute; z-index: 2; top: max(18px, env(safe-area-inset-top)); left: 18px; right: 18px; min-height: 52px; border: 2px solid rgba(255,255,255,.88); border-radius: 16px; display: flex; align-items: center; justify-content: center; gap: 9px; background: #ff5b70; color: #fff; box-shadow: 0 10px 34px rgba(255,91,112,.55); font-size: 15px; font-weight: 900; text-transform: uppercase; animation: top-pulse 1s ease-in-out infinite; }
+    .intro-tap-banner .live-dot { width: 10px; height: 10px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 0 rgba(255,255,255,.75); animation: live-ring 1s ease-out infinite; }
+    .intro-brand { position: relative; display: flex; align-items: center; gap: 10px; margin-top: 38px; margin-bottom: 27px; font-size: 25px; font-weight: 850; }
+    .intro-logo { width: 52px; height: 52px; border: 1px solid rgba(255,255,255,.34); border-radius: 15px; display: grid; place-items: center; background: linear-gradient(145deg,#9333ea,#4f46e5); box-shadow: 0 12px 30px rgba(0,0,0,.26); font-size: 31px; }
+    .intro-kicker { position: relative; display: inline-flex; align-items: center; min-height: 35px; padding: 7px 13px; border: 1px solid rgba(216,180,254,.55); border-radius: 999px; color: #fff; background: rgba(124,58,237,.3); font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: .8px; box-shadow: 0 8px 22px rgba(0,0,0,.13); }
+    .intro-overlay h1 { position: relative; max-width: 360px; margin-top: 12px; font-size: 42px; line-height: 1.02; }
+    .intro-overlay h1 em { color: #ff5b70; font-style: normal; }
+    .intro-overlay > p { position: relative; max-width: 330px; margin-top: 17px; color: rgba(255,255,255,.78); font-size: 17px; line-height: 1.45; }
+    .intro-preview { position: relative; width: min(100%, 340px); margin: 30px 0 26px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .intro-preview-card { min-height: 94px; border: 1px solid rgba(255,255,255,.24); border-radius: 18px; padding: 14px; background: rgba(255,255,255,.1); backdrop-filter: blur(10px); text-align: left; }
+    .intro-preview-card span { display: block; color: #c4b5fd; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+    .intro-preview-card strong { display: block; margin-top: 7px; font-size: 16px; line-height: 1.2; }
+    .tap-explore { position: relative; width: min(100%, 330px); min-height: 64px; border: 2px solid #fff; border-radius: 18px; display: flex; align-items: center; justify-content: center; gap: 10px; background: #ff5b70; color: #fff; box-shadow: 0 12px 30px rgba(255,91,112,.3); font-size: 19px; font-weight: 900; animation: tap-pulse 1s ease-in-out infinite; }
+    .tap-explore::after { content: ""; position: absolute; inset: -7px; border: 2px solid rgba(255,255,255,.72); border-radius: 23px; animation: cta-ring 1s ease-out infinite; }
+    .tap-hand { font-size: 25px; animation: tap-hand .55s ease-in-out infinite alternate; }
+    .intro-footnote { position: relative; margin-top: 14px; color: rgba(255,255,255,.68); font-size: 11px; font-weight: 700; }
+    .install-fab { position: absolute; z-index: 22; right: 14px; bottom: calc(84px + var(--safe-bottom)); min-height: 46px; border: 2px solid #fff; border-radius: 999px; padding: 0 16px; display: flex; align-items: center; justify-content: center; gap: 7px; background: #ff5b70; color: #fff; box-shadow: 0 9px 26px rgba(255,91,112,.42); font-size: 13px; font-weight: 900; opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity .22s ease, transform .22s ease; }
+    .install-fab.visible { opacity: 1; transform: translateY(0); pointer-events: auto; animation: install-nudge 2.2s ease-in-out infinite; }
+    @keyframes top-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.045); } }
+    @keyframes live-ring { 0% { box-shadow: 0 0 0 0 rgba(255,255,255,.8); } 100% { box-shadow: 0 0 0 9px rgba(255,255,255,0); } }
+    @keyframes tap-pulse { 0%,100% { transform: scale(1); box-shadow: 0 12px 30px rgba(255,91,112,.3); } 50% { transform: scale(1.07); box-shadow: 0 19px 46px rgba(255,91,112,.72); } }
+    @keyframes cta-ring { 0% { transform: scale(.96); opacity: .85; } 100% { transform: scale(1.08); opacity: 0; } }
+    @keyframes tap-hand { from { transform: translateY(-3px) scale(1); } to { transform: translateY(4px) scale(1.13); } }
+    @keyframes install-nudge { 0%,78%,100% { transform: scale(1); } 84% { transform: scale(1.06); } 90% { transform: scale(.98); } 96% { transform: scale(1.03); } }
+    .toast { position: absolute; left: 50%; bottom: 98px; z-index: 80; transform: translate(-50%, 18px); opacity: 0; pointer-events: none; background: #151515; color: #fff; padding: 10px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; transition: .2s ease; }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    /* Use the full playable viewport; Meta renders its App Store panel outside the playable. */
+    body { padding-bottom: 0; }
+    /* Meta already supplies a persistent install CTA; avoid obscuring workout controls. */
+    .install-fab { display: none !important; }
+
+    @media (max-height: 720px) {
+      .quick-card { min-height: 98px; }
+      .streak-card { padding: 16px 20px; margin: 10px 0; }
+      .prep-content { padding-top: 18px; }
+      .prep-content h1 { font-size: 31px; }
+      .stats { margin: 18px 0; }
+      .exercise-media { width: min(100%, 235px); }
+      .live-content h1 { font-size: 22px; }
+    }
+    @media (min-width: 700px) {
+      body { padding: 18px 0; }
+      .ad-shell { height: calc(100% - 36px); border-radius: 28px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ad-shell" id="app">
+    <div class="intro-overlay" id="intro-overlay" role="button" aria-label="Tap to explore SparkFit">
+      <div class="intro-glow"></div>
+      <div class="intro-tap-banner"><span class="live-dot"></span>Interactive demo — tap to try</div>
+      <div class="intro-brand"><span class="intro-logo">ϟ</span><span>SparkFit</span></div>
+      <span class="intro-kicker">Get fit in 15 minutes a day</span>
+      <h1>Eat smarter.<br><em>Train stronger.</em></h1>
+      <p>Explore a personalised seven-day meal plan and build your next gym workout.</p>
+      <div class="intro-preview"><div class="intro-preview-card"><span>Meal plan</span><strong>4 balanced meals every day</strong></div><div class="intro-preview-card"><span>Workout</span><strong>Built around your equipment</strong></div></div>
+      <div class="tap-explore"><span class="tap-hand">☝</span>Try the app now!</div>
+      <span class="intro-footnote">Interactive SparkFit preview</span>
+    </div>
+    <button class="install-fab" id="install-floating">↗ Install SparkFit</button>
+    <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+      <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+      <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></symbol>
+      <symbol id="i-message" viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></symbol>
+      <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.2L5.8 21 7 14.2l-5-4.9 6.9-1z"/></symbol>
+      <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3v18M5 7h14M5 7l-3 6h6zM19 7l-3 6h6zM8 21h8"/></symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 6v6h-6M4 18v-6h6M19 9a7 7 0 0 0-12-3L4 9M5 15a7 7 0 0 0 12 3l3-3"/></symbol>
+      <symbol id="i-cart" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1"/><circle cx="19" cy="20" r="1"/><path d="M3 4h2l2.4 10.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L21 8H6"/></symbol>
+      <symbol id="i-apple" viewBox="0 0 24 24"><path d="M12 6c-2-2-7-1.7-8.4 2.6C2.2 13 5 20 9 21c1 .2 2-.7 3-.7s2 .9 3 .7c4-1 6.8-8 5.4-12.4C19 4.3 14 4 12 6Z"/><path d="M12 6c0-2 1.5-4 4-4"/></symbol>
+      <symbol id="i-dumbbell" viewBox="0 0 24 24"><path d="m6.5 6.5 11 11M4 8l4-4M2.5 6.5l3 3M20 16l-4 4M18.5 14.5l3 3M7 12l5-5M12 17l5-5"/></symbol>
+      <symbol id="i-trend" viewBox="0 0 24 24"><path d="m3 17 6-6 4 4 8-9M15 6h6v6"/></symbol>
+      <symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M8.2 13 7 22l5-3 5 3-1.2-9"/></symbol>
+      <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.8 1.8 0 0 0 .4 2l.1.1-2.8 2.8-.1-.1a1.8 1.8 0 0 0-2-.4 1.8 1.8 0 0 0-1.1 1.7V21h-4v-.1A1.8 1.8 0 0 0 8.8 19a1.8 1.8 0 0 0-2 .4l-.1.1-2.8-2.8.1-.1a1.8 1.8 0 0 0 .4-2A1.8 1.8 0 0 0 2.7 14H2v-4h.7a1.8 1.8 0 0 0 1.7-1.1 1.8 1.8 0 0 0-.4-2l-.1-.1L6.7 4l.1.1a1.8 1.8 0 0 0 2 .4A1.8 1.8 0 0 0 10 2.8V2h4v.8a1.8 1.8 0 0 0 1.1 1.7 1.8 1.8 0 0 0 2-.4l.1-.1L20 6.8l-.1.1a1.8 1.8 0 0 0-.4 2 1.8 1.8 0 0 0 1.7 1.1h.8v4h-.8a1.8 1.8 0 0 0-1.8 1Z"/></symbol>
+      <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7z" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="m20 6-11 11-5-5"/></symbol>
+      <symbol id="i-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></symbol>
+      <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M12 20h.01M2 9a15 15 0 0 1 20 0"/></symbol>
+    </svg>
+
+    <section class="screen active" id="nutrition-screen">
+      <div class="status-bar"><span>9:41</span><div class="status-icons"><span class="signal"><i></i><i></i><i></i></span><svg class="icon sm"><use href="#i-wifi"/></svg><span class="battery"><span></span></span></div></div>
+      <main class="scroll" id="nutrition-scroll">
+        <header class="page-header">
+          <div><h1>Hey there!</h1><p class="subtitle">Your daily nutrition plan</p></div>
+          <button class="icon-text-button" id="open-tips"><svg class="icon"><use href="#i-info"/></svg>Tips</button>
+        </header>
+        <div class="quick-grid">
+          <div class="quick-card green"><span class="quick-icon"><svg class="icon"><use href="#i-share"/></svg></span><strong>Share App</strong><span>with Friends</span></div>
+          <button class="quick-card orange" id="open-coach"><span class="quick-icon"><svg class="icon"><use href="#i-message"/></svg></span><strong>Chat to your<br>AI coach</strong></button>
+          <div class="quick-card purple"><span class="quick-icon"><svg class="icon"><use href="#i-star"/></svg></span><strong>Review App</strong></div>
+        </div>
+        <div class="checkin"><svg class="icon"><use href="#i-scale"/></svg><div class="checkin-copy"><strong>Last check-in: Yesterday</strong><span>Next check-in: 6 days</span></div><span class="checkin-cta">Tap to check-in ›</span></div>
+        <div class="section-heading"><div class="heading-copy"><h2>7 Day Weekly Meal Plan</h2><svg class="icon sm" style="color:#6b7280"><use href="#i-info"/></svg></div><button class="round-icon" id="refresh-meals"><svg class="icon"><use href="#i-refresh"/></svg></button></div>
+        <div class="progress-card"><div class="progress-head">Daily Progress <span id="meal-progress-label">0/4 meals</span></div><div class="track"><div class="track-fill" id="meal-progress"></div></div></div>
+        <button class="shopping-button" id="open-shopping"><svg class="icon"><use href="#i-cart"/></svg>Weekly Shopping List</button>
+        <div class="meals-list" id="meals-list"></div>
+        <section class="nutrition-summary">
+          <article class="total-card"><h3>🎯 Target for today</h3><div class="total-stats"><div class="total-stat"><strong>2200</strong><small>Calories</small></div><div class="total-stat"><span class="macro-dot" style="background:#ff6b6b">P</span><strong>165g</strong><small>30%</small></div><div class="total-stat"><span class="macro-dot" style="background:#4ecdc4">C</span><strong>248g</strong><small>45%</small></div><div class="total-stat"><span class="macro-dot" style="background:#ffb700">F</span><strong>61g</strong><small>25%</small></div></div></article>
+          <article class="total-card"><h3>Actual for today</h3><div class="total-stats"><div class="total-stat"><strong>2200</strong><small>Calories</small></div><div class="total-stat"><span class="macro-dot" style="background:#ff6b6b">P</span><strong>170g</strong><small>31%</small></div><div class="total-stat"><span class="macro-dot" style="background:#4ecdc4">C</span><strong>224g</strong><small>41%</small></div><div class="total-stat"><span class="macro-dot" style="background:#ffb700">F</span><strong>66g</strong><small>27%</small></div></div></article>
+          <article class="last-checkin"><h3>📋 Last Check-in</h3><div class="checkin-grid"><div class="checkin-grid-item"><span>⚖️</span><strong>82.5 kg</strong><small>Weight</small></div><div class="checkin-grid-item"><span>🎯</span><strong>Lose weight</strong><small>Goal</small></div><div class="checkin-grid-item"><span>⚡</span><strong>Moderate</strong><small>Activity</small></div><div class="checkin-grid-item"><span>🥗</span><strong>Standard</strong><small>Diet</small></div></div></article>
+        </section>
+      </main>
+      <nav class="tab-bar" data-tabs>
+        <button class="tab active" data-screen="nutrition-screen"><svg class="icon"><use href="#i-apple"/></svg><span>Nutrition</span></button>
+        <button class="tab" data-screen="workouts-screen"><svg class="icon"><use href="#i-dumbbell"/></svg><span>Workouts</span></button>
+        <button class="tab" data-toast="Tracking in the full SparkFit app"><svg class="icon"><use href="#i-trend"/></svg><span>Tracking</span></button>
+        <button class="tab" data-toast="Awards in the full SparkFit app"><svg class="icon"><use href="#i-award"/></svg><span>Awards</span></button>
+        <button class="tab" data-toast="Settings in the full SparkFit app"><svg class="icon"><use href="#i-settings"/></svg><span>Settings</span></button>
+      </nav>
+    </section>
+
+    <section class="screen" id="workouts-screen">
+      <div class="status-bar"><span>9:41</span><div class="status-icons"><span class="signal"><i></i><i></i><i></i></span><svg class="icon sm"><use href="#i-wifi"/></svg><span class="battery"><span></span></span></div></div>
+      <main class="scroll" id="workout-scroll">
+        <header class="page-header"><div><h1>Today’s Workout</h1><p class="subtitle">15 minutes towards a better you</p></div></header>
+        <div class="streak-card"><div class="streak-number"><span>🔥</span>0</div><h3>Day Streak</h3><p>Keep the momentum going!</p></div>
+        <div class="workout-card" id="workout-card">
+          <div class="empty-workout">
+            <svg class="icon lg" style="color:#4f46e5"><use href="#i-dumbbell"/></svg>
+            <h2>Choose today’s workout</h2>
+            <p>Pick bodyweight or gym so SparkFit only creates a workout when you ask for one.</p>
+            <button class="primary-button new-workout-button" id="new-workout"><span class="button-disc"><svg class="icon"><use href="#i-plus"/></svg></span>New Workout</button>
+          </div>
+        </div>
+      </main>
+      <nav class="tab-bar" data-tabs>
+        <button class="tab" data-screen="nutrition-screen"><svg class="icon"><use href="#i-apple"/></svg><span>Nutrition</span></button>
+        <button class="tab active" data-screen="workouts-screen"><svg class="icon"><use href="#i-dumbbell"/></svg><span>Workouts</span></button>
+        <button class="tab" data-toast="Tracking in the full SparkFit app"><svg class="icon"><use href="#i-trend"/></svg><span>Tracking</span></button>
+        <button class="tab" data-toast="Awards in the full SparkFit app"><svg class="icon"><use href="#i-award"/></svg><span>Awards</span></button>
+        <button class="tab" data-toast="Settings in the full SparkFit app"><svg class="icon"><use href="#i-settings"/></svg><span>Settings</span></button>
+      </nav>
+    </section>
+
+    <div class="feature-overlay" id="tips-overlay">
+      <section class="feature-sheet" role="dialog" aria-modal="true" aria-label="Fitness success tips">
+        <div class="feature-head"><div><h2>Fitness Success Tips</h2><p>Small habits that make your plan easier to stick to.</p></div><button class="close" data-close-feature aria-label="Close tips"><svg class="icon"><use href="#i-x"/></svg></button></div>
+        <div class="tip-list">
+          <article class="tip-card"><span class="tip-icon">🥗</span><div><h3>Build balanced meals</h3><p>Include a source of protein, colourful vegetables and a satisfying carbohydrate to support energy and recovery.</p></div></article>
+          <article class="tip-card"><span class="tip-icon">💧</span><div><h3>Stay hydrated</h3><p>Sip water regularly throughout the day and have extra around workouts, especially when training hard.</p></div></article>
+          <article class="tip-card"><span class="tip-icon">🌙</span><div><h3>Prioritise recovery</h3><p>Aim for consistent sleep and give your body time to recover between demanding sessions.</p></div></article>
+          <article class="tip-card"><span class="tip-icon">⚡</span><div><h3>Keep it achievable</h3><p>Fifteen focused minutes counts. Consistency beats waiting for the perfect day or the perfect workout.</p></div></article>
+        </div>
+      </section>
+    </div>
+
+    <div class="feature-overlay" id="shopping-overlay">
+      <section class="feature-sheet" role="dialog" aria-modal="true" aria-label="Weekly shopping list">
+        <div class="feature-head"><div><h2>Weekly Shopping List</h2><p>Everything you need for your personalised seven-day meal plan.</p></div><button class="close" data-close-feature aria-label="Close shopping list"><svg class="icon"><use href="#i-x"/></svg></button></div>
+        <div class="shopping-groups">
+          <div class="shopping-group"><h3>Protein & dairy</h3><div class="shopping-items"><button class="shopping-item"><span class="shopping-box"></span><span class="shopping-copy">Chicken breast <small>1.2 kg</small></span></button><button class="shopping-item"><span class="shopping-box"></span><span class="shopping-copy">Salmon fillets <small>4</small></span></button><button class="shopping-item"><span class="shopping-box"></span><span class="shopping-copy">Greek yoghurt <small>1 kg</small></span></button><button class="shopping-item"><span class="shopping-box"></span><span class="shopping-copy">Eggs <small>12</small></span></button></div></div>
+          <div class="shopping-group"><h3>Fruit & vegetables</h3><div class="shopping-items"><button class="shopping-item"><span class="shopping-box"></span><span class="shopping-copy">Bananas <small>7</small></span></button><button class="shopping-item"><span class="shopping-box"></span><span class="shopping-copy">Mixed berries <small>500 g</small></span></button><button class="shopping-item"><span class="shopping-box"></span><span class="shopping-copy">Broccoli <small>3 heads</small></span></button><button class="shopping-item"><span class="shopping-box"></span><span class="shopping-copy">Sweet potatoes <small>1 kg</small></span></button></div></div>
+          <div class="shopping-group"><h3>Carbs & staples</h3><div class="shopping-items"><button class="shopping-item"><span class="shopping-box"></span><span class="shopping-copy">Oats <small>750 g</small></span></button><button class="shopping-item"><span class="shopping-box"></span><span class="shopping-copy">Quinoa <small>500 g</small></span></button><button class="shopping-item"><span class="shopping-box"></span><span class="shopping-copy">Almond milk <small>2 L</small></span></button><button class="shopping-item"><span class="shopping-box"></span><span class="shopping-copy">Nut butter <small>1 jar</small></span></button></div></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="feature-overlay" id="coach-overlay">
+      <section class="feature-sheet chat-sheet" role="dialog" aria-modal="true" aria-label="SparkFit AI Coach">
+        <div class="feature-head"><div><h2>Ask your AI Coach</h2><p>Quick support for training, nutrition and motivation.</p></div><button class="close" data-close-feature aria-label="Close AI coach"><svg class="icon"><use href="#i-x"/></svg></button></div>
+        <div class="chat-messages" id="chat-messages"><div class="message coach"><span class="coach-name">SparkFit Coach</span>Hey Col! What can I help you with today?</div></div>
+        <div class="chat-prompts"><button class="chat-prompt" data-prompt="What should I eat after training?">Post-workout meal</button><button class="chat-prompt" data-prompt="How can I stay motivated?">Stay motivated</button></div>
+        <form class="chat-compose" id="chat-form"><input id="chat-input" maxlength="100" placeholder="Ask your coach..." autocomplete="off"><button class="chat-send" type="submit" aria-label="Send message">➜</button></form>
+      </section>
+    </div>
+
+    <div class="sheet-backdrop" id="workout-sheet">
+      <div class="sheet" role="dialog" aria-modal="true" aria-label="Choose workout type">
+        <div class="sheet-head"><h2>What type of workout do you want?</h2><button class="close" id="close-sheet" aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button></div>
+        <div class="type-grid">
+          <button class="type-option" data-type="bodyweight"><h3>Bodyweight</h3><p>Fast 15-minute no-equipment circuit.</p></button>
+          <button class="type-option" data-type="gym"><h3>Gym</h3><p>Practical one-zone strength circuit.</p></button>
+        </div>
+        <div class="equipment-section" id="equipment-section">
+          <h3>What equipment do you have access to?</h3>
+          <div class="equipment-grid" id="equipment-grid"></div>
+          <div class="equipment-actions"><button class="outline-button" id="select-all">Select all</button><button class="outline-button" id="clear-all">Clear</button></div>
+          <div class="validation" id="equipment-validation">Select at least one piece of equipment.</div>
+          <button class="primary-button" id="create-gym" disabled>Create Gym Workout</button>
+        </div>
+      </div>
+    </div>
+
+    <section class="screen workout-full" id="workout-prep-screen">
+      <div class="status-bar"><span>9:41</span><div class="status-icons"><span class="signal"><i></i><i></i><i></i></span><svg class="icon sm"><use href="#i-wifi"/></svg><span class="battery"><span></span></span></div></div>
+      <header class="workout-header"><span></span><h2>Dumbbell Full Body Circuit</h2><button class="header-action" data-close-workout><svg class="icon lg"><use href="#i-x"/></svg></button></header>
+      <div class="workout-progress"><span></span></div>
+      <main class="prep-content"><h1>Dumbbell Full Body Circuit</h1><p>A balanced full-body dumbbell strength circuit</p><div class="stats"><div class="stat"><strong>3</strong><small>Exercises</small></div><div class="stat"><strong>3</strong><small>Rounds</small></div><div class="stat"><strong>40s</strong><small>Work Time</small></div><div class="stat"><strong>20s</strong><small>Rest Time</small></div></div><div class="first-exercise"><small>First Exercise</small><h2>Dumbbell Goblet Squat</h2></div></main>
+      <footer class="workout-footer"><button class="primary-button" id="begin-exercise">Start Workout</button></footer>
+    </section>
+
+    <section class="screen workout-full" id="workout-live-screen">
+      <div class="status-bar"><span>9:41</span><div class="status-icons"><span class="signal"><i></i><i></i><i></i></span><svg class="icon sm"><use href="#i-wifi"/></svg><span class="battery"><span></span></span></div></div>
+      <header class="workout-header"><button class="header-action" data-close-workout><svg class="icon lg"><use href="#i-x"/></svg></button><span></span><span></span></header>
+      <div class="workout-progress"><span id="live-progress"></span></div>
+      <main class="live-content"><span class="exercise-count">Exercise 1 of 9</span><h1>Dumbbell Goblet Squat</h1><img class="exercise-media" src="assets/dumbbell_goblet_squat.gif" alt="Dumbbell Goblet Squat demonstration"><div class="live-lower"><div class="instructions"><strong>Instructions</strong><p>Hold one dumbbell vertically at chest height. Sit into a squat with chest tall, knees tracking over toes, then drive through the heels to stand.</p></div><div class="timer" id="timer"><span id="timer-label">Get Ready</span><strong id="timer-value">3</strong></div></div><div class="live-actions"><button class="next" id="finish-demo">Finish demo</button></div></main>
+    </section>
+
+    <section class="screen finish-screen" id="finish-screen"><div class="brand-mark">ϟ</div><h1>Feel the Spark.</h1><p>Personalised meal plans and effective 15-minute workouts, all in one place.</p><button class="primary-button install-button" id="install-cta">Get SparkFit</button><button class="replay" id="replay-demo">Replay demo</button></section>
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script>
+    (() => {
+      const equipmentOptions = ['Dumbbells', 'Barbell', 'Bench', 'Squat Rack', 'Cables', 'Pull-up Bar'];
+      const exercises = [
+        ['Dumbbell Goblet Squat', 'Hold one dumbbell vertically at chest height. Sit tall and drive through the heels.'],
+        ['One Arm Dumbbell Row', 'Brace through the torso and row the dumbbell toward your hip with control.'],
+        ['Dumbbell Romanian Deadlift', 'Hinge at the hips with a flat back, then stand by squeezing the glutes.']
+      ];
+      const meals = [
+        { type: 'Breakfast', name: 'Protein Oatmeal with Banana', calories: 520, ingredients: '80g oats • 1 scoop whey protein • 1 banana • 200ml almond milk • cinnamon • 1 tbsp nut butter', macros: [38, 62, 14] },
+        { type: 'Lunch', name: 'Grilled Chicken with Quinoa & Veggies', calories: 580, ingredients: '200g chicken breast • 150g quinoa • broccoli • peppers • 1 tbsp olive oil', macros: [52, 58, 14] },
+        { type: 'Dinner', name: 'Grilled Salmon with Sweet Potato', calories: 620, ingredients: '200g salmon • 200g sweet potato • asparagus • lemon • 1 tbsp olive oil', macros: [48, 52, 22] },
+        { type: 'Snack', name: 'Greek Yogurt Bowl with Berries', calories: 480, ingredients: '300g Greek yogurt • 150g mixed berries • 30g almonds • 1 tbsp honey • 50g oats', macros: [32, 52, 16] }
+      ];
+      const mealAlternates = ['Greek Yogurt Bowl with Berries', 'Scrambled Eggs with Spinach & Mushrooms', 'Turkey & Veggie Whole Wheat Wrap'];
+      const selectedEquipment = new Set();
+      let mealDone = new Set();
+      let swapIndex = 0;
+      let countdown = null;
+      let time = 3;
+      let timerPhase = 'ready';
+      let demoStarted = false;
+
+      const $ = (selector, root = document) => root.querySelector(selector);
+      const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+      const icon = (name, cls = '') => `<svg class="icon ${cls}"><use href="#i-${name}"/></svg>`;
+
+      function showScreen(id) {
+        $$('.screen').forEach(screen => screen.classList.toggle('active', screen.id === id));
+        $$('.sheet-backdrop').forEach(sheet => sheet.classList.remove('open'));
+        $$('.feature-overlay').forEach(sheet => sheet.classList.remove('open'));
+        $('#install-floating').classList.toggle('visible', demoStarted && (id === 'nutrition-screen' || id === 'workouts-screen'));
+      }
+
+      function openFeature(id) {
+        $(`#${id}`).classList.add('open');
+      }
+
+      function toast(message) {
+        const node = $('#toast');
+        node.textContent = message;
+        node.classList.add('show');
+        clearTimeout(toast.timeout);
+        toast.timeout = setTimeout(() => node.classList.remove('show'), 1600);
+      }
+
+      function renderMeals() {
+        $('#meals-list').innerHTML = meals.map((meal, index) => `
+          <article class="meal-card ${mealDone.has(index) ? 'eaten' : ''}" data-meal="${index}">
+            <div class="meal-head"><div class="meal-type"><button class="meal-check" data-check="${index}" aria-label="Mark ${meal.type} eaten">${icon(mealDone.has(index) ? 'check' : 'circle')}</button>${meal.type}</div><div class="meal-actions"><span class="calories">${meal.calories} cal</span><button class="swap" data-swap="${index}">Swap</button></div></div>
+            <h3 class="meal-name">${meal.name}</h3><p class="ingredients">${meal.ingredients}</p>
+            <div class="macros"><div class="macro"><span class="macro-dot" style="background:#ff6b6b">P</span><strong>${meal.macros[0]}g</strong><small>Protein</small></div><span class="divider"></span><div class="macro"><span class="macro-dot" style="background:#4ecdc4">C</span><strong>${meal.macros[1]}g</strong><small>Carbs</small></div><span class="divider"></span><div class="macro"><span class="macro-dot" style="background:#ffb700">F</span><strong>${meal.macros[2]}g</strong><small>Fat</small></div></div>
+          </article>`).join('');
+        const pct = mealDone.size / meals.length * 100;
+        $('#meal-progress').style.width = `${pct}%`;
+        $('#meal-progress-label').textContent = `${mealDone.size}/${meals.length} meals`;
+      }
+
+      function renderEquipment() {
+        $('#equipment-grid').innerHTML = equipmentOptions.map(item => `<button class="equipment ${selectedEquipment.has(item) ? 'active' : ''}" data-equipment="${item}">${item}</button>`).join('');
+        const valid = selectedEquipment.size > 0;
+        $('#create-gym').disabled = !valid;
+        $('#equipment-validation').textContent = valid ? '' : 'Select at least one piece of equipment.';
+      }
+
+      function renderWorkout() {
+        const equipment = [...selectedEquipment];
+        $('#workout-card').innerHTML = `<div class="generated-head"><div><h2>Dumbbell Full Body Circuit</h2><p>A balanced full-body dumbbell strength circuit</p></div><span class="duration">15 min</span></div><div class="meta-row"><span class="meta-pill">40s work</span><span class="meta-pill">20s rest</span><span class="meta-pill">3 rounds</span></div><div class="gym-info"><strong>Equipment: ${equipment.join(', ')}</strong>Built around one equipment zone to keep transitions realistic.</div><div class="exercise-list">${exercises.map((exercise, index) => `<div class="exercise-row"><span class="exercise-number">${index + 1}</span><div><h3>${exercise[0]}</h3><span class="time">40s work • 20s rest</span><p>${exercise[1]}</p></div></div>`).join('')}</div><button class="secondary-button" id="regenerate-workout">${icon('plus')} New Workout</button><button class="primary-button" id="start-workout">${icon('play')} Start Workout</button>`;
+        $('#workout-scroll').scrollTo({ top: 270, behavior: 'smooth' });
+      }
+
+      function startTimer() {
+        clearInterval(countdown);
+        countdown = setInterval(() => {
+          time -= 1;
+          if (time <= 0 && timerPhase === 'ready') {
+            timerPhase = 'work';
+            time = 40;
+            $('#timer').classList.add('work');
+            $('#timer-label').textContent = 'Time to work';
+          }
+          $('#timer-value').textContent = time;
+          $('#live-progress').style.width = `${Math.min(100, timerPhase === 'work' ? 8 + ((40 - time) / 40 * 8) : 8)}%`;
+        }, 1000);
+      }
+
+      function coachReply(text) {
+        const query = text.toLowerCase();
+        if (query.includes('eat') || query.includes('meal') || query.includes('food')) {
+          return 'After training, aim for protein plus carbohydrates. Greek yoghurt with berries or chicken with quinoa are both great options from your plan.';
+        }
+        if (query.includes('motivat') || query.includes('routine')) {
+          return 'Keep the target small: commit to starting just 15 minutes. Track each completed session and focus on building the streak, not being perfect.';
+        }
+        return 'A strong next step is today’s 15-minute workout, followed by one balanced meal from your plan. Small, consistent actions create the biggest change.';
+      }
+
+      function sendCoachMessage(text) {
+        const clean = text.trim();
+        if (!clean) return;
+        const messages = $('#chat-messages');
+        const userMessage = document.createElement('div');
+        userMessage.className = 'message user';
+        userMessage.textContent = clean;
+        messages.appendChild(userMessage);
+        const response = document.createElement('div');
+        response.className = 'message coach';
+        const label = document.createElement('span');
+        label.className = 'coach-name';
+        label.textContent = 'SparkFit Coach';
+        response.append(label, document.createTextNode(coachReply(clean)));
+        messages.appendChild(response);
+        messages.scrollTop = messages.scrollHeight;
+      }
+
+      function openStore() {
+        if (typeof FbPlayableAd !== 'undefined' && typeof FbPlayableAd.onCTAClick === 'function') {
+          FbPlayableAd.onCTAClick();
+          return;
+        }
+        toast('Install CTA is active in Meta placements');
+      }
+
+      document.addEventListener('click', event => {
+        const target = event.target.closest('button, [data-toast]');
+        if (!target) return;
+        if (target.dataset.screen) {
+          showScreen(target.dataset.screen);
+          const scroll = target.dataset.screen === 'nutrition-screen' ? $('#nutrition-scroll') : $('#workout-scroll');
+          scroll.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        if (target.dataset.toast) toast(target.dataset.toast);
+        if (target.dataset.check !== undefined) {
+          const index = Number(target.dataset.check);
+          mealDone.has(index) ? mealDone.delete(index) : mealDone.add(index);
+          renderMeals();
+        }
+        if (target.dataset.swap !== undefined) {
+          const index = Number(target.dataset.swap);
+          meals[index].name = mealAlternates[swapIndex++ % mealAlternates.length];
+          renderMeals();
+          toast('Meal swapped');
+        }
+        if (target.dataset.type) {
+          $$('.type-option').forEach(option => option.classList.toggle('active', option === target));
+          $('#equipment-section').classList.toggle('visible', target.dataset.type === 'gym');
+          if (target.dataset.type === 'bodyweight') toast('Choose Gym to try equipment selection');
+        }
+        if (target.dataset.equipment) {
+          selectedEquipment.has(target.dataset.equipment) ? selectedEquipment.delete(target.dataset.equipment) : selectedEquipment.add(target.dataset.equipment);
+          renderEquipment();
+        }
+        if (target.dataset.prompt) sendCoachMessage(target.dataset.prompt);
+        if (target.matches('.shopping-item')) target.classList.toggle('checked');
+        if (target.matches('[data-close-feature]')) target.closest('.feature-overlay').classList.remove('open');
+        if (target.matches('[data-close-workout]')) {
+          clearInterval(countdown);
+          showScreen('workouts-screen');
+        }
+      });
+
+      $('#new-workout').addEventListener('click', () => $('#workout-sheet').classList.add('open'));
+      $('#intro-overlay').addEventListener('click', () => {
+        demoStarted = true;
+        $('#intro-overlay').classList.add('hidden');
+        $('#install-floating').classList.add('visible');
+      });
+      $('#open-tips').addEventListener('click', () => openFeature('tips-overlay'));
+      $('#open-shopping').addEventListener('click', () => openFeature('shopping-overlay'));
+      $('#open-coach').addEventListener('click', () => openFeature('coach-overlay'));
+      $$('.feature-overlay').forEach(overlay => overlay.addEventListener('click', event => { if (event.target === overlay) overlay.classList.remove('open'); }));
+      $('#chat-form').addEventListener('submit', event => { event.preventDefault(); sendCoachMessage($('#chat-input').value); $('#chat-input').value = ''; });
+      $('#close-sheet').addEventListener('click', () => $('#workout-sheet').classList.remove('open'));
+      $('#workout-sheet').addEventListener('click', event => { if (event.target === event.currentTarget) event.currentTarget.classList.remove('open'); });
+      $('#select-all').addEventListener('click', () => { equipmentOptions.forEach(item => selectedEquipment.add(item)); renderEquipment(); });
+      $('#clear-all').addEventListener('click', () => { selectedEquipment.clear(); renderEquipment(); });
+      $('#create-gym').addEventListener('click', () => { $('#workout-sheet').classList.remove('open'); renderWorkout(); });
+      $('#workout-card').addEventListener('click', event => {
+        if (event.target.closest('#regenerate-workout')) $('#workout-sheet').classList.add('open');
+        if (event.target.closest('#start-workout')) showScreen('workout-prep-screen');
+      });
+      $('#begin-exercise').addEventListener('click', () => { time = 3; timerPhase = 'ready'; $('#timer').classList.remove('work'); $('#timer-label').textContent = 'Get Ready'; $('#timer-value').textContent = time; showScreen('workout-live-screen'); startTimer(); });
+      $('#finish-demo').addEventListener('click', () => { clearInterval(countdown); showScreen('finish-screen'); });
+      $('#install-floating').addEventListener('click', openStore);
+      $('#install-cta').addEventListener('click', openStore);
+      $('#replay-demo').addEventListener('click', () => { mealDone = new Set(); selectedEquipment.clear(); renderMeals(); renderEquipment(); showScreen('nutrition-screen'); });
+      $('#refresh-meals').addEventListener('click', () => { meals[0].name = mealAlternates[swapIndex++ % mealAlternates.length]; renderMeals(); toast('Meal plan refreshed'); });
+
+      renderMeals();
+      renderEquipment();
+    })();
+  </script>
+</body>
+</html>
