@@ -10,9 +10,9 @@ The live site is served by GitHub Pages, so it cannot execute the Cloudflare Pag
 
 `/functions/api/business-enquiry.js` is retained for a future deployment on Cloudflare Pages or another compatible Functions host. If that deployment route is adopted, configure these production secrets/variables and reconnect the form to `/api/business-enquiry`:
 
-- `RESEND_API_KEY` — API key for the verified `spark-fit.com` sending domain.
-- `TURNSTILE_REQUIRED` — optional; set to `true` only after a Turnstile widget has been configured in the form.
-- `TURNSTILE_SECRET_KEY` — required only when `TURNSTILE_REQUIRED=true`.
+- `RESEND_API_KEY`: API key for the verified `spark-fit.com` sending domain.
+- `TURNSTILE_REQUIRED`: optional; set to `true` only after a Turnstile widget has been configured in the form.
+- `TURNSTILE_SECRET_KEY`: required only when `TURNSTILE_REQUIRED=true`.
 
 The endpoint validates origin, content type, field lengths, allowed enquiry types, positive licence/employee quantities, privacy acceptance and a honeypot. It sends the internal notification and acknowledgement from `partnerships@spark-fit.com`; the internal notification goes only to `partnerships@spark-fit.com` and includes the selected enquiry type.
 

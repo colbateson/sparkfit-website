@@ -105,6 +105,10 @@
 
     const video = document.createElement('video');
     video.controls = true;
+    video.autoplay = true;
+    video.muted = true;
+    video.defaultMuted = true;
+    video.loop = true;
     video.playsInline = true;
     video.preload = 'metadata';
     video.poster = videoComponent.dataset.poster || '';
@@ -116,6 +120,9 @@
       video.append(source);
     });
     videoComponent.replaceChildren(video);
+    video.play().catch(() => {
+      // Browser autoplay policies may still require the visitor to press play.
+    });
   };
 
   if (videoComponent) {
@@ -146,7 +153,7 @@
 
     const payload = Object.fromEntries(new FormData(form).entries());
 
-    const subject = `[SparkFit Partnerships] ${payload.enquiryType} — ${payload.organisation}`;
+    const subject = `[SparkFit Partnerships] ${payload.enquiryType}: ${payload.organisation}`;
     const body = [
       'SparkFit partnership enquiry',
       '',

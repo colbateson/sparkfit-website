@@ -105,7 +105,7 @@ export async function onRequestPost(context) {
   if (!env.RESEND_API_KEY) return json({ message: 'The enquiry service is temporarily unavailable.' }, 503);
 
   const receivedAt = new Date().toISOString();
-  const subject = `[SparkFit Partnerships] ${lead.enquiryType} — ${lead.organisation}`;
+  const subject = `[SparkFit Partnerships] ${lead.enquiryType} - ${lead.organisation}`;
   const notificationText = [
     'New SparkFit Partnerships enquiry',
     '',
