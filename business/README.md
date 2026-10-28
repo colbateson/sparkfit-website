@@ -2,9 +2,13 @@
 
 The business page is isolated under `/business/`; the consumer homepage is unchanged.
 
-## Cloudflare lead capture
+## Enquiry handoff on GitHub Pages
 
-`/functions/api/business-enquiry.js` is a Cloudflare Pages Function. Configure these production secrets/variables:
+The live site is served by GitHub Pages, so it cannot execute the Cloudflare Pages Function in this repository. The business form validates the enquiry in the browser, then opens a pre-filled email to `partnerships@spark-fit.com` for the visitor to review and send.
+
+## Optional Cloudflare lead capture
+
+`/functions/api/business-enquiry.js` is retained for a future deployment on Cloudflare Pages or another compatible Functions host. If that deployment route is adopted, configure these production secrets/variables and reconnect the form to `/api/business-enquiry`:
 
 - `RESEND_API_KEY` — API key for the verified `spark-fit.com` sending domain.
 - `TURNSTILE_REQUIRED` — optional; set to `true` only after a Turnstile widget has been configured in the form.

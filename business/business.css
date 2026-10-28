@@ -132,7 +132,7 @@ h3 { font-size: clamp(1.35rem, 2vw, 1.9rem); }
 .video-fallback-copy strong { margin: 12px 0; font-family: "Space Grotesk", sans-serif; font-size: clamp(1.5rem, 3vw, 3rem); line-height: 1.05; }
 .video-fallback-copy small { color: #c9bcdd; }
 
-.employee-benefits { background: var(--paper); }
+.employee-benefits { padding-bottom: 64px; background: var(--paper); }
 .benefit-layout { display: grid; grid-template-columns: .9fr 1.1fr; min-height: 740px; border-radius: var(--radius); overflow: hidden; background: var(--white); box-shadow: var(--shadow); }
 .benefit-list { padding: clamp(30px, 6vw, 76px); }
 .benefit-list article { display: grid; grid-template-columns: 45px 1fr; gap: 18px; padding: 24px 0; border-bottom: 1px solid var(--line); }
@@ -144,8 +144,8 @@ h3 { font-size: clamp(1.35rem, 2vw, 1.9rem); }
 .benefits-store-note { display: flex; justify-content: space-between; align-items: center; gap: 30px; padding: 28px 0 0; }
 .benefits-store-note p { margin: 0; color: var(--muted); font-size: .85rem; }
 
-.showcase-section { overflow: hidden; }
-.showcase-heading { display: flex; justify-content: space-between; align-items: end; }
+.showcase-section { overflow: hidden; padding-top: 56px; padding-bottom: 96px; }
+.showcase-heading { display: flex; justify-content: space-between; align-items: end; margin-bottom: 32px; }
 .showcase-heading h2 { margin: 0; }
 .carousel-controls { display: flex; gap: 8px; }
 .carousel-controls button { width: 48px; height: 48px; border: 1px solid var(--line); border-radius: 50%; background: var(--white); cursor: pointer; font-size: 1.15rem; }
@@ -154,9 +154,8 @@ h3 { font-size: clamp(1.35rem, 2vw, 1.9rem); }
 .carousel::-webkit-scrollbar { display: none; }
 .carousel-track { display: grid; grid-auto-flow: column; grid-auto-columns: min(340px, 82vw); gap: 22px; width: max-content; }
 .carousel-card { scroll-snap-align: start; overflow: hidden; border: 1px solid var(--line); border-radius: 22px; background: var(--white); box-shadow: 0 14px 35px rgba(31,18,56,.08); }
-.carousel-card > button { width: 100%; height: 500px; border: 0; padding: 0; overflow: hidden; background: #271151; cursor: zoom-in; }
-.carousel-card img { width: 100%; height: 100%; object-fit: cover; transition: transform .45s; }
-.carousel-card button:hover img { transform: scale(1.03); }
+.carousel-card > button { width: 100%; height: auto; aspect-ratio: 9/16; border: 0; padding: 0; overflow: hidden; background: #271151; cursor: zoom-in; }
+.carousel-card img { width: 100%; height: 100%; object-fit: contain; }
 .carousel-card > div { min-height: 175px; padding: 24px; }
 .carousel-card span { color: var(--purple); font-size: .64rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
 .carousel-card h3 { margin: 8px 0; font-size: 1.35rem; }
@@ -261,7 +260,6 @@ h3 { font-size: clamp(1.35rem, 2vw, 1.9rem); }
 .form-status { min-height: 24px; margin: 14px 0 0; color: var(--muted); font-size: .75rem; text-align: center; }
 .form-status.is-error { color: #a2203d; }
 .form-status.is-success { color: #157255; }
-.form-privacy { margin: 5px 0 0; color: #8a8490; font-size: .61rem; text-align: center; }
 .trap { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; }
 
 .business-footer { padding: 72px 0 25px; background: #0f091e; color: #a79db5; }
@@ -326,7 +324,6 @@ h3 { font-size: clamp(1.35rem, 2vw, 1.9rem); }
   .benefits-store-note, .showcase-footer { align-items: flex-start; flex-direction: column; }
   .showcase-heading { align-items: flex-start; gap: 28px; flex-direction: column; }
   .carousel-track { grid-auto-columns: min(310px, 84vw); }
-  .carousel-card > button { height: 465px; }
   .option-grid, .evidence-grid, .boundary-grid, .form-grid { grid-template-columns: 1fr; }
   .option-summary { min-height: auto; }
   .journey-list li { grid-template-columns: 48px 1fr; }

@@ -81,7 +81,6 @@
           <div class="hero-image-wrap">
             <img src="../assets/business/screenshots/01_15_Minute_Workouts_Android_1440x2560.jpg" alt="SparkFit promotional app screen showing a guided 15-minute workout" width="1152" height="2048" fetchpriority="high">
           </div>
-          <div class="floating-note note-top"><span class="note-icon" aria-hidden="true">15</span><strong>Short sessions</strong><small>At home or in the gym</small></div>
           <div class="floating-note note-bottom"><span class="status-dot" aria-hidden="true"></span><strong>Available now</strong><small>iPhone and Android</small></div>
         </div>
       </div>
@@ -442,7 +441,7 @@
           <p class="direct-email">Prefer email?<br><a href="mailto:partnerships@spark-fit.com">partnerships@spark-fit.com</a></p>
         </div>
         <div class="form-card">
-          <form id="business-enquiry-form" action="/api/business-enquiry" method="post" data-business-form>
+          <form id="business-enquiry-form" action="mailto:partnerships@spark-fit.com" method="post" data-business-form>
             <div class="form-heading"><span>Partnership enquiry</span><p>Fields marked * are required.</p></div>
             <div class="form-field form-field-full">
               <label for="enquiry-type">Enquiry type *</label>
@@ -468,10 +467,8 @@
             <div class="form-field form-field-full"><label for="requirements">Additional requirements <span>(optional)</span></label><textarea id="requirements" name="requirements" rows="5" maxlength="2000" placeholder="Anything useful about your team, goals or timing"></textarea></div>
             <div class="trap" aria-hidden="true"><label for="website">Leave this field empty</label><input id="website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
             <label class="consent"><input type="checkbox" name="privacyAccepted" value="yes" required><span>I understand SparkFit will use these details to respond to this partnership enquiry. Read the <a href="../privacy.html" target="_blank" rel="noopener">Privacy Policy</a>. *</span></label>
-            <input type="hidden" name="turnstileToken" value="">
-            <button class="button button-primary form-submit" type="submit" data-form-submit>Send partnership enquiry</button>
+            <button class="button button-primary form-submit" type="submit" data-form-submit>Prepare partnership email</button>
             <p class="form-status" role="status" aria-live="polite" data-form-status></p>
-            <p class="form-privacy">Securely submitted through SparkFit's Cloudflare endpoint. Notifications are sent to partnerships@spark-fit.com.</p>
           </form>
         </div>
       </div>

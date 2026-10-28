@@ -133,55 +133,41 @@
   }
 
   const form = qs('[data-business-form]');
-  const submitButton = qs('[data-form-submit]');
   const formStatus = qs('[data-form-status]');
 
-  form?.addEventListener('submit', async (event) => {
+  form?.addEventListener('submit', (event) => {
     event.preventDefault();
     if (!form.reportValidity()) return;
 
-    const originalText = submitButton?.textContent || 'Send partnership enquiry';
-    if (submitButton) {
-      submitButton.disabled = true;
-      submitButton.textContent = 'Sending…';
-    }
     if (formStatus) {
       formStatus.textContent = '';
       formStatus.className = 'form-status';
     }
 
-    const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 15000);
     const payload = Object.fromEntries(new FormData(form).entries());
 
-    try {
-      const response = await fetch(form.action, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify(payload),
-        credentials: 'same-origin',
-        signal: controller.signal
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(result.message || 'We could not send the enquiry.');
+    const subject = `[SparkFit Partnerships] ${payload.enquiryType} — ${payload.organisation}`;
+    const body = [
+      'SparkFit partnership enquiry',
+      '',
+      `Enquiry type: ${payload.enquiryType}`,
+      `Organisation: ${payload.organisation}`,
+      `UK location: ${payload.ukLocation}`,
+      `Contact name: ${payload.contactName}`,
+      `Work email: ${payload.workEmail}`,
+      `Approximate employee count: ${payload.employeeCount}`,
+      `Desired licence quantity: ${payload.licenceQuantity || 'Not supplied / not applicable'}`,
+      `Intended launch timeframe: ${payload.launchTimeframe}`,
+      '',
+      'Additional requirements:',
+      payload.requirements || 'None supplied'
+    ].join('\n');
 
-      form.reset();
-      updateAnnualFields();
-      if (formStatus) {
-        formStatus.textContent = 'Thank you. Your enquiry has been sent to SparkFit Partnerships.';
-        formStatus.classList.add('is-success');
-      }
-    } catch (error) {
-      if (formStatus) {
-        formStatus.innerHTML = 'We could not send this securely right now. Please email <a href="mailto:partnerships@spark-fit.com">partnerships@spark-fit.com</a>.';
-        formStatus.classList.add('is-error');
-      }
-    } finally {
-      window.clearTimeout(timeout);
-      if (submitButton) {
-        submitButton.disabled = false;
-        submitButton.textContent = originalText;
-      }
+    if (formStatus) {
+      formStatus.textContent = 'Your email app should open with the enquiry ready to send.';
+      formStatus.classList.add('is-success');
     }
+
+    window.location.href = `mailto:partnerships@spark-fit.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   });
 })();
