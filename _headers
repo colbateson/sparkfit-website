@@ -4,3 +4,12 @@
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://www.google.com https://www.gstatic.com https://connect.facebook.net https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://in.heycatch.ai https://script.google.com https://www.google.com https://www.gstatic.com; frame-src https://www.google.com https://recaptcha.google.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'
+
+/assets/business/screenshots/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/business/video/*
+  Cache-Control: public, max-age=86400
+
+/business/*
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
