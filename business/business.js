@@ -51,21 +51,27 @@
   const priceTerm = qs('[data-price-term]');
   const priceQuantity = qs('[data-price-quantity]');
   const priceBand = qs('[data-price-band]');
+  const priceBase = qs('[data-price-base]');
   const pricePerCode = qs('[data-price-per-code]');
+  const pricePerCodeLabel = qs('[data-price-per-code-label]');
   const priceTotal = qs('[data-price-total]');
+  const priceTotalLabel = qs('[data-price-total-label]');
   const priceSaving = qs('[data-price-saving]');
+  const priceSavingLabel = qs('[data-price-saving-label]');
   const priceNote = qs('[data-price-note]');
   const priceOrder = qs('[data-price-order]');
   const priceContact = qs('[data-price-contact]');
+  const vatButtons = qsa('[data-vat-mode]');
+  const tablePrices = qsa('[data-table-price]');
   const licenceQuantity = qs('[name="licenceQuantity"]');
   const requirements = qs('[name="requirements"]');
 
   const pricingTerms = {
-    3: { label: '3 months', base: 9.99 },
-    6: { label: '6 months', base: 14.99 },
-    9: { label: '9 months', base: 19.99 },
-    12: { label: '12 months', base: 24.99 },
-    lifetime: { label: 'Lifetime', base: 59.99 }
+    3: { label: '3 months', directGross: 14.97 },
+    6: { label: '6 months', directGross: 29.94 },
+    9: { label: '9 months', directGross: 44.91 },
+    12: { label: '12 months', directGross: 24.99 },
+    lifetime: { label: 'Lifetime', directGross: 59.99 }
   };
 
   const pricingTiers = [
@@ -84,7 +90,21 @@
     maximumFractionDigits: 2
   });
   const roundMoney = (value) => Math.round((value + 0.00000001) * 100) / 100;
+  const vatMultiplier = 1.20;
+  let vatMode = 'ex';
   let currentPrice = null;
+
+  const updateVatControls = () => {
+    vatButtons.forEach((button) => {
+      const active = button.dataset.vatMode === vatMode;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+    tablePrices.forEach((node) => {
+      const value = Number.parseFloat(node.dataset[vatMode]);
+      if (Number.isFinite(value)) node.textContent = formatCurrency.format(value);
+    });
+  };
 
   const updateCalculator = () => {
     if (!pricingCalculator || !priceTerm || !priceQuantity) return;
@@ -92,13 +112,17 @@
     const term = pricingTerms[termKey];
     const quantity = Number.parseInt(priceQuantity.value, 10);
     currentPrice = null;
+    if (priceBase) priceBase.textContent = term ? formatCurrency.format(term.directGross) : 'Not available';
+    if (pricePerCodeLabel) pricePerCodeLabel.textContent = vatMode === 'inc' ? 'Employer price per code, inc VAT' : 'Employer price per code, ex VAT';
+    if (priceTotalLabel) priceTotalLabel.textContent = vatMode === 'inc' ? 'Employer order total, inc VAT' : 'Employer order total, ex VAT';
+    if (priceSavingLabel) priceSavingLabel.textContent = vatMode === 'inc' ? 'Reduction including VAT' : 'Reduction before VAT';
 
     if (!term || !Number.isInteger(quantity) || quantity < 20) {
       if (priceBand) priceBand.textContent = 'Minimum order: 20 codes';
       if (pricePerCode) pricePerCode.textContent = 'Not available';
       if (priceTotal) priceTotal.textContent = 'Enter 20+';
       if (priceSaving) priceSaving.textContent = 'Not available';
-      if (priceNote) priceNote.textContent = 'Enter at least 20 employee codes to calculate a guide price.';
+      if (priceNote) priceNote.textContent = 'Enter at least 20 employee codes to calculate an employer price.';
       if (priceOrder) priceOrder.hidden = true;
       if (priceContact) priceContact.hidden = true;
       return;
@@ -118,19 +142,24 @@
 
     const tier = pricingTiers.find((candidate) => quantity >= candidate.minimum);
     const discount = termKey === 'lifetime' ? tier.lifetime : tier.standard;
-    const perCode = roundMoney(term.base * (1 - discount));
+    const referenceExVat = roundMoney(term.directGross / vatMultiplier);
+    const perCodeExVat = roundMoney(referenceExVat * (1 - discount));
+    const perCodeIncVat = roundMoney(perCodeExVat * vatMultiplier);
+    const perCode = vatMode === 'inc' ? perCodeIncVat : perCodeExVat;
     const total = roundMoney(perCode * quantity);
-    const saving = roundMoney((term.base - perCode) * quantity);
-    currentPrice = { termKey, term, tier, quantity, discount, perCode, total, saving, bespoke: false };
+    const referenceTotal = roundMoney((vatMode === 'inc' ? term.directGross : referenceExVat) * quantity);
+    const saving = roundMoney(referenceTotal - total);
+    currentPrice = { termKey, term, tier, quantity, discount, perCode, perCodeExVat, perCodeIncVat, total, saving, vatMode, bespoke: false };
 
     if (priceBand) priceBand.textContent = `${tier.label} · ${discount * 100}% volume discount`;
     if (pricePerCode) pricePerCode.textContent = formatCurrency.format(perCode);
     if (priceTotal) priceTotal.textContent = formatCurrency.format(total);
     if (priceSaving) priceSaving.textContent = formatCurrency.format(saving);
     if (priceNote) {
+      const vatView = vatMode === 'inc' ? 'including VAT at 20%' : 'excluding VAT';
       priceNote.textContent = termKey === 'lifetime'
-        ? `Lifetime Premium access for ${quantity.toLocaleString('en-GB')} employees. This is a one-off access-code purchase.`
-        : `${term.label} of Premium access for ${quantity.toLocaleString('en-GB')} employees. Fixed-term access can be topped up later.`;
+        ? `Lifetime Premium access for ${quantity.toLocaleString('en-GB')} employees. The direct app-store price is ${formatCurrency.format(term.directGross)} including VAT. Employer prices are shown ${vatView}.`
+        : `${term.label} of Premium access for ${quantity.toLocaleString('en-GB')} employees. The direct app-store comparison is ${formatCurrency.format(term.directGross)} including VAT. Employer prices are shown ${vatView}.`;
     }
     if (priceOrder) priceOrder.hidden = false;
     if (priceContact) priceContact.hidden = true;
@@ -144,7 +173,7 @@
 
     const summary = currentPrice.bespoke
       ? `Pricing selection: ${currentPrice.term.label}, ${currentPrice.quantity} codes, bespoke quote required.`
-      : `Pricing selection: ${currentPrice.term.label}, ${currentPrice.quantity} codes, ${formatCurrency.format(currentPrice.perCode)} per code, ${formatCurrency.format(currentPrice.total)} guide total, ${currentPrice.discount * 100}% volume discount.`;
+      : `Pricing selection: ${currentPrice.term.label}, ${currentPrice.quantity} codes, ${formatCurrency.format(currentPrice.term.directGross)} direct app-store price including VAT, ${formatCurrency.format(currentPrice.perCode)} per code ${currentPrice.vatMode === 'inc' ? 'including VAT' : 'excluding VAT'}, ${formatCurrency.format(currentPrice.total)} guide total ${currentPrice.vatMode === 'inc' ? 'including VAT' : 'excluding VAT'}, ${currentPrice.discount * 100}% volume discount.`;
 
     if (requirements) {
       const existingLines = requirements.value.split('\n').filter((line) => !line.startsWith('Pricing selection:'));
@@ -154,8 +183,14 @@
 
   priceTerm?.addEventListener('change', updateCalculator);
   priceQuantity?.addEventListener('input', updateCalculator);
+  vatButtons.forEach((button) => button.addEventListener('click', () => {
+    vatMode = button.dataset.vatMode === 'inc' ? 'inc' : 'ex';
+    updateVatControls();
+    updateCalculator();
+  }));
   priceOrder?.addEventListener('click', applyCalculatorSelection);
   priceContact?.addEventListener('click', applyCalculatorSelection);
+  updateVatControls();
   updateCalculator();
 
   const carousel = qs('[data-carousel]');

@@ -13,8 +13,8 @@
   <meta property="og:description" content="A practical employee wellbeing benefit with transparent access-code pricing and volume discounts for UK organisations.">
   <meta property="og:image" content="https://spark-fit.com/assets/business/screenshots/01_15_Minute_Workouts_Android_1440x2560.jpg">
   <link rel="icon" href="../icon.png" type="image/png">
-  <link rel="stylesheet" href="./business.css?v=20261104-1">
-  <script src="./business.js?v=20261104-1" defer></script>
+  <link rel="stylesheet" href="./business.css?v=20261104-2">
+  <script src="./business.js?v=20261104-2" defer></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -332,24 +332,42 @@
             <h2>Choose the access period and number of codes.</h2>
           </div>
           <div>
-            <p>Consumer subscriptions cost £4.99 monthly, £24.99 annually or £59.99 for lifetime access. Employer code prices below include a volume discount.</p>
+            <p>The comparison starts with what one person pays when subscribing directly through the app stores. Those consumer prices include VAT. Employer code prices are calculated from the equivalent price before VAT.</p>
           </div>
         </div>
 
         <div class="pricing-principles" aria-label="How SparkFit employer pricing works">
           <article><strong>20 code minimum</strong><span>Use the calculator for any quantity from 20 to 500.</span></article>
           <article><strong>Up to 50% off</strong><span>Fixed-term discounts increase with the number of codes.</span></article>
-          <article><strong>Private employee use</strong><span>Employees activate and use their access independently.</span></article>
+          <article><strong>Clear VAT view</strong><span>Switch employer prices between excluding and including VAT.</span></article>
           <article><strong>501 or more</strong><span>Contact us for bespoke volume pricing.</span></article>
+        </div>
+
+        <div class="direct-price-reference" aria-label="Direct app-store subscription prices">
+          <div>
+            <span>Direct app-store prices</span>
+            <strong>What one person pays</strong>
+            <p>These public consumer prices include VAT.</p>
+          </div>
+          <article><span>Monthly</span><strong>£4.99</strong></article>
+          <article><span>Annual</span><strong>£24.99</strong></article>
+          <article><span>Lifetime</span><strong>£59.99</strong></article>
         </div>
 
         <div class="pricing-table-card">
           <div class="pricing-table-intro">
             <div>
-              <span>Per-code guide price</span>
+              <span>Employer price per code</span>
               <h3>Volume pricing at each order level</h3>
             </div>
-            <p>Fixed-term access uses the main discount. Lifetime uses a smaller discount because it is a one-off purchase with no renewal revenue.</p>
+            <div>
+              <p>For 3, 6 and 9 months, the direct comparison uses £4.99 per month. The 12-month comparison uses the £24.99 annual price.</p>
+              <div class="vat-toggle" role="group" aria-label="Show employer prices">
+                <span>Show prices</span>
+                <button class="is-active" type="button" data-vat-mode="ex" aria-pressed="true">Excluding VAT</button>
+                <button type="button" data-vat-mode="inc" aria-pressed="false">Including VAT</button>
+              </div>
+            </div>
           </div>
           <div class="pricing-table-scroll" tabindex="0" aria-label="Scroll to view the full pricing table">
             <table class="pricing-table">
@@ -357,25 +375,24 @@
               <thead>
                 <tr>
                   <th scope="col">Codes</th>
-                  <th scope="col">Discount<br><small>Fixed / lifetime</small></th>
-                  <th scope="col">3 months</th>
-                  <th scope="col">6 months</th>
-                  <th scope="col">9 months</th>
-                  <th scope="col">12 months</th>
-                  <th scope="col">Lifetime</th>
+                  <th scope="col">3 months<small>Direct £14.97 inc VAT</small></th>
+                  <th scope="col">6 months<small>Direct £29.94 inc VAT</small></th>
+                  <th scope="col">9 months<small>Direct £44.91 inc VAT</small></th>
+                  <th scope="col">12 months<small>Direct £24.99 inc VAT</small></th>
+                  <th scope="col">Lifetime<small>Direct £59.99 inc VAT</small></th>
                 </tr>
               </thead>
               <tbody>
-                <tr><th scope="row">20</th><td>20% / 5%</td><td>£7.99</td><td>£11.99</td><td>£15.99</td><td>£19.99</td><td>£56.99</td></tr>
-                <tr><th scope="row">50</th><td>25% / 7.5%</td><td>£7.49</td><td>£11.24</td><td>£14.99</td><td>£18.74</td><td>£55.49</td></tr>
-                <tr><th scope="row">75</th><td>30% / 10%</td><td>£6.99</td><td>£10.49</td><td>£13.99</td><td>£17.49</td><td>£53.99</td></tr>
-                <tr><th scope="row">100</th><td>35% / 12.5%</td><td>£6.49</td><td>£9.74</td><td>£12.99</td><td>£16.24</td><td>£52.49</td></tr>
-                <tr><th scope="row">250</th><td>40% / 15%</td><td>£5.99</td><td>£8.99</td><td>£11.99</td><td>£14.99</td><td>£50.99</td></tr>
-                <tr><th scope="row">500</th><td>50% / 20%</td><td>£5.00</td><td>£7.50</td><td>£10.00</td><td>£12.50</td><td>£47.99</td></tr>
+                <tr><th scope="row">20</th><td><span data-table-price data-ex="9.98" data-inc="11.98">£9.98</span><small>20% off</small></td><td><span data-table-price data-ex="19.96" data-inc="23.95">£19.96</span><small>20% off</small></td><td><span data-table-price data-ex="29.94" data-inc="35.93">£29.94</span><small>20% off</small></td><td><span data-table-price data-ex="16.66" data-inc="19.99">£16.66</span><small>20% off</small></td><td><span data-table-price data-ex="47.49" data-inc="56.99">£47.49</span><small>5% off</small></td></tr>
+                <tr><th scope="row">50</th><td><span data-table-price data-ex="9.36" data-inc="11.23">£9.36</span><small>25% off</small></td><td><span data-table-price data-ex="18.71" data-inc="22.45">£18.71</span><small>25% off</small></td><td><span data-table-price data-ex="28.07" data-inc="33.68">£28.07</span><small>25% off</small></td><td><span data-table-price data-ex="15.62" data-inc="18.74">£15.62</span><small>25% off</small></td><td><span data-table-price data-ex="46.24" data-inc="55.49">£46.24</span><small>7.5% off</small></td></tr>
+                <tr><th scope="row">75</th><td><span data-table-price data-ex="8.74" data-inc="10.49">£8.74</span><small>30% off</small></td><td><span data-table-price data-ex="17.47" data-inc="20.96">£17.47</span><small>30% off</small></td><td><span data-table-price data-ex="26.20" data-inc="31.44">£26.20</span><small>30% off</small></td><td><span data-table-price data-ex="14.58" data-inc="17.50">£14.58</span><small>30% off</small></td><td><span data-table-price data-ex="44.99" data-inc="53.99">£44.99</span><small>10% off</small></td></tr>
+                <tr><th scope="row">100</th><td><span data-table-price data-ex="8.11" data-inc="9.73">£8.11</span><small>35% off</small></td><td><span data-table-price data-ex="16.22" data-inc="19.46">£16.22</span><small>35% off</small></td><td><span data-table-price data-ex="24.33" data-inc="29.20">£24.33</span><small>35% off</small></td><td><span data-table-price data-ex="13.54" data-inc="16.25">£13.54</span><small>35% off</small></td><td><span data-table-price data-ex="43.74" data-inc="52.49">£43.74</span><small>12.5% off</small></td></tr>
+                <tr><th scope="row">250</th><td><span data-table-price data-ex="7.49" data-inc="8.99">£7.49</span><small>40% off</small></td><td><span data-table-price data-ex="14.97" data-inc="17.96">£14.97</span><small>40% off</small></td><td><span data-table-price data-ex="22.46" data-inc="26.95">£22.46</span><small>40% off</small></td><td><span data-table-price data-ex="12.50" data-inc="15.00">£12.50</span><small>40% off</small></td><td><span data-table-price data-ex="42.49" data-inc="50.99">£42.49</span><small>15% off</small></td></tr>
+                <tr><th scope="row">500</th><td><span data-table-price data-ex="6.24" data-inc="7.49">£6.24</span><small>50% off</small></td><td><span data-table-price data-ex="12.48" data-inc="14.98">£12.48</span><small>50% off</small></td><td><span data-table-price data-ex="18.72" data-inc="22.46">£18.72</span><small>50% off</small></td><td><span data-table-price data-ex="10.42" data-inc="12.50">£10.42</span><small>50% off</small></td><td><span data-table-price data-ex="39.99" data-inc="47.99">£39.99</span><small>20% off</small></td></tr>
               </tbody>
             </table>
           </div>
-          <p class="pricing-table-note">The fixed-term employer base prices are £9.99 for 3 months, £14.99 for 6 months, £19.99 for 9 months and £24.99 for 12 months. Lifetime is based on the £59.99 consumer price.</p>
+          <p class="pricing-table-note">The direct prices shown in each column are what one person would pay through the app stores and include VAT. Employer discounts are applied to the equivalent price before VAT. Use the toggle to see VAT added back at 20%.</p>
         </div>
 
         <div class="pricing-calculator" data-pricing-calculator>
@@ -386,6 +403,11 @@
             <p class="calculator-assurance"><strong>No payment is taken here.</strong> Requesting an order sends your selected guide price to the partnership enquiry form for confirmation.</p>
           </div>
           <div class="calculator-panel">
+            <div class="vat-toggle vat-toggle-light" role="group" aria-label="Show calculator prices">
+              <span>Show prices</span>
+              <button class="is-active" type="button" data-vat-mode="ex" aria-pressed="true">Excluding VAT</button>
+              <button type="button" data-vat-mode="inc" aria-pressed="false">Including VAT</button>
+            </div>
             <div class="calculator-fields">
               <label>Access period
                 <select data-price-term>
@@ -402,11 +424,12 @@
             </div>
             <p class="calculator-band" data-price-band>20-code band · 20% volume discount</p>
             <div class="calculator-results" aria-live="polite">
-              <div><span>Price per code</span><strong data-price-per-code>£19.99</strong></div>
-              <div><span>Estimated order total</span><strong data-price-total>£399.80</strong></div>
-              <div><span>Volume saving</span><strong data-price-saving>£100.00</strong></div>
+              <div><span>Direct app-store price, VAT included</span><strong data-price-base>£24.99</strong></div>
+              <div><span data-price-per-code-label>Employer price per code, ex VAT</span><strong data-price-per-code>£16.66</strong></div>
+              <div><span data-price-total-label>Employer order total, ex VAT</span><strong data-price-total>£333.20</strong></div>
+              <div><span data-price-saving-label>Reduction before VAT</span><strong data-price-saving>£83.30</strong></div>
             </div>
-            <p class="calculator-note" data-price-note>12 months of Premium access for 20 employees. Fixed-term access can be topped up later.</p>
+            <p class="calculator-note" data-price-note>12 months of Premium access for 20 employees. The direct app-store reference is £24.99 including VAT. Employer prices currently exclude VAT.</p>
             <div class="calculator-actions">
               <a class="button button-primary" href="#enquire" data-price-order>Request This Order</a>
               <a class="button button-dark" href="#enquire" data-price-contact hidden>Contact Us for Volume Pricing</a>
@@ -414,7 +437,7 @@
           </div>
         </div>
 
-        <p class="pricing-terms">Prices are guide prices in GBP and include the stated volume discount. We confirm the final order value, applicable VAT treatment and commercial terms before codes are issued. Orders over 500 codes require a tailored quotation.</p>
+        <p class="pricing-terms"><strong>Employer prices default to excluding VAT.</strong> Use the VAT toggle to see the equivalent including VAT at 20%. Prices are guide prices in GBP and include the stated volume discount. Orders over 500 codes require a tailored quotation.</p>
       </div>
     </section>
 
