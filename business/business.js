@@ -146,10 +146,12 @@
     const perCodeExVat = roundMoney(referenceExVat * (1 - discount));
     const perCodeIncVat = roundMoney(perCodeExVat * vatMultiplier);
     const perCode = vatMode === 'inc' ? perCodeIncVat : perCodeExVat;
-    const total = roundMoney(perCode * quantity);
+    const totalExVat = roundMoney(perCodeExVat * quantity);
+    const totalIncVat = roundMoney(perCodeIncVat * quantity);
+    const total = vatMode === 'inc' ? totalIncVat : totalExVat;
     const referenceTotal = roundMoney((vatMode === 'inc' ? term.directGross : referenceExVat) * quantity);
     const saving = roundMoney(referenceTotal - total);
-    currentPrice = { termKey, term, tier, quantity, discount, perCode, perCodeExVat, perCodeIncVat, total, saving, vatMode, bespoke: false };
+    currentPrice = { termKey, term, tier, quantity, discount, perCode, perCodeExVat, perCodeIncVat, total, totalExVat, totalIncVat, saving, vatMode, bespoke: false };
 
     if (priceBand) priceBand.textContent = `${tier.label} · ${discount * 100}% volume discount`;
     if (pricePerCode) pricePerCode.textContent = formatCurrency.format(perCode);
@@ -173,7 +175,7 @@
 
     const summary = currentPrice.bespoke
       ? `Pricing selection: ${currentPrice.term.label}, ${currentPrice.quantity} codes, bespoke quote required.`
-      : `Pricing selection: ${currentPrice.term.label}, ${currentPrice.quantity} codes, ${formatCurrency.format(currentPrice.term.directGross)} direct app-store price including VAT, ${formatCurrency.format(currentPrice.perCode)} per code ${currentPrice.vatMode === 'inc' ? 'including VAT' : 'excluding VAT'}, ${formatCurrency.format(currentPrice.total)} guide total ${currentPrice.vatMode === 'inc' ? 'including VAT' : 'excluding VAT'}, ${currentPrice.discount * 100}% volume discount.`;
+      : `Pricing selection: ${currentPrice.term.label}, ${currentPrice.quantity} codes, ${formatCurrency.format(currentPrice.perCodeExVat)} per code excluding VAT, ${formatCurrency.format(currentPrice.perCodeIncVat)} per code including VAT, ${formatCurrency.format(currentPrice.totalExVat)} guide total excluding VAT, ${formatCurrency.format(currentPrice.totalIncVat)} guide total including VAT, ${currentPrice.discount * 100}% volume discount applied.`;
 
     if (requirements) {
       const existingLines = requirements.value.split('\n').filter((line) => !line.startsWith('Pricing selection:'));
