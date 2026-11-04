@@ -1,7 +1,7 @@
 const PARTNERSHIPS_EMAIL = 'partnerships@spark-fit.com';
 const ALLOWED_ENQUIRY_TYPES = new Set([
   'Free Founding Partner Trial',
-  'Annual Employee Wellbeing Partnership',
+  'Employee Access Code Order',
   'Distribution / Community Partnership',
   'General Partnership Enquiry'
 ]);
@@ -89,7 +89,7 @@ export async function onRequestPost(context) {
     || !lead.launchTimeframe
     || lead.privacyAccepted !== 'yes';
 
-  const missingAnnualDetails = lead.enquiryType === 'Annual Employee Wellbeing Partnership'
+  const missingAnnualDetails = lead.enquiryType === 'Employee Access Code Order'
     && !isPositiveInteger(lead.licenceQuantity);
 
   if (missingRequired || missingAnnualDetails) return json({ message: 'Please check the required fields and try again.' }, 422);
@@ -115,7 +115,7 @@ export async function onRequestPost(context) {
     `Contact: ${lead.contactName}`,
     `Work email: ${lead.workEmail}`,
     `Approximate employee count: ${lead.employeeCount}`,
-    `Desired licence quantity: ${lead.licenceQuantity || 'Not supplied / not applicable'}`,
+    `Desired code quantity: ${lead.licenceQuantity || 'Not supplied / not applicable'}`,
     `Intended launch timeframe: ${lead.launchTimeframe}`,
     '',
     'Additional requirements:',
