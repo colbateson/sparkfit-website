@@ -226,6 +226,7 @@ h3 { font-size: clamp(1.35rem, 2vw, 1.9rem); }
 .pricing-table tbody th { color: var(--purple); font-family: "Space Grotesk", sans-serif; font-size: 1rem; }
 .pricing-table tbody td { font-size: .9rem; font-weight: 700; }
 .pricing-table tbody td span, .pricing-table tbody td small { display: block; }
+.pricing-table tbody td [data-table-price]::after { content: " per code"; color: var(--muted); font-size: .62rem; font-weight: 700; }
 .pricing-table tbody td small { margin-top: 4px; color: var(--muted); font-size: .59rem; font-weight: 700; }
 .pricing-table th:nth-child(5), .pricing-table td:nth-child(5) { background: #f6f1ff; }
 .pricing-table-note { margin: 0; padding: 19px 32px; border-top: 1px solid var(--line); background: #fbfafc; color: var(--muted); font-size: .72rem; }
