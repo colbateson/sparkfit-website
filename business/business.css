@@ -208,6 +208,8 @@ h3 { font-size: clamp(1.35rem, 2vw, 1.9rem); }
 .pricing-table-intro > div:first-child > span { color: var(--pink); font-size: .66rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
 .pricing-table-intro h3 { margin: 8px 0 0; font-size: clamp(1.5rem, 2.8vw, 2.45rem); }
 .pricing-table-intro p { max-width: 540px; margin: 0; color: #c8bdd9; font-size: .77rem; }
+.pricing-table-guide { margin: 0; padding: 14px 34px; border-bottom: 1px solid var(--line); background: #fbfafc; color: var(--muted); font-size: .72rem; }
+.pricing-table-guide strong { color: var(--ink); }
 .vat-toggle { display: flex; align-items: center; gap: 6px; margin-top: 16px; }
 .vat-toggle > span { margin-right: 5px; color: #c8bdd9; font-size: .64rem; font-weight: 700; }
 .vat-toggle button { min-height: 34px; padding: 7px 12px; border: 1px solid rgba(255,255,255,.24); border-radius: 999px; background: transparent; color: var(--white); font: inherit; font-size: .65rem; font-weight: 800; cursor: pointer; }
@@ -401,6 +403,7 @@ h3 { font-size: clamp(1.35rem, 2vw, 1.9rem); }
   .direct-price-reference { grid-template-columns: 1fr; }
   .direct-price-reference > div, .direct-price-reference article { min-height: auto; }
   .pricing-table-intro { grid-template-columns: 1fr; align-items: flex-start; gap: 16px; padding: 26px 22px; }
+  .pricing-table-guide { padding: 14px 20px; }
   .pricing-table-note { padding: 17px 20px; }
   .pricing-calculator { padding: 26px 18px; }
   .vat-toggle { align-items: flex-start; flex-wrap: wrap; }
