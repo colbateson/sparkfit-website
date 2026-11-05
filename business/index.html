@@ -4,17 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>SparkFit for Employers | Employee access and pricing</title>
-  <meta name="description" content="Give employees practical fitness and nutrition support with transparent volume pricing for 3, 6, 9, 12-month and lifetime SparkFit access codes.">
+  <meta name="description" content="Give employees practical fitness and nutrition support with transparent annual SparkFit Premium subscription pricing for UK organisations.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://spark-fit.com/business/">
   <meta name="theme-color" content="#24104f">
   <meta property="og:type" content="website">
   <meta property="og:title" content="SparkFit for Employers | Employee access and pricing">
-  <meta property="og:description" content="A practical employee wellbeing benefit with transparent access-code pricing and volume discounts for UK organisations.">
+  <meta property="og:description" content="A practical employee wellbeing benefit with transparent annual subscription pricing and volume discounts for UK organisations.">
   <meta property="og:image" content="https://spark-fit.com/assets/business/screenshots/01_15_Minute_Workouts_Android_1440x2560.jpg">
   <link rel="icon" href="../icon.png" type="image/png">
-  <link rel="stylesheet" href="./business.css?v=20261104-4">
-  <script src="./business.js?v=20261104-5" defer></script>
+  <link rel="stylesheet" href="./business.css?v=20261104-annual-preview-1">
+  <script src="./pricing.js?v=20261104-annual-preview-1" defer></script>
+  <script src="./business.js?v=20261104-annual-preview-1" defer></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -67,13 +68,13 @@
             </div>
             <div>
               <span>Choose employee access</span>
-              <strong>3 to 12 months or lifetime</strong>
-              <small>From 20 codes · published volume discounts · simple activation</small>
+              <strong>Annual employer subscription</strong>
+              <small>From 20 licences · published volume discounts · simple activation</small>
             </div>
           </div>
           <div class="hero-actions">
-            <a class="button button-primary" href="#enquire" data-enquiry-link="trial">Apply for a Free Team Trial</a>
-            <a class="button button-secondary" href="#pricing">View Code Pricing</a>
+            <a class="button button-primary" href="#enquire" data-enquiry-link="trial">Request Your Free Team Trial</a>
+            <a class="button button-secondary" href="#pricing">View Annual Pricing</a>
           </div>
           <p class="hero-includes"><strong>Your organisation gets:</strong> a simple activation portal · employee instructions · activation reporting · private employee app use</p>
         </div>
@@ -282,12 +283,12 @@
         <div class="section-heading centred-heading">
           <p class="eyebrow"><span></span> Two ways to begin</p>
           <h2>Trial the fit. Then choose what works.</h2>
-          <p>Try SparkFit with a small group, then choose a fixed access period or lifetime access for participating employees.</p>
+          <p>Try SparkFit with a small group, then choose an annual employer subscription for your participating employees.</p>
         </div>
         <div class="option-grid">
           <article class="option-card option-trial">
             <div class="option-topline"><span>Option A</span><em>Free introduction</em></div>
-            <h3>Founding Partner Trial</h3>
+            <h3>Try SparkFit with 20 employees, free for 30 days</h3>
             <p class="option-summary">Try the complete SparkFit employee experience with a small team before discussing anything longer term.</p>
             <ul>
               <li>30 days free</li>
@@ -300,162 +301,155 @@
               <li>No automatic paid renewal</li>
               <li>Honest feedback requested</li>
             </ul>
-            <a class="button button-dark" href="#enquire" data-enquiry-link="trial">Apply for a Free Team Trial</a>
+            <a class="button button-dark" href="#enquire" data-enquiry-link="trial">Request Your Free Team Trial</a>
           </article>
           <article class="option-card option-annual">
             <div class="option-topline"><span>Option B</span><em>Paid employee access</em></div>
-            <h3>Employee Access Codes</h3>
-            <p class="option-summary">Buy Premium access codes for participating employees, with clear pricing, simple activation instructions and activation reporting.</p>
+            <h3>Annual Employer Subscription</h3>
+            <p class="option-summary">Fund a year of SparkFit Premium for participating employees, with transparent volume pricing, activation instructions and reporting.</p>
             <ul>
               <li>Employer-funded Premium access</li>
-              <li>3, 6, 9 or 12 months of access</li>
-              <li>Lifetime access available</li>
-              <li>Orders from 20 to 500 codes</li>
+              <li>One annual subscription</li>
+              <li>Published pricing from 20 to 500 licences</li>
+              <li>501 to 1,000 seat preview pending approval</li>
               <li>Published volume discounts</li>
               <li>Self-service employee activation</li>
               <li>Activation reporting for employers</li>
-              <li>Top up fixed-term access when needed</li>
-              <li>No automatic renewal</li>
+              <li>Annual billing managed by enquiry for now</li>
+              <li>Automatic Stripe renewal is planned</li>
             </ul>
-            <a class="button button-primary" href="#pricing">View Pricing and Calculate</a>
+            <a class="button button-primary" href="#pricing">Build Your Team Plan</a>
           </article>
         </div>
-        <p class="pricing-note">Each code gives one employee Premium access at no personal cost for the selected period. Fixed-term access can be topped up later. Lifetime access is a one-off purchase.</p>
+        <p class="pricing-note">Each licence funds one active employee account for a year. The current website prepares an enquiry and does not take payment or create an automatic subscription.</p>
       </div>
     </section>
 
     <section id="pricing" class="section pricing-section">
       <div class="shell">
-        <div class="section-heading split-heading pricing-heading">
+        <div class="pricing-heading pricing-heading-annual">
           <div>
-            <p class="eyebrow"><span></span> Transparent employer pricing</p>
-            <h2>Choose the access period and number of codes.</h2>
+            <p class="eyebrow"><span></span> Transparent annual pricing</p>
+            <h2>Build Your Team's SparkFit Plan</h2>
+            <p>Choose how many employees you'd like to support and see exactly how much your business saves compared with individual SparkFit subscriptions.</p>
           </div>
+          <div class="vat-toggle vat-toggle-shared" role="group" aria-label="Show all pricing">
+            <span>Show all prices</span>
+            <button class="is-active" type="button" data-vat-mode="ex" aria-pressed="true">Excluding VAT</button>
+            <button type="button" data-vat-mode="inc" aria-pressed="false">Including VAT</button>
+          </div>
+        </div>
+
+        <div class="pricing-principles" aria-label="How SparkFit annual employer pricing works">
+          <article><strong>20 licence minimum</strong><span>Choose any whole-number quantity from 20 to 1,000 in this preview.</span></article>
+          <article><strong>Up to 50% off</strong><span>The existing whole-order volume bands are preserved.</span></article>
+          <article><strong>One annual plan</strong><span>Every licence provides one employee with Premium access for a year.</span></article>
+          <article><strong>1,000+ employees</strong><span>Contact us for tailored enterprise pricing.</span></article>
+        </div>
+
+        <div class="direct-annual-reference" aria-label="Direct App Store or Google Play annual subscription comparison">
           <div>
-            <p>The comparison starts with what one person pays when subscribing directly through the app stores. Those consumer prices include VAT. Employer code prices are calculated from the equivalent price before VAT.</p>
+            <span>Direct individual purchasing</span>
+            <strong>App Store or Google Play</strong>
+            <p>The public annual subscription is £24.99 per employee including VAT.</p>
+          </div>
+          <div class="direct-annual-price">
+            <span data-direct-price-label>Per employee, excluding VAT</span>
+            <strong data-direct-price>£20.83</strong>
+            <small>One year of SparkFit Premium</small>
           </div>
         </div>
 
-        <div class="pricing-principles" aria-label="How SparkFit employer pricing works">
-          <article><strong>20 code minimum</strong><span>Use the calculator for any quantity from 20 to 500.</span></article>
-          <article><strong>Up to 50% off</strong><span>Fixed-term discounts increase with the number of codes.</span></article>
-          <article><strong>Clear VAT view</strong><span>Switch employer prices between excluding and including VAT.</span></article>
-          <article><strong>501 or more</strong><span>Contact us for bespoke volume pricing.</span></article>
+        <div class="package-heading">
+          <div><span>Suggested starting points</span><h3>Choose a package or set your own team size.</h3></div>
+          <p>Every package includes the same SparkFit Premium functionality. Only the number of licences and volume price change.</p>
+        </div>
+        <div class="package-grid" aria-label="Suggested annual subscription packages">
+          <button class="package-card" type="button" data-package-seats="20">
+            <span class="package-name">Starter</span><strong>20 employees</strong><em data-package-discount>20% volume discount</em>
+            <span class="package-price" data-package-total>£333.20</span><small data-package-vat>per year, excluding VAT</small>
+            <span data-package-monthly>£27.77 monthly equivalent</span><span data-package-saving>Save £83.40 annually</span><b>Full SparkFit Premium access</b>
+          </button>
+          <button class="package-card package-card-featured" type="button" data-package-seats="50">
+            <span class="package-name">Growth</span><strong>50 employees</strong><em data-package-discount>25% volume discount</em>
+            <span class="package-price" data-package-total>£781.00</span><small data-package-vat>per year, excluding VAT</small>
+            <span data-package-monthly>£65.08 monthly equivalent</span><span data-package-saving>Save £260.50 annually</span><b>Full SparkFit Premium access</b>
+          </button>
+          <button class="package-card" type="button" data-package-seats="100">
+            <span class="package-name">Business</span><strong>100 employees</strong><em data-package-discount>35% volume discount</em>
+            <span class="package-price" data-package-total>£1,354.00</span><small data-package-vat>per year, excluding VAT</small>
+            <span data-package-monthly>£112.83 monthly equivalent</span><span data-package-saving>Save £729.00 annually</span><b>Full SparkFit Premium access</b>
+          </button>
         </div>
 
-        <div class="direct-price-reference" aria-label="Direct App Store or Google Play subscription prices">
-          <div>
-            <span>Direct App Store or Google Play prices</span>
-            <strong>What one person pays directly</strong>
-            <p>These public consumer prices include VAT.</p>
+        <div class="annual-calculator" data-pricing-calculator>
+          <div class="annual-calculator-controls">
+            <p class="eyebrow eyebrow-light"><span></span> Custom seat calculator</p>
+            <h3>How many employees would you like to support?</h3>
+            <p>Enter any whole number from 20 to 1,000. Pricing updates instantly using the existing SparkFit volume bands.</p>
+            <label for="seat-count">Number of employee licences</label>
+            <div class="seat-input-wrap">
+              <input id="seat-count" type="number" min="20" max="1000" step="1" value="50" inputmode="numeric" data-price-quantity aria-describedby="seat-error">
+              <span>employees</span>
+            </div>
+            <input class="seat-slider" type="range" min="20" max="1000" step="1" value="50" data-seat-slider aria-label="Number of employee licences">
+            <div class="slider-scale" aria-hidden="true"><span>20</span><span>500</span><span>1,000</span></div>
+            <p id="seat-error" class="calculator-error" data-calculator-error aria-live="polite"></p>
+            <p class="calculator-band" data-price-band>50-seat band · 25% volume discount</p>
+            <p class="provisional-pricing-note" data-provisional-note hidden><strong>Commercial approval required:</strong> pricing for 501 to 1,000 seats provisionally retains the 50% discount. It is not approved for production use.</p>
           </div>
-          <article><span>Monthly</span><strong>£4.99</strong></article>
-          <article><span>Annual</span><strong>£24.99</strong></article>
-          <article><span>Lifetime</span><strong>£59.99</strong></article>
-        </div>
 
-        <div class="pricing-table-card">
-          <div class="pricing-table-intro">
-            <div>
-              <span>Employer price per code</span>
-              <h3>Volume pricing at each order level</h3>
+          <div class="annual-plan-results" aria-live="polite">
+            <div class="plan-results-heading"><span>Your Team's Annual SparkFit Plan</span><strong><span data-result-seats>50</span> employee licences</strong></div>
+            <div class="comparison-price">
+              <span data-direct-total-label>Direct individual purchasing, excluding VAT</span>
+              <del data-direct-total>£1,041.50</del>
+              <small><span data-direct-per-seat>£20.83</span> per employee per year</small>
             </div>
-            <div>
-              <p>The direct comparison is what one person pays through the App Store or Google Play. The 3, 6 and 9 month figures are based on £4.99 for one month of access.</p>
-              <div class="vat-toggle" role="group" aria-label="Show employer prices">
-                <span>Show prices</span>
-                <button class="is-active" type="button" data-vat-mode="ex" aria-pressed="true">Excluding VAT</button>
-                <button type="button" data-vat-mode="inc" aria-pressed="false">Including VAT</button>
-              </div>
+            <div class="discount-result"><span>Volume discount</span><strong data-result-discount>25%</strong></div>
+            <div class="employer-price-result"><span data-employer-total-label>Employer annual subscription, excluding VAT</span><strong data-employer-total>£781.00</strong></div>
+            <div class="saving-result"><span data-saving-label>Annual saving, excluding VAT</span><strong data-saving>£260.50</strong></div>
+            <div class="monthly-results">
+              <div><span>Cost per employee</span><strong data-monthly-per-seat>£1.30</strong><small>monthly equivalent</small></div>
+              <div><span>Total subscription</span><strong data-monthly-total>£65.08</strong><small>monthly equivalent</small></div>
             </div>
-          </div>
-          <p class="pricing-table-guide"><strong>How to read the table:</strong> choose the number of codes being purchased in the first column. Every price across that row is the price for one employee code.</p>
-          <div class="pricing-table-scroll" tabindex="0" aria-label="Scroll to view the full pricing table">
-            <table class="pricing-table">
-              <caption class="sr-only">SparkFit employee access price per code by quantity and access period</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Codes purchased</th>
-                  <th scope="col">3 months<small>App Store or Google Play<br>£14.97 inc VAT (3 × £4.99)</small></th>
-                  <th scope="col">6 months<small>App Store or Google Play<br>£29.94 inc VAT (6 × £4.99)</small></th>
-                  <th scope="col">9 months<small>App Store or Google Play<br>£44.91 inc VAT (9 × £4.99)</small></th>
-                  <th scope="col">12 months<small>App Store or Google Play<br>£24.99 annual, inc VAT</small></th>
-                  <th scope="col">Lifetime<small>App Store or Google Play<br>£59.99 one-off, inc VAT</small></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr><th scope="row">20 codes</th><td><span data-table-price data-ex="9.98" data-inc="11.98">£9.98</span><small>20% off</small></td><td><span data-table-price data-ex="19.96" data-inc="23.95">£19.96</span><small>20% off</small></td><td><span data-table-price data-ex="29.94" data-inc="35.93">£29.94</span><small>20% off</small></td><td><span data-table-price data-ex="16.66" data-inc="19.99">£16.66</span><small>20% off</small></td><td><span data-table-price data-ex="47.49" data-inc="56.99">£47.49</span><small>5% off</small></td></tr>
-                <tr><th scope="row">50 codes</th><td><span data-table-price data-ex="9.36" data-inc="11.23">£9.36</span><small>25% off</small></td><td><span data-table-price data-ex="18.71" data-inc="22.45">£18.71</span><small>25% off</small></td><td><span data-table-price data-ex="28.07" data-inc="33.68">£28.07</span><small>25% off</small></td><td><span data-table-price data-ex="15.62" data-inc="18.74">£15.62</span><small>25% off</small></td><td><span data-table-price data-ex="46.24" data-inc="55.49">£46.24</span><small>7.5% off</small></td></tr>
-                <tr><th scope="row">75 codes</th><td><span data-table-price data-ex="8.74" data-inc="10.49">£8.74</span><small>30% off</small></td><td><span data-table-price data-ex="17.47" data-inc="20.96">£17.47</span><small>30% off</small></td><td><span data-table-price data-ex="26.20" data-inc="31.44">£26.20</span><small>30% off</small></td><td><span data-table-price data-ex="14.58" data-inc="17.50">£14.58</span><small>30% off</small></td><td><span data-table-price data-ex="44.99" data-inc="53.99">£44.99</span><small>10% off</small></td></tr>
-                <tr><th scope="row">100 codes</th><td><span data-table-price data-ex="8.11" data-inc="9.73">£8.11</span><small>35% off</small></td><td><span data-table-price data-ex="16.22" data-inc="19.46">£16.22</span><small>35% off</small></td><td><span data-table-price data-ex="24.33" data-inc="29.20">£24.33</span><small>35% off</small></td><td><span data-table-price data-ex="13.54" data-inc="16.25">£13.54</span><small>35% off</small></td><td><span data-table-price data-ex="43.74" data-inc="52.49">£43.74</span><small>12.5% off</small></td></tr>
-                <tr><th scope="row">250 codes</th><td><span data-table-price data-ex="7.49" data-inc="8.99">£7.49</span><small>40% off</small></td><td><span data-table-price data-ex="14.97" data-inc="17.96">£14.97</span><small>40% off</small></td><td><span data-table-price data-ex="22.46" data-inc="26.95">£22.46</span><small>40% off</small></td><td><span data-table-price data-ex="12.50" data-inc="15.00">£12.50</span><small>40% off</small></td><td><span data-table-price data-ex="42.49" data-inc="50.99">£42.49</span><small>15% off</small></td></tr>
-                <tr><th scope="row">500 codes</th><td><span data-table-price data-ex="6.24" data-inc="7.49">£6.24</span><small>50% off</small></td><td><span data-table-price data-ex="12.48" data-inc="14.98">£12.48</span><small>50% off</small></td><td><span data-table-price data-ex="18.72" data-inc="22.46">£18.72</span><small>50% off</small></td><td><span data-table-price data-ex="10.42" data-inc="12.50">£10.42</span><small>50% off</small></td><td><span data-table-price data-ex="39.99" data-inc="47.99">£39.99</span><small>20% off</small></td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p class="pricing-table-note">The direct prices shown in each column are what one person would pay through the App Store or Google Play and include VAT. Employer discounts are applied to the equivalent price before VAT. Use the toggle to see VAT added back at 20%.</p>
-        </div>
-
-        <div class="pricing-calculator" data-pricing-calculator>
-          <div class="calculator-copy">
-            <p class="eyebrow"><span></span> Price calculator</p>
-            <h3>Build an employee access order.</h3>
-            <p>Choose an access period and enter the number of employees. The calculator applies the correct volume band automatically.</p>
-            <p class="calculator-assurance"><strong>No payment is taken here.</strong> Requesting an order sends your selected guide price to the partnership enquiry form for confirmation.</p>
-          </div>
-          <div class="calculator-panel">
-            <div class="vat-toggle vat-toggle-light" role="group" aria-label="Show calculator prices">
-              <span>Show prices</span>
-              <button class="is-active" type="button" data-vat-mode="ex" aria-pressed="true">Excluding VAT</button>
-              <button type="button" data-vat-mode="inc" aria-pressed="false">Including VAT</button>
-            </div>
-            <div class="calculator-fields">
-              <label>Access period
-                <select data-price-term>
-                  <option value="3">3 months</option>
-                  <option value="6">6 months</option>
-                  <option value="9">9 months</option>
-                  <option value="12" selected>12 months</option>
-                  <option value="lifetime">Lifetime</option>
-                </select>
-              </label>
-              <label>Number of employee codes
-                <input type="number" min="20" step="1" value="20" inputmode="numeric" data-price-quantity>
-              </label>
-            </div>
-            <p class="calculator-band" data-price-band>20-code band · 20% volume discount</p>
-            <div class="calculator-results" aria-live="polite">
-              <div><span>Direct app-store price, VAT included</span><strong data-price-base>£24.99</strong></div>
-              <div><span data-price-per-code-label>Employer price per code, ex VAT</span><strong data-price-per-code>£16.66</strong></div>
-              <div><span data-price-total-label>Employer order total, ex VAT</span><strong data-price-total>£333.20</strong></div>
-              <div><span data-price-saving-label>Reduction before VAT</span><strong data-price-saving>£83.30</strong></div>
-            </div>
-            <p class="calculator-note" data-price-note>12 months of Premium access for 20 employees. The direct app-store reference is £24.99 including VAT. Employer prices currently exclude VAT.</p>
-            <div class="calculator-actions">
-              <a class="button button-primary" href="#enquire" data-price-order>Request This Order</a>
-              <a class="button button-dark" href="#enquire" data-price-contact hidden>Contact Us for Volume Pricing</a>
-            </div>
+            <p class="calculator-note" data-price-note>50 annual employee licences with a 25% volume discount. Prices are shown excluding VAT.</p>
+            <a class="button button-primary" href="#enquire" data-price-order>Get Started with 50 Employees</a>
           </div>
         </div>
 
-        <p class="pricing-terms"><strong>Employer prices default to excluding VAT.</strong> Use the VAT toggle to see the equivalent including VAT at 20%. Prices are guide prices in GBP and include the stated volume discount. Orders over 500 codes require a tailored quotation.</p>
+        <div class="enterprise-callout">
+          <div><span>Enterprise teams</span><strong>Supporting more than 1,000 employees?</strong><p>Contact us for tailored enterprise pricing.</p></div>
+          <a class="button button-dark" href="#enquire" data-enterprise-link>Contact Partnerships</a>
+        </div>
+
+        <p class="pricing-terms"><strong>Important pricing information.</strong> Employer prices default to excluding VAT. The toggle provides an illustrative 20% UK VAT view and uses like-for-like tax treatment for every comparison. Actual tax will be determined by the future server-side billing and tax system. The current website prepares an enquiry only and does not take payment. Annual automatic billing through Stripe is planned, not currently live.</p>
       </div>
     </section>
 
     <section class="section journey-section">
       <div class="shell journey-grid">
         <div class="journey-intro">
-          <p class="eyebrow"><span></span> Light to manage</p>
-          <h2>A simple rollout for your organisation.</h2>
-          <p>SparkFit is designed to be supportive without creating a hands-on programme for your people team to operate.</p>
+          <p class="eyebrow"><span></span> How SparkFit Works for Your Business</p>
+          <h2>Simple for your organisation. Private for employees.</h2>
+          <p>Your organisation funds annual access. Employees activate and use their own SparkFit accounts independently.</p>
+          <div class="delivery-status">
+            <p><strong>Available now:</strong> activation instructions, employee activation and activation-status reporting.</p>
+            <p><strong>Planned:</strong> automated Stripe billing, annual renewal, seat changes and a self-service employer licence dashboard.</p>
+          </div>
         </div>
         <ol class="journey-list">
-          <li><span>01</span><div><h3>Agree employee access</h3><p>Choose the number of codes, access period and a suitable start date for your organisation.</p></div></li>
-          <li><span>02</span><div><h3>Receive your activation portal</h3><p>We provide a simple employee activation portal with clear instructions ready to share.</p></div></li>
-          <li><span>03</span><div><h3>Share access with employees</h3><p>Your organisation shares the portal through its usual internal channels. No live onboarding programme is required.</p></div></li>
-          <li><span>04</span><div><h3>Employees activate independently</h3><p>Employees activate their access and use SparkFit privately, with guidance available inside the app.</p></div></li>
-          <li><span>05</span><div><h3>See activation progress</h3><p>We report who has activated an account so you can manage available codes. Individual app activity, fitness, nutrition and progress remain private.</p></div></li>
+          <li><span>01</span><div><h3>Choose your team size</h3><p>Select the number of employees you want to support. Your volume discount is calculated automatically.</p></div></li>
+          <li><span>02</span><div><h3>Set up your subscription</h3><p>Your business pays one annual subscription covering your selected employee licences. Until Stripe Billing is introduced, this is confirmed through the partnership enquiry process.</p></div></li>
+          <li><span>03</span><div><h3>Invite your employees</h3><p>Share secure activation instructions so employees can activate their own SparkFit Premium access without paying individually.</p></div></li>
+          <li><span>04</span><div><h3>Manage your licences</h3><p>One active employee account uses each licence. Current reporting shows who has activated. Self-service invitations, reassignment and seat management are planned features.</p></div></li>
         </ol>
+      </div>
+      <div class="shell subscription-facts" aria-label="Employer subscription details">
+        <article><strong>One account per licence</strong><p>Each active employer-funded licence supports one employee account.</p></article>
+        <article><strong>Employee-owned accounts</strong><p>Employees retain their own SparkFit accounts and personal app data.</p></article>
+        <article><strong>Private wellbeing activity</strong><p>Employers cannot see workouts, nutrition information, conversations or progress.</p></article>
+        <article><strong>Annual billing</strong><p>Subscriptions are designed for annual billing. Automatic Stripe renewal is planned and is not yet live.</p></article>
       </div>
     </section>
 
@@ -505,7 +499,7 @@
         </div>
         <div class="boundary-grid">
           <article><span aria-hidden="true">✓</span><h3>Employee activation portal</h3><p>A simple place for employees to activate the Premium access funded by your organisation.</p></article>
-          <article><span aria-hidden="true">✓</span><h3>Activation reporting</h3><p>See which invited employees have activated an account so your organisation can manage available codes.</p></article>
+          <article><span aria-hidden="true">✓</span><h3>Activation reporting</h3><p>See which invited employees have activated an account so your organisation can manage available licences.</p></article>
           <article><span aria-hidden="true">✓</span><h3>Private individual use</h3><p>Employers do not see workouts, nutrition choices, conversations, measurements or personal progress.</p></article>
           <article><span aria-hidden="true">✓</span><h3>Low administration</h3><p>Your team shares the activation information. Employees then get started and use the app independently.</p></article>
         </div>
@@ -523,20 +517,60 @@
         </div>
         <div class="accordion" data-accordion>
           <details open>
-            <summary>What happens after the free trial?<span aria-hidden="true">+</span></summary>
-            <div><p>There's no automatic charge or commitment. If SparkFit is a good fit for your team, choose the access period and number of employee codes you would like to order.</p></div>
+            <summary>How does the annual employer subscription work?<span aria-hidden="true">+</span></summary>
+            <div><p>Your organisation chooses the number of employee licences and receives a volume discount. Each licence funds one active employee's SparkFit Premium access for a year. The current website sends a priced enquiry for confirmation and does not take payment.</p></div>
           </details>
           <details>
-            <summary>Can we purchase SparkFit for more than 20 employees?<span aria-hidden="true">+</span></summary>
-            <div><p>Yes. Published pricing covers orders from 20 to 500 codes. Use the calculator for an immediate guide price. Contact SparkFit Partnerships for 501 codes or more.</p></div>
+            <summary>How are volume discounts calculated?<span aria-hidden="true">+</span></summary>
+            <div><p>The existing whole-order bands apply 20% from 20 licences, 25% from 50, 30% from 75, 35% from 100, 40% from 250 and 50% from 500. Reaching a threshold changes the price of every licence in the order.</p></div>
           </details>
           <details>
-            <summary>How much does employee access cost?<span aria-hidden="true">+</span></summary>
-            <div><p>Employer pricing depends on the access period and number of codes. Choose 3, 6, 9 or 12 months, or lifetime access. Published volume discounts apply from 20 to 500 codes, and the calculator shows the guide total.</p></div>
+            <summary>Why is employer pricing lower than direct app purchasing?<span aria-hidden="true">+</span></summary>
+            <div><p>Employer pricing applies the published volume discount to the annual consumer reference price excluding VAT. The calculator compares like-for-like totals so the displayed saving reflects the volume price rather than a VAT mismatch.</p></div>
           </details>
           <details>
-            <summary>What happens when fixed-term access ends?<span aria-hidden="true">+</span></summary>
-            <div><p>There is no automatic renewal. Your organisation can top up access with another fixed term if you want employees to continue. Lifetime codes are a one-off purchase and do not need a top-up.</p></div>
+            <summary>Why does the consumer reference price include VAT?<span aria-hidden="true">+</span></summary>
+            <div><p>The public £24.99 annual App Store and Google Play price is a consumer price and includes VAT. Employer discounts are calculated from its £20.83 VAT-exclusive equivalent.</p></div>
+          </details>
+          <details>
+            <summary>What does the VAT toggle change?<span aria-hidden="true">+</span></summary>
+            <div><p>It changes every displayed estimate, including package prices, direct comparisons, annual totals, monthly equivalents, per-employee costs and savings. It uses an illustrative 20% UK VAT rate. Actual tax will be determined by the future checkout and server-side tax system.</p></div>
+          </details>
+          <details>
+            <summary>Do employees need to pay?<span aria-hidden="true">+</span></summary>
+            <div><p>No. The organisation funds the selected annual licences. Employees use the employer-funded activation route rather than purchasing Premium individually.</p></div>
+          </details>
+          <details>
+            <summary>How do employees activate their licences?<span aria-hidden="true">+</span></summary>
+            <div><p>Your organisation shares the activation instructions supplied by SparkFit Partnerships. Employees activate their own SparkFit accounts and use the app independently.</p></div>
+          </details>
+          <details>
+            <summary>Can licences be reassigned?<span aria-hidden="true">+</span></summary>
+            <div><p>Licence reassignment and a self-service employer dashboard are planned. During the current rollout, discuss changes with SparkFit Partnerships so the available process can be confirmed.</p></div>
+          </details>
+          <details>
+            <summary>How do we add or remove seats?<span aria-hidden="true">+</span></summary>
+            <div><p>Automated subscription quantity changes and proration are planned for the Stripe Billing integration. They are not available through this website yet. Contact SparkFit Partnerships to discuss a change.</p></div>
+          </details>
+          <details>
+            <summary>What happens when an employee leaves?<span aria-hidden="true">+</span></summary>
+            <div><p>The employee retains their personal SparkFit account and data. The process for removing employer-funded Premium access and reassigning the licence must currently be coordinated with SparkFit Partnerships.</p></div>
+          </details>
+          <details>
+            <summary>What happens if the employer cancels?<span aria-hidden="true">+</span></summary>
+            <div><p>Cancellation terms will be confirmed in the employer agreement. Automatic annual renewal is planned but is not currently active on this website. Employees keep their personal accounts, but employer-funded Premium access would end according to the agreed subscription terms.</p></div>
+          </details>
+          <details>
+            <summary>What if an employee already pays for Premium?<span aria-hidden="true">+</span></summary>
+            <div><p>Employer-funded access is separate from a personal App Store or Google Play subscription. The employee should contact SparkFit before activation so overlapping paid access can be reviewed. Do not assume an app-store subscription is cancelled automatically.</p></div>
+          </details>
+          <details>
+            <summary>How do we request more than 1,000 seats?<span aria-hidden="true">+</span></summary>
+            <div><p>Use the Contact Partnerships link or the enquiry form for tailored enterprise pricing. The calculator is intentionally limited to 1,000 seats.</p></div>
+          </details>
+          <details>
+            <summary>How does the 30-day free pilot work?<span aria-hidden="true">+</span></summary>
+            <div><p>Eligible UK organisations can request full SparkFit Premium access for up to 20 employees for 30 days. No payment details are required, there is no obligation to continue and the pilot does not convert automatically to a paid subscription.</p></div>
           </details>
           <details>
             <summary>Is SparkFit already available to download?<span aria-hidden="true">+</span></summary>
@@ -545,14 +579,6 @@
           <details>
             <summary>What reporting does an employer receive?<span aria-hidden="true">+</span></summary>
             <div><p>Your organisation can receive activation reporting showing who has activated an account. It does not include individual app usage, workouts, nutrition information, conversations, measurements or progress.</p></div>
-          </details>
-          <details>
-            <summary>How much work is required from our team?<span aria-hidden="true">+</span></summary>
-            <div><p>The model is designed to be light to manage. Your organisation agrees the access, shares the activation portal and instructions, and can review activation status. Employees use SparkFit independently.</p></div>
-          </details>
-          <details>
-            <summary>Who can apply?<span aria-hidden="true">+</span></summary>
-            <div><p>UK organisations can enquire about a trial, annual employee wellbeing access, or a distribution/community partnership. Availability is discussed directly and an enquiry is not a guarantee of acceptance.</p></div>
           </details>
         </div>
       </div>
@@ -566,7 +592,7 @@
           <p>Tell us how many employees you would like to support and when you want to begin. We will help you choose the appropriate access arrangement.</p>
           <ul>
             <li><span aria-hidden="true">✓</span> UK organisations only</li>
-            <li><span aria-hidden="true">✓</span> No automatic purchase or renewal</li>
+            <li><span aria-hidden="true">✓</span> No payment or subscription created here</li>
             <li><span aria-hidden="true">✓</span> No payment details in this form</li>
           </ul>
           <p class="direct-email">Prefer email?<br><a href="mailto:partnerships@spark-fit.com">partnerships@spark-fit.com</a></p>
@@ -579,7 +605,7 @@
               <select id="enquiry-type" name="enquiryType" required data-enquiry-type>
                 <option value="">Choose an option</option>
                 <option value="Free Founding Partner Trial">Free Founding Partner Trial</option>
-                <option value="Employee Access Code Order">Employee Access Code Order</option>
+                <option value="Annual Employer Subscription Enquiry">Annual Employer Subscription Enquiry</option>
                 <option value="Distribution / Community Partnership">Distribution / Community Partnership</option>
                 <option value="General Partnership Enquiry">General Partnership Enquiry</option>
               </select>
@@ -593,7 +619,7 @@
               <div class="form-field"><label for="launch-timeframe">Intended launch timeframe *</label><select id="launch-timeframe" name="launchTimeframe" required><option value="">Choose a timeframe</option><option>Within 1 month</option><option>1–3 months</option><option>3–6 months</option><option>6–12 months</option><option>Just exploring</option></select></div>
             </div>
             <div class="annual-fields" data-annual-fields hidden>
-              <div class="form-field form-field-full"><label for="licence-quantity">Desired code quantity *</label><input id="licence-quantity" name="licenceQuantity" type="number" min="20" max="1000000" inputmode="numeric" data-annual-required></div>
+              <div class="form-field form-field-full"><label for="licence-quantity">Desired annual licence quantity *</label><input id="licence-quantity" name="licenceQuantity" type="number" min="20" max="1000" step="1" inputmode="numeric" data-annual-required></div>
             </div>
             <div class="form-field form-field-full"><label for="requirements">Additional requirements <span>(optional)</span></label><textarea id="requirements" name="requirements" rows="5" maxlength="2000" placeholder="Anything useful about your team, goals or timing"></textarea></div>
             <div class="trap" aria-hidden="true"><label for="website">Leave this field empty</label><input id="website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
@@ -612,7 +638,7 @@
         <a class="brand brand-light" href="./"><img src="../icon.webp" alt="" width="64" height="64"><span><strong>SPARKFIT</strong><small>PARTNERSHIPS</small></span></a>
         <p>Practical employee wellbeing support that is simple for UK organisations to offer.</p>
       </div>
-      <div><h2>Partnerships</h2><a href="#options">Free team trial</a><a href="#pricing">Employee code pricing</a><a href="#enquire">Enquire</a><a href="mailto:partnerships@spark-fit.com">partnerships@spark-fit.com</a></div>
+      <div><h2>Partnerships</h2><a href="#options">Free team trial</a><a href="#pricing">Annual employer pricing</a><a href="#enquire">Enquire</a><a href="mailto:partnerships@spark-fit.com">partnerships@spark-fit.com</a></div>
       <div><h2>The app</h2><a href="https://apps.apple.com/gb/app/sparkfit-15-min-workouts/id6754826325" target="_blank" rel="noopener">See SparkFit on the App Store ↗</a><a href="https://play.google.com/store/apps/details?id=app.spark.fit" target="_blank" rel="noopener">See SparkFit on Google Play ↗</a><a href="../">Consumer website</a></div>
       <div><h2>Legal</h2><a href="../privacy.html">Privacy Policy</a><a href="../terms.html">Terms</a><a href="../contact.html">Contact</a></div>
     </div>
