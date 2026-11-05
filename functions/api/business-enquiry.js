@@ -1,6 +1,7 @@
 const PARTNERSHIPS_EMAIL = 'partnerships@spark-fit.com';
 const ALLOWED_ENQUIRY_TYPES = new Set([
   'Free Founding Partner Trial',
+  'Annual Employer Subscription Enquiry',
   'Employee Access Code Order',
   'Distribution / Community Partnership',
   'General Partnership Enquiry'
@@ -92,7 +93,10 @@ export async function onRequestPost(context) {
   const missingAnnualDetails = lead.enquiryType === 'Employee Access Code Order'
     && !isPositiveInteger(lead.licenceQuantity);
 
-  if (missingRequired || missingAnnualDetails) return json({ message: 'Please check the required fields and try again.' }, 422);
+  const missingSubscriptionDetails = lead.enquiryType === 'Annual Employer Subscription Enquiry'
+    && (!isPositiveInteger(lead.licenceQuantity) || Number(lead.licenceQuantity) < 20 || Number(lead.licenceQuantity) > 1000);
+
+  if (missingRequired || missingAnnualDetails || missingSubscriptionDetails) return json({ message: 'Please check the required fields and try again.' }, 422);
 
   if (env.TURNSTILE_REQUIRED === 'true') {
     if (!env.TURNSTILE_SECRET_KEY) return json({ message: 'Enquiry protection is not configured.' }, 503);
@@ -115,7 +119,7 @@ export async function onRequestPost(context) {
     `Contact: ${lead.contactName}`,
     `Work email: ${lead.workEmail}`,
     `Approximate employee count: ${lead.employeeCount}`,
-    `Desired code quantity: ${lead.licenceQuantity || 'Not supplied / not applicable'}`,
+    `Desired annual licence quantity: ${lead.licenceQuantity || 'Not supplied / not applicable'}`,
     `Intended launch timeframe: ${lead.launchTimeframe}`,
     '',
     'Additional requirements:',

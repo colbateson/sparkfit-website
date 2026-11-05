@@ -256,6 +256,90 @@ h3 { font-size: clamp(1.35rem, 2vw, 1.9rem); }
 .calculator-actions .button { width: 100%; }
 .pricing-terms { max-width: 950px; margin: 24px auto 0; color: var(--muted); font-size: .7rem; text-align: center; }
 
+.pricing-heading-annual { display: grid; grid-template-columns: 1.3fr .7fr; align-items: end; gap: clamp(32px, 7vw, 90px); margin-bottom: 38px; }
+.pricing-heading-annual h2 { max-width: 850px; margin: 0 0 18px; }
+.pricing-heading-annual p:not(.eyebrow) { max-width: 760px; margin: 0; color: var(--muted); }
+.vat-toggle-shared { justify-content: flex-end; margin: 0; }
+.vat-toggle-shared > span { color: var(--muted); }
+.vat-toggle-shared button { border-color: var(--line); color: var(--ink); }
+.vat-toggle-shared button.is-active { border-color: var(--purple); background: var(--purple); color: var(--white); }
+
+.direct-annual-reference { display: grid; grid-template-columns: 1.3fr .7fr; gap: 1px; overflow: hidden; margin-bottom: 42px; border: 1px solid var(--line); border-radius: 20px; background: var(--line); }
+.direct-annual-reference > div { min-height: 138px; padding: 27px 30px; background: var(--white); }
+.direct-annual-reference > div:first-child > span, .package-heading > div > span, .enterprise-callout > div > span { color: var(--purple); font-size: .64rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.direct-annual-reference > div:first-child > strong, .direct-annual-reference > div:first-child > p { display: block; }
+.direct-annual-reference > div:first-child > strong { margin-top: 7px; font-family: "Space Grotesk", sans-serif; font-size: 1.35rem; }
+.direct-annual-reference > div:first-child > p { margin: 7px 0 0; color: var(--muted); font-size: .75rem; }
+.direct-annual-price { display: flex; align-items: flex-start; justify-content: center; flex-direction: column; }
+.direct-annual-price > span, .direct-annual-price > small { color: var(--muted); font-size: .68rem; font-weight: 700; }
+.direct-annual-price > strong { margin: 5px 0; font-family: "Space Grotesk", sans-serif; font-size: clamp(2rem, 4vw, 3.3rem); line-height: 1; }
+
+.package-heading { display: grid; grid-template-columns: 1fr 1fr; gap: 35px; align-items: end; margin-bottom: 22px; }
+.package-heading h3 { margin: 8px 0 0; font-size: clamp(1.8rem, 3vw, 3rem); }
+.package-heading > p { margin: 0; color: var(--muted); font-size: .78rem; }
+.package-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 30px; }
+.package-card { position: relative; display: flex; align-items: flex-start; min-height: 365px; padding: 30px; border: 1px solid var(--line); border-radius: 20px; background: var(--white); color: var(--ink); font: inherit; text-align: left; cursor: pointer; flex-direction: column; transition: border-color .2s, box-shadow .2s, transform .2s; }
+.package-card:hover { border-color: #ad8bea; box-shadow: 0 18px 45px rgba(44,20,82,.12); transform: translateY(-3px); }
+.package-card:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
+.package-card.is-selected { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(108,47,228,.12), 0 18px 45px rgba(44,20,82,.12); }
+.package-card-featured::before { content: "Popular starting point"; position: absolute; top: 0; right: 25px; padding: 7px 10px; border-radius: 0 0 9px 9px; background: var(--purple); color: var(--white); font-size: .57rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.package-name { color: var(--purple); font-size: .67rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.package-card > strong { margin-top: 12px; font-family: "Space Grotesk", sans-serif; font-size: 1.6rem; }
+.package-card > em { padding: 6px 9px; margin-top: 13px; border-radius: 999px; background: #eee7fb; color: var(--purple); font-size: .63rem; font-style: normal; font-weight: 800; }
+.package-price { margin-top: 28px; font-family: "Space Grotesk", sans-serif; font-size: clamp(2rem, 3.6vw, 3.2rem); font-weight: 700; line-height: 1; letter-spacing: -.04em; }
+.package-card > small { margin-top: 6px; color: var(--muted); font-size: .67rem; }
+.package-card > span:not(.package-name):not(.package-price) { margin-top: 15px; color: var(--muted); font-size: .72rem; }
+.package-card > b { padding-top: 18px; margin-top: auto; border-top: 1px solid var(--line); width: 100%; color: var(--ink); font-size: .72rem; }
+
+.annual-calculator { display: grid; grid-template-columns: .85fr 1.15fr; gap: clamp(35px, 6vw, 80px); padding: clamp(32px, 5vw, 64px); border-radius: var(--radius); background: radial-gradient(circle at 12% 18%, #5422a4, var(--navy) 60%); color: var(--white); box-shadow: var(--shadow); }
+.annual-calculator-controls h3 { margin: 0 0 18px; font-size: clamp(2.15rem, 4vw, 4rem); }
+.annual-calculator-controls > p:not(.eyebrow):not(.calculator-band):not(.calculator-error):not(.provisional-pricing-note) { color: #c8bdd9; }
+.annual-calculator-controls > label { display: block; margin-top: 28px; color: #ded6e9; font-size: .7rem; font-weight: 800; }
+.seat-input-wrap { display: grid; grid-template-columns: 1fr auto; align-items: center; overflow: hidden; margin-top: 8px; border: 1px solid rgba(255,255,255,.25); border-radius: 14px; background: rgba(255,255,255,.08); }
+.seat-input-wrap:focus-within { border-color: var(--pink); box-shadow: 0 0 0 4px rgba(226,92,207,.14); }
+.seat-input-wrap input { min-width: 0; padding: 15px 18px; border: 0; outline: 0; background: transparent; color: var(--white); font-family: "Space Grotesk", sans-serif; font-size: 1.35rem; font-weight: 700; }
+.seat-input-wrap span { padding-right: 18px; color: #c8bdd9; font-size: .69rem; font-weight: 700; }
+.seat-slider { width: 100%; margin: 25px 0 0; accent-color: var(--pink); cursor: pointer; }
+.slider-scale { display: flex; justify-content: space-between; margin-top: 6px; color: #a99dbc; font-size: .58rem; }
+.calculator-error { min-height: 22px; margin: 12px 0 0; color: #ffd1dc; font-size: .68rem; font-weight: 700; }
+.annual-calculator .calculator-band { background: rgba(226,92,207,.16); color: #ffc8f3; }
+.provisional-pricing-note { padding: 13px 15px; border: 1px solid rgba(255,201,92,.5); border-radius: 12px; background: rgba(255,201,92,.1); color: #ffe5ae; font-size: .68rem; }
+
+.annual-plan-results { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; overflow: hidden; border-radius: 22px; background: var(--line); color: var(--ink); }
+.annual-plan-results > div, .annual-plan-results > p, .annual-plan-results > a { background: var(--white); }
+.plan-results-heading { grid-column: 1 / -1; padding: 26px 28px; }
+.plan-results-heading span, .plan-results-heading strong { display: block; }
+.plan-results-heading > span { color: var(--purple); font-size: .62rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.plan-results-heading > strong { margin-top: 7px; font-family: "Space Grotesk", sans-serif; font-size: 1.7rem; }
+.comparison-price, .discount-result, .employer-price-result, .saving-result { min-height: 140px; padding: 23px 26px; }
+.annual-plan-results div > span, .annual-plan-results div > small { color: var(--muted); font-size: .62rem; font-weight: 700; }
+.comparison-price del, .discount-result strong, .employer-price-result strong, .saving-result strong { display: block; margin: 8px 0 5px; font-family: "Space Grotesk", sans-serif; font-size: clamp(1.6rem, 3vw, 2.5rem); line-height: 1; }
+.comparison-price del { color: #81788d; text-decoration-thickness: 2px; }
+.employer-price-result strong { color: var(--purple); }
+.saving-result { background: #ecfff8 !important; }
+.saving-result strong { color: #137251; }
+.monthly-results { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; padding: 0 !important; background: var(--line) !important; }
+.monthly-results > div { padding: 20px 25px; background: var(--white); }
+.monthly-results strong { display: block; margin: 6px 0 2px; font-family: "Space Grotesk", sans-serif; font-size: 1.45rem; }
+.annual-plan-results .calculator-note { grid-column: 1 / -1; min-height: auto; padding: 18px 25px; margin: 0; }
+.annual-plan-results > .button { grid-column: 1 / -1; min-height: 58px; margin: 0; border-radius: 0; background: var(--purple); color: var(--white); }
+.annual-plan-results > .button:hover { background: #5821bd; }
+.annual-plan-results.is-invalid { opacity: .55; }
+
+.enterprise-callout { display: flex; justify-content: space-between; align-items: center; gap: 30px; padding: 27px 30px; margin-top: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--paper); }
+.enterprise-callout strong, .enterprise-callout p { display: block; }
+.enterprise-callout strong { margin-top: 6px; font-family: "Space Grotesk", sans-serif; font-size: 1.35rem; }
+.enterprise-callout p { margin: 4px 0 0; color: var(--muted); font-size: .72rem; }
+.enterprise-callout .button { flex: 0 0 auto; }
+
+.delivery-status { padding-top: 18px; margin-top: 26px; border-top: 1px solid var(--line); }
+.delivery-status p { font-size: .72rem; }
+.delivery-status strong { color: var(--ink); }
+.subscription-facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; margin-top: 55px; border: 1px solid var(--line); background: var(--line); }
+.subscription-facts article { min-height: 165px; padding: 25px; background: var(--white); }
+.subscription-facts strong { font-family: "Space Grotesk", sans-serif; font-size: 1rem; }
+.subscription-facts p { margin: 12px 0 0; color: var(--muted); font-size: .72rem; }
+
 .journey-section { border-bottom: 1px solid var(--line); }
 .journey-grid { display: grid; grid-template-columns: .72fr 1.28fr; gap: clamp(50px, 9vw, 130px); }
 .journey-intro { position: sticky; top: 130px; align-self: start; }
@@ -364,6 +448,11 @@ h3 { font-size: clamp(1.35rem, 2vw, 1.9rem); }
   .pricing-principles { grid-template-columns: repeat(2, 1fr); }
   .direct-price-reference { grid-template-columns: repeat(2, 1fr); }
   .pricing-calculator { grid-template-columns: 1fr; }
+  .pricing-heading-annual, .annual-calculator { grid-template-columns: 1fr; }
+  .vat-toggle-shared { justify-content: flex-start; }
+  .package-grid { grid-template-columns: 1fr; }
+  .package-card { min-height: 0; }
+  .subscription-facts { grid-template-columns: repeat(2, 1fr); }
   .journey-intro, .faq-intro, .enquiry-copy { position: static; }
   .privacy-footnote { grid-column: auto; }
   .footer-grid { grid-template-columns: repeat(2, 1fr); }
@@ -403,6 +492,18 @@ h3 { font-size: clamp(1.35rem, 2vw, 1.9rem); }
   .pricing-principles { grid-template-columns: 1fr; }
   .direct-price-reference { grid-template-columns: 1fr; }
   .direct-price-reference > div, .direct-price-reference article { min-height: auto; }
+  .pricing-heading-annual { margin-bottom: 28px; }
+  .vat-toggle-shared { align-items: flex-start; flex-wrap: wrap; }
+  .direct-annual-reference, .package-heading { grid-template-columns: 1fr; }
+  .direct-annual-reference > div { min-height: auto; }
+  .package-card { padding: 26px; }
+  .annual-calculator { padding: 26px 18px; }
+  .annual-plan-results { grid-template-columns: 1fr; }
+  .plan-results-heading, .monthly-results, .annual-plan-results .calculator-note, .annual-plan-results > .button { grid-column: auto; }
+  .monthly-results { grid-template-columns: 1fr; }
+  .enterprise-callout { align-items: flex-start; flex-direction: column; }
+  .enterprise-callout .button { width: 100%; }
+  .subscription-facts { grid-template-columns: 1fr; }
   .pricing-table-intro { grid-template-columns: 1fr; align-items: flex-start; gap: 16px; padding: 26px 22px; }
   .pricing-table-guide { padding: 14px 20px; }
   .pricing-table-note { padding: 17px 20px; }
