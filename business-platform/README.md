@@ -55,3 +55,9 @@ Required non-secret production variables include `ADMIN_EMAILS`, `REVENUECAT_PRO
 10. Enable production side effects one at a time, with logs and rollback available.
 
 The existing `revcat-sparkfit-trial-worker` is not modified by this implementation. Its consumer trial route remains a separate production dependency until regression coverage and a safe hardening deployment are approved.
+
+## Production implementation guide
+
+Follow [PRODUCTION_RUNBOOK.md](./PRODUCTION_RUNBOOK.md) for the complete ordered implementation, test, launch and rollback process. Start with the mobile identity work. RevenueCat writes must remain disabled until stable authenticated app accounts and verified email are released on both mobile platforms.
+
+Use `wrangler.production.example.toml` as the safe starting point for the production Worker configuration. It intentionally keeps every external side effect disabled and contains no secrets.

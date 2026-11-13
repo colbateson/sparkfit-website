@@ -1,0 +1,38 @@
+name = "sparkfit-business-platform-production"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+workers_dev = false
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = true
+
+[observability]
+enabled = true
+
+[vars]
+ENVIRONMENT = "production"
+PUBLIC_APP_ORIGIN = "https://business.spark-fit.com"
+PILOT_DEFAULT_DAYS = "30"
+PILOT_MAX_SEATS = "20"
+PAYMENTS_ENABLED = "false"
+REVENUECAT_WRITES_ENABLED = "false"
+EMAIL_ENABLED = "false"
+TURNSTILE_REQUIRED = "false"
+ADMIN_EMAILS = "approved.admin@spark-fit.com"
+PRICING_VERSION = "annual-v1"
+REVENUECAT_PROJECT_ID = "replace_with_project_id"
+REVENUECAT_BUSINESS_ENTITLEMENT_ID = "replace_with_entitlement_id"
+EMAIL_FROM = "SparkFit Partnerships <partnerships@mail.spark-fit.com>"
+EMAIL_REPLY_TO = "partnerships@spark-fit.com"
+PARTNERSHIPS_EMAIL = "partnerships@spark-fit.com"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "sparkfit-business-production"
+database_id = "replace_with_production_d1_database_id"
+migrations_dir = "migrations"
+
+[triggers]
+crons = ["15 8 * * *"]
