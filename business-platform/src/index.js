@@ -1,4 +1,4 @@
-import { audit, clean, corsHeaders, email, HttpError, id, integer, isoAfterDays, json, nowIso, parseJson, randomToken, sha256, validEmail, verifyTurnstile } from './lib.js';
+import { audit, clean, corsHeaders, email, HttpError, id, integer, isoAfterDays, json, normaliseWebsite, nowIso, parseJson, randomToken, sha256, validEmail, verifyTurnstile } from './lib.js';
 import { consumeMagicLink, issueMagicLink, requireSession } from './auth.js';
 import { flushEmailOutbox, queueEmail, templates } from './email.js';
 import { priceAnnual } from './pricing.js';
@@ -16,7 +16,7 @@ async function pilotApplication(request, env) {
   const application = {
     id: id('pilot'),
     companyName: clean(body.companyName, 120),
-    companyWebsite: clean(body.companyWebsite, 300),
+    companyWebsite: normaliseWebsite(body.companyWebsite, true),
     contactName: clean(body.contactName, 120),
     jobTitle: clean(body.jobTitle, 120),
     businessEmail: email(body.businessEmail),
@@ -25,7 +25,7 @@ async function pilotApplication(request, env) {
     message: clean(body.message, 2000),
     marketingConsent: body.marketingConsent === true ? 1 : 0,
   };
-  if (!application.companyName || !/^https:\/\//i.test(application.companyWebsite) || !application.contactName || !application.jobTitle
+  if (!application.companyName || !application.companyWebsite || !application.contactName || !application.jobTitle
     || !validEmail(application.businessEmail) || !integer(application.companySize, 1, 1000000) || !integer(application.requestedSeats, 1, Number(env.PILOT_MAX_SEATS || 20))) {
     throw new HttpError(422, 'Please check the pilot application details.');
   }
@@ -336,10 +336,10 @@ async function updateSeats(request, env) {
 async function checkout(request, env) {
   const body = await parseJson(request);
   const order = {
-    id: id('ord'), company_name: clean(body.companyName, 120), company_website: clean(body.companyWebsite, 300),
+    id: id('ord'), company_name: clean(body.companyName, 120), company_website: normaliseWebsite(body.companyWebsite),
     billing_email: email(body.billingEmail), contact_name: clean(body.contactName, 120), seats: Number(body.seats),
   };
-  if (!order.company_name || !validEmail(order.billing_email) || !order.contact_name || !integer(order.seats, 20, 1000)) throw new HttpError(422, 'Please check the order details.');
+  if (!order.company_name || order.company_website === null || !validEmail(order.billing_email) || !order.contact_name || !integer(order.seats, 20, 1000)) throw new HttpError(422, 'Please check the order details.');
   const price = priceAnnual(order.seats);
   if (price.provisional) throw new HttpError(409, 'Pricing above 500 seats requires commercial approval.');
   Object.assign(order, { unit_amount_ex_vat: price.unitExVat, subtotal_ex_vat: price.subtotalExVat, discount_bps: price.discountBps, pricing_version: price.pricingVersion });

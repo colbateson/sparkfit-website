@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { priceAnnual, TIERS } from '../src/pricing.js';
 import { normaliseSubscriptionStatus, verifyStripeWebhook } from '../src/stripe.js';
 import { revenueCatPolicy } from '../src/revenuecat.js';
+import { normaliseWebsite } from '../src/lib.js';
 
 const schema = readFileSync(new URL('../migrations/0001_init.sql', import.meta.url), 'utf8');
 const lifecycleSchema = readFileSync(new URL('../migrations/0002_lifecycle_and_webhook_state.sql', import.meta.url), 'utf8');
@@ -16,6 +17,14 @@ test('preserves approved annual volume pricing milestones', () => {
   assert.equal(priceAnnual(20).subtotalExVat, 33320);
   assert.equal(priceAnnual(50).subtotalExVat, 78100);
   assert.equal(priceAnnual(100).subtotalExVat, 135400);
+});
+
+test('accepts company websites with or without a protocol', () => {
+  assert.equal(normaliseWebsite('www.google.com', true), 'https://www.google.com/');
+  assert.equal(normaliseWebsite('google.com/path', true), 'https://google.com/path');
+  assert.equal(normaliseWebsite('https://example.com', true), 'https://example.com/');
+  assert.equal(normaliseWebsite('not a website', true), null);
+  assert.equal(normaliseWebsite('', false), '');
 });
 
 test('accepts every integer seat quantity and flags unapproved extension', () => {

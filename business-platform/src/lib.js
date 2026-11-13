@@ -8,6 +8,17 @@ export const validEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(value
 export const integer = (value, min, max) => Number.isInteger(Number(value)) && Number(value) >= min && Number(value) <= max;
 export const isoAfterDays = (days, from = Date.now()) => new Date(from + days * 86400000).toISOString();
 
+export function normaliseWebsite(value, required = false) {
+  const entered = clean(value, 300);
+  if (!entered) return required ? null : '';
+  const candidate = /^[a-z][a-z0-9+.-]*:\/\//i.test(entered) ? entered : `https://${entered}`;
+  try {
+    const parsed = new URL(candidate);
+    if (!['http:', 'https:'].includes(parsed.protocol) || !parsed.hostname.includes('.')) return null;
+    return parsed.toString();
+  } catch { return null; }
+}
+
 export function json(body, status = 200, extra = {}) {
   return new Response(JSON.stringify(body), {
     status,
