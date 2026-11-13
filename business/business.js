@@ -61,6 +61,7 @@
   const licenceQuantity = qs('[name="licenceQuantity"]');
   const requirements = qs('[name="requirements"]');
   const resultPanel = qs('.annual-plan-results');
+  const businessPlatformOrigin = 'https://sparkfit-business-platform-staging.colbateson.workers.dev';
   let vatMode = 'ex';
   let currentPlan = null;
 
@@ -100,7 +101,13 @@
     resultPanel?.classList.remove('is-invalid');
     if (priceOrder) {
       priceOrder.hidden = false;
-      priceOrder.textContent = `Get Started with ${plan.seats.toLocaleString('en-GB')} Employees`;
+      if (plan.provisional) {
+        priceOrder.href = '#enquire';
+        priceOrder.textContent = `Contact Us About ${plan.seats.toLocaleString('en-GB')} Employees`;
+      } else {
+        priceOrder.href = `${businessPlatformOrigin}/buy/?seats=${plan.seats}`;
+        priceOrder.textContent = `Buy Access for ${plan.seats.toLocaleString('en-GB')} Employees`;
+      }
     }
     if (priceBand) priceBand.textContent = `${plan.tierMinimum}-seat band · ${plan.discountLabel} volume discount`;
     if (provisionalNote) provisionalNote.hidden = !plan.provisional;

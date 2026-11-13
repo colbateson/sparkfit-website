@@ -1,0 +1,8 @@
+import { api, setStatus } from '/common.js';
+const form = document.querySelector('[data-buy-form]'); const status = document.querySelector('[data-status]'); const input = form.elements.seats;
+const directExVat = 2499 / 1.2;
+function discount(seats) { if (seats >= 500) return .5; if (seats >= 250) return .4; if (seats >= 100) return .35; if (seats >= 75) return .3; if (seats >= 50) return .25; return .2; }
+function money(pence) { return new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(pence / 100); }
+function render() { const seats = Math.max(20, Math.min(500, Number(input.value) || 20)); const rate = discount(seats); const unit = Math.round(directExVat * (1 - rate)); document.querySelector('[data-hero-seats]').textContent = seats; document.querySelector('[data-discount]').textContent = `${rate * 100}%`; document.querySelector('[data-unit]').textContent = money(unit); document.querySelector('[data-total]').textContent = money(unit * seats); }
+input.value = new URLSearchParams(location.search).get('seats') || 50; input.addEventListener('input', render); render();
+form.addEventListener('submit', async (event) => { event.preventDefault(); const button = form.querySelector('button[type="submit"]'); button.disabled = true; try { const data = Object.fromEntries(new FormData(form).entries()); data.seats = Number(data.seats); const result = await api('/v1/checkout/sessions', { method: 'POST', body: JSON.stringify(data) }); location.href = result.checkoutUrl; } catch (error) { setStatus(status, error.message, 'error'); button.disabled = false; } });
