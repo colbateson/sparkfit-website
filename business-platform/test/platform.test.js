@@ -9,8 +9,13 @@ import { normaliseWebsite } from '../src/lib.js';
 const schema = readFileSync(new URL('../migrations/0001_init.sql', import.meta.url), 'utf8');
 const lifecycleSchema = readFileSync(new URL('../migrations/0002_lifecycle_and_webhook_state.sql', import.meta.url), 'utf8');
 const emailActivationSchema = readFileSync(new URL('../migrations/0003_verified_email_activation.sql', import.meta.url), 'utf8');
+const rateLimitSchema = readFileSync(new URL('../migrations/0004_rate_limits.sql', import.meta.url), 'utf8');
+const appAccountSchema = readFileSync(new URL('../migrations/0005_app_accounts.sql', import.meta.url), 'utf8');
 const worker = readFileSync(new URL('../src/index.js', import.meta.url), 'utf8');
 const config = readFileSync(new URL('../wrangler.toml', import.meta.url), 'utf8');
+const commonClient = readFileSync(new URL('../public/common.js', import.meta.url), 'utf8');
+const pilotClient = readFileSync(new URL('../public/pilot/pilot.js', import.meta.url), 'utf8');
+const buyClient = readFileSync(new URL('../public/buy/buy.js', import.meta.url), 'utf8');
 
 test('preserves approved annual volume pricing milestones', () => {
   assert.deepEqual(TIERS.map((tier) => [tier.min, tier.discountBps]), [[20, 2000], [50, 2500], [75, 3000], [100, 3500], [250, 4000], [500, 5000]]);
@@ -94,4 +99,22 @@ test('staging config disables external side effects by default', () => {
   assert.match(config, /REVENUECAT_WRITES_ENABLED = "false"/);
   assert.match(config, /EMAIL_ENABLED = "false"/);
   assert.doesNotMatch(`${worker}\n${schema}`, /sk_live_|whsec_[A-Za-z0-9]/);
+});
+
+test('protects public routes with configurable Turnstile and persisted rate limits', () => {
+  assert.match(rateLimitSchema, /CREATE TABLE IF NOT EXISTS api_rate_limits/);
+  for (const scope of ['pilot_application', 'sign_in_request', 'employee_activation', 'checkout_creation']) assert.match(worker, new RegExp(scope));
+  assert.match(config, /RATE_LIMITING_ENABLED = "true"/);
+  assert.match(config, /TURNSTILE_REQUIRED = "false"/);
+  assert.match(commonClient, /challenges\.cloudflare\.com\/turnstile/);
+  assert.match(pilotClient, /turnstileToken/);
+  assert.match(buyClient, /turnstileToken/);
+});
+
+test('supports verified app accounts with stable server-issued RevenueCat identity', () => {
+  for (const table of ['app_accounts', 'app_auth_challenges', 'app_auth_exchanges', 'app_sessions']) assert.match(appAccountSchema, new RegExp(`CREATE TABLE IF NOT EXISTS ${table}`));
+  assert.match(worker, /account\.id, account\.id/);
+  assert.match(worker, /REQUIRE_APP_ACCOUNT_FOR_BUSINESS/);
+  assert.match(worker, /v1\/app-auth\/exchange/);
+  assert.match(worker, /v1\/app\/employee-invitations\/accept/);
 });

@@ -37,6 +37,7 @@ export async function flushEmailOutbox(env, limit = 25) {
 }
 
 export const templates = {
+  appEmailVerification: (link) => ({ subject: 'Verify your SparkFit email', text: `Verify your email to create or access your secure SparkFit account. This link expires in 30 minutes.\n\n${link}\n\nIf you did not request this email, you can ignore it.\n\nSparkFit` }),
   pilotReceived: (name, applicationId) => ({ subject: 'We received your SparkFit employee pilot request', text: `Hello ${name},\n\nWe received your SparkFit employee pilot request (${applicationId}). It is pending review. No employee access has been activated and no payment details are required.\n\nSparkFit Partnerships` }),
   pilotAdmin: (company, applicationId) => ({ subject: `New SparkFit pilot request: ${company}`, text: `Application ${applicationId} from ${company} is ready for review in the SparkFit admin dashboard.` }),
   pilotApproved: (company, link) => ({ subject: 'Your SparkFit employee pilot has been approved', text: `${company}'s pilot has been approved. Use this secure link to access the employer portal:\n\n${link}\n\nSparkFit Partnerships` }),

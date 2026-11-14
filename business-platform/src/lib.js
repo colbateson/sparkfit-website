@@ -85,3 +85,18 @@ export async function verifyTurnstile(request, env, token) {
   if (!response.ok) return false;
   return (await response.json()).success === true;
 }
+
+export async function enforceRateLimit(request, env, scope, limit, periodSeconds = 60) {
+  if (env.RATE_LIMITING_ENABLED !== 'true') return;
+  if (!env.DB) throw new HttpError(503, 'Request protection is temporarily unavailable.');
+  const forwarded = request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For')?.split(',')[0] || 'unknown';
+  const windowStartedAt = Math.floor(Date.now() / (periodSeconds * 1000)) * periodSeconds;
+  const keyHash = await sha256(`${scope}:${forwarded}:${windowStartedAt}`);
+  const expiresAt = new Date((windowStartedAt + periodSeconds * 2) * 1000).toISOString();
+  const row = await env.DB.prepare(`INSERT INTO api_rate_limits (key_hash, scope, request_count, window_started_at, expires_at)
+    VALUES (?, ?, 1, ?, ?)
+    ON CONFLICT(key_hash) DO UPDATE SET request_count = request_count + 1
+    RETURNING request_count`)
+    .bind(keyHash, scope, new Date(windowStartedAt * 1000).toISOString(), expiresAt).first();
+  if (Number(row?.request_count || 1) > limit) throw new HttpError(429, 'Too many requests. Please wait and try again.');
+}

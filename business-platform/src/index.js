@@ -1,15 +1,17 @@
-import { audit, clean, corsHeaders, email, HttpError, id, integer, isoAfterDays, json, normaliseWebsite, nowIso, parseJson, randomToken, sha256, validEmail, verifyTurnstile } from './lib.js';
+import { audit, clean, corsHeaders, email, enforceRateLimit, HttpError, id, integer, isoAfterDays, json, normaliseWebsite, nowIso, parseJson, randomToken, sha256, validEmail, verifyTurnstile } from './lib.js';
 import { consumeMagicLink, issueMagicLink, requireSession } from './auth.js';
 import { flushEmailOutbox, queueEmail, templates } from './email.js';
 import { priceAnnual } from './pricing.js';
 import { reconcileBusinessEntitlement } from './revenuecat.js';
 import { createBillingPortalSession, createCheckoutSession, normaliseSubscriptionStatus, updateSubscriptionQuantity, verifyStripeWebhook } from './stripe.js';
+import { exchangeAppVerification, requestAppVerification, requireAppSession, revokeAppSession, verifyAppEmail } from './app-auth.js';
 
 const adminEmails = (env) => new Set(String(env.ADMIN_EMAILS || '').split(',').map(email).filter(Boolean));
 const appOrigin = (env) => env.PUBLIC_APP_ORIGIN || 'https://spark-fit.com';
 const serviceOrigin = (request) => new URL(request.url).origin;
 
 async function pilotApplication(request, env) {
+  await enforceRateLimit(request, env, 'pilot_application', 5, 600);
   const body = await parseJson(request);
   if (clean(body.website, 200)) return json({ ok: true });
   if (!(await verifyTurnstile(request, env, clean(body.turnstileToken, 2048)))) throw new HttpError(403, 'Please complete the security check.');
@@ -44,6 +46,7 @@ async function pilotApplication(request, env) {
 }
 
 async function requestSignIn(request, env) {
+  await enforceRateLimit(request, env, 'sign_in_request', 10, 600);
   const body = await parseJson(request);
   const address = email(body.email);
   if (!validEmail(address)) throw new HttpError(422, 'Enter a valid business email.');
@@ -59,6 +62,7 @@ async function requestSignIn(request, env) {
   const token = await issueMagicLink(env, address, role, organisationId);
   const link = `${new URL(request.url).origin}/v1/auth/consume?token=${encodeURIComponent(token)}`;
   await queueEmail(env, 'magic_link', address, { subject: 'Your secure SparkFit Partnerships sign-in link', text: `Use this one-time link within 30 minutes:\n\n${link}` });
+  await flushEmailOutbox(env, 10);
   return json({ ok: true, ...(env.ENVIRONMENT === 'test' ? { testToken: token } : {}) });
 }
 
@@ -170,6 +174,7 @@ async function createInvitation(request, env) {
   }
   const link = `${serviceOrigin(request)}/employee-access/?token=${encodeURIComponent(token)}`;
   await queueEmail(env, 'employee_invitation', recipient, { ...templates.employeeInvite(organisation.name, link), invitationId });
+  await flushEmailOutbox(env, 10);
   await audit(env.DB, actor, 'employee.invited', 'employee_invitation', invitationId, actor.organisationId, { recipient });
   return json({ ok: true, invitationId, expiresAt }, 201);
 }
@@ -259,6 +264,7 @@ async function adminOrganisationAction(request, env, organisationId) {
 }
 
 async function acceptInvitation(request, env) {
+  await enforceRateLimit(request, env, 'employee_activation', 10, 600);
   const body = await parseJson(request);
   const token = clean(body.token, 200);
   const tokenHash = await sha256(token);
@@ -266,6 +272,7 @@ async function acceptInvitation(request, env) {
     FROM employee_invitations i JOIN organisations o ON o.id = i.organisation_id
     WHERE i.token_hash = ? AND i.status = 'pending' AND i.expires_at > ?`).bind(tokenHash, nowIso()).first();
   if (!invitation || invitation.organisation_status !== 'active') throw new HttpError(410, 'This invitation is invalid or expired.');
+  if (env.REQUIRE_APP_ACCOUNT_FOR_BUSINESS === 'true') throw new HttpError(409, 'Open this invitation in the SparkFit app and sign in with a verified account.');
   // Current SparkFit releases identify RevenueCat customers by normalised onboarding email.
   // The email comes only from the server-side invitation record after possession of the
   // one-time emailed token has been proven. No client-supplied RevenueCat ID is accepted.
@@ -291,6 +298,35 @@ async function acceptInvitation(request, env) {
   const reconciliation = await reconcileBusinessEntitlement(env, appUserId);
   await audit(env.DB, { email: invitation.email, role: 'employee' }, 'employee.invitation.accepted', 'membership', membershipId, invitation.organisation_id);
   return json({ ok: true, membershipId, premium: reconciliation });
+}
+
+async function activateInvitationForAccount(request, env) {
+  await enforceRateLimit(request, env, 'employee_activation', 10, 600);
+  const account = await requireAppSession(request, env);
+  const body = await parseJson(request);
+  const tokenHash = await sha256(clean(body.token, 200));
+  const invitation = await env.DB.prepare(`SELECT i.*, o.plan_type, o.expires_at AS organisation_expires_at, o.status AS organisation_status
+    FROM employee_invitations i JOIN organisations o ON o.id = i.organisation_id
+    WHERE i.token_hash = ? AND i.status = 'pending' AND i.expires_at > ?`).bind(tokenHash, nowIso()).first();
+  if (!invitation || invitation.organisation_status !== 'active') throw new HttpError(410, 'This invitation is invalid or expired.');
+  const membershipId = id('mem');
+  const entitlementId = id('ent');
+  const now = nowIso();
+  try {
+    await env.DB.batch([
+      env.DB.prepare(`INSERT INTO organisation_memberships (id, organisation_id, invitation_id, email, revenuecat_app_user_id, sparkfit_account_id, joined_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(membershipId, invitation.organisation_id, invitation.id, invitation.email, account.id, account.id, now),
+      env.DB.prepare(`INSERT INTO employer_entitlements (id, organisation_id, membership_id, revenuecat_app_user_id, source, status, starts_at, expires_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, 'active', ?, ?, ?)`).bind(entitlementId, invitation.organisation_id, membershipId, account.id, invitation.plan_type, now, invitation.organisation_expires_at, now),
+      env.DB.prepare(`UPDATE employee_invitations SET status = 'accepted', accepted_at = ?, verified_at = ? WHERE id = ?`).bind(now, now, invitation.id),
+    ]);
+  } catch (error) {
+    if (String(error).includes('seat limit')) throw new HttpError(409, 'No employee seats are available.');
+    throw error;
+  }
+  const reconciliation = await reconcileBusinessEntitlement(env, account.id);
+  await audit(env.DB, { email: account.primary_email, role: 'employee' }, 'employee.invitation.accepted', 'membership', membershipId, invitation.organisation_id, { invitedEmail: invitation.email });
+  return json({ ok: true, membershipId, accountId: account.id, premium: reconciliation });
 }
 
 async function removeMember(request, env, membershipId) {
@@ -334,6 +370,7 @@ async function updateSeats(request, env) {
 }
 
 async function checkout(request, env) {
+  await enforceRateLimit(request, env, 'checkout_creation', 5, 600);
   const body = await parseJson(request);
   const order = {
     id: id('ord'), company_name: clean(body.companyName, 120), company_website: normaliseWebsite(body.companyWebsite),
@@ -470,6 +507,31 @@ async function route(request, env) {
   const url = new URL(request.url);
   const path = url.pathname.replace(/\/$/, '') || '/';
   if (request.method === 'GET' && path === '/health') return json({ ok: true, environment: env.ENVIRONMENT, paymentsEnabled: env.PAYMENTS_ENABLED === 'true', revenueCatWritesEnabled: env.REVENUECAT_WRITES_ENABLED === 'true', emailEnabled: env.EMAIL_ENABLED === 'true' });
+  if (request.method === 'GET' && path === '/v1/public-config') return json({
+    turnstileRequired: env.TURNSTILE_REQUIRED === 'true',
+    turnstileSiteKey: env.TURNSTILE_SITE_KEY || '',
+    requireAppAccountForBusiness: env.REQUIRE_APP_ACCOUNT_FOR_BUSINESS === 'true',
+  });
+  if (request.method === 'POST' && path === '/v1/app-auth/request') {
+    await enforceRateLimit(request, env, 'app_auth_request', 5, 600);
+    return json(await requestAppVerification(request, env, serviceOrigin(request)));
+  }
+  if (request.method === 'GET' && path === '/v1/app-auth/verify') {
+    const target = await verifyAppEmail(env, clean(url.searchParams.get('token'), 200), serviceOrigin(request));
+    return new Response(null, { status: 302, headers: { Location: target, 'Cache-Control': 'no-store' } });
+  }
+  if (request.method === 'POST' && path === '/v1/app-auth/exchange') {
+    const body = await parseJson(request);
+    return json(await exchangeAppVerification(env, clean(body.exchangeToken, 200)));
+  }
+  if (request.method === 'GET' && path === '/v1/app-auth/me') {
+    const account = await requireAppSession(request, env);
+    return json({ account: { id: account.id, email: account.primary_email, emailVerifiedAt: account.email_verified_at, legacyRevenueCatAppUserId: account.legacy_revenuecat_app_user_id } });
+  }
+  if (request.method === 'POST' && path === '/v1/app-auth/logout') {
+    await revokeAppSession(request, env);
+    return json({ ok: true });
+  }
   if (request.method === 'POST' && path === '/v1/pilot-applications') return pilotApplication(request, env);
   if (request.method === 'POST' && path === '/v1/auth/request') return requestSignIn(request, env);
   if (request.method === 'GET' && path === '/v1/auth/consume') return consumeSignIn(request, env);
@@ -484,6 +546,7 @@ async function route(request, env) {
   const invitationMatch = path.match(/^\/v1\/portal\/invitations\/([^/]+)\/action$/);
   if (request.method === 'POST' && invitationMatch) return invitationAction(request, env, invitationMatch[1]);
   if (request.method === 'POST' && path === '/v1/employee-invitations/accept') return acceptInvitation(request, env);
+  if (request.method === 'POST' && path === '/v1/app/employee-invitations/accept') return activateInvitationForAccount(request, env);
   const memberMatch = path.match(/^\/v1\/portal\/members\/([^/]+)\/remove$/);
   if (request.method === 'POST' && memberMatch) return removeMember(request, env, memberMatch[1]);
   if (request.method === 'POST' && path === '/v1/portal/billing-portal') return billingPortal(request, env);

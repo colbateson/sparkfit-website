@@ -74,6 +74,8 @@ SparkFit Business secrets must only be stored with Cloudflare secret commands. N
 
 ## 4. Confirm the commercial and privacy policy
 
+The proposed operating defaults are recorded in [COMMERCIAL_TERMS_DRAFT.md](./COMMERCIAL_TERMS_DRAFT.md). Have the renewal, cancellation, payment failure, refund, seat reduction and retention sections reviewed before copying them into the employer agreement or enabling live Stripe settings.
+
 Record written answers for all of these items before enabling checkout:
 
 1. Pilot duration. Current default is 30 days.

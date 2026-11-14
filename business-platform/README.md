@@ -60,4 +60,6 @@ The existing `revcat-sparkfit-trial-worker` is not modified by this implementati
 
 Follow [PRODUCTION_RUNBOOK.md](./PRODUCTION_RUNBOOK.md) for the complete ordered implementation, test, launch and rollback process. Start with the mobile identity work. RevenueCat writes must remain disabled until stable authenticated app accounts and verified email are released on both mobile platforms.
 
+Review [COMMERCIAL_TERMS_DRAFT.md](./COMMERCIAL_TERMS_DRAFT.md) for the proposed renewal, cancellation, payment failure, refund, seat-change and data-retention defaults. These are implementation proposals and require legal, tax and commercial approval before launch.
+
 Use `wrangler.production.example.toml` as the safe starting point for the production Worker configuration. It intentionally keeps every external side effect disabled and contains no secrets.
