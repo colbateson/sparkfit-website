@@ -1,0 +1,306 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import platform, { lifecycle } from '../src/index.js';
+import { testDatabase } from './sqlite-db.js';
+import { issueMagicLink, consumeMagicLink } from '../src/auth.js';
+import { requestAppVerification, verifyAppEmail, exchangeAppVerification } from '../src/app-auth.js';
+import { persistSubscription, subscriptionAccess } from '../src/billing.js';
+import { sha256 } from '../src/lib.js';
+import { flushEmailOutbox } from '../src/email.js';
+import { reconcileBusinessEntitlement } from '../src/revenuecat.js';
+
+const origin = 'https://business.example.com';
+function setup() {
+  const DB = testDatabase();
+  const env = {
+    DB, ENVIRONMENT: 'test', PUBLIC_APP_ORIGIN: origin, SERVICE_ORIGIN: origin,
+    PAYMENTS_ENABLED: 'true', STRIPE_SECRET_KEY: 'test-provider-secret', STRIPE_WEBHOOK_SECRET: 'test-signing-secret',
+    REVENUECAT_WRITES_ENABLED: 'false', EMAIL_ENABLED: 'false', RATE_LIMITING_ENABLED: 'false',
+    REQUIRE_APP_ACCOUNT_FOR_BUSINESS: 'true', ADMIN_EMAILS: 'admin@example.com',
+  };
+  async function call(path, body, cookie, extra = {}) {
+    const response = await platform.fetch(new Request(`${origin}${path}`, {
+      method: body === undefined ? 'GET' : 'POST',
+      headers: { 'Content-Type': 'application/json', ...(cookie ? { Cookie: cookie } : {}), ...extra },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    }), env);
+    return { response, data: await response.json().catch(() => ({})) };
+  }
+  return { env, DB, call };
+}
+const latestEmail = (DB, template) => JSON.parse(DB.prepare('SELECT payload FROM email_outbox WHERE template = ? ORDER BY rowid DESC LIMIT 1').bind(template).first().payload);
+const emailToken = (payload, parameter = 'token') => new URL(payload.text.match(/https:\/\/[^\s]+/g).find((link) => link.includes(`${parameter}=`))).searchParams.get(parameter);
+async function cookieFor(env, address, organisationId, role = 'organisation_admin') {
+  const token = await issueMagicLink(env, address, role, organisationId);
+  return (await consumeMagicLink(env, token)).cookie.split(';')[0];
+}
+async function verifiedAccount(env, address) {
+  await requestAppVerification(new Request(`${origin}/v1/app-auth/request`, {
+    method: 'POST', body: JSON.stringify({ email: address }),
+  }), env, origin);
+  const token = emailToken(latestEmail(env.DB, 'app_email_verification'));
+  const redirect = await verifyAppEmail(env, token, origin);
+  return exchangeAppVerification(env, new URL(redirect).searchParams.get('exchange'));
+}
+
+test('pilot, verified different-email activation, privacy, removal and re-invitation', async () => {
+  const { env, DB, call } = setup();
+  const applied = await call('/v1/pilot-applications', {
+    companyName: 'Flow Test Ltd', companyWebsite: 'www.example.com', contactName: 'Employer', jobTitle: 'People lead',
+    businessEmail: 'employer@example.com', companySize: 100, requestedSeats: 20,
+  });
+  assert.equal(applied.response.status, 201);
+  const admin = await cookieFor(env, 'admin@example.com', null, 'sparkfit_admin');
+  assert.equal((await call('/v1/admin/dashboard', undefined, admin)).response.status, 200);
+  const approved = await call(`/v1/admin/pilot-applications/${applied.data.applicationId}/decision`, { decision: 'approve' }, admin);
+  assert.equal(approved.response.status, 200);
+  const org = approved.data.organisationId;
+  const employer = await cookieFor(env, 'employer@example.com', org);
+  const invite = await call('/v1/portal/invitations', { email: 'work@example.com' }, employer);
+  assert.equal(invite.response.status, 201);
+  const token = emailToken(latestEmail(DB, 'employee_invitation'));
+  const account = await verifiedAccount(env, 'personal@example.com');
+  const activated = await call('/v1/app/employee-invitations/accept', { token }, null, { Authorization: `Bearer ${account.token}` });
+  assert.equal(activated.response.status, 200);
+  assert.equal(activated.data.accountId, account.account.id);
+  assert.equal(activated.data.premium.mock, true);
+  assert.equal(activated.data.premium.active, false, 'disabled provider must not claim actual premium activation');
+  const replay = await call('/v1/app/employee-invitations/accept', { token }, null, { Authorization: `Bearer ${account.token}` });
+  assert.equal(replay.response.status, 410);
+  const summary = await call('/v1/portal/summary', undefined, employer);
+  assert.equal(summary.data.seats.active, 1);
+  assert.equal(summary.data.seats.pending, 0);
+  assert.equal(JSON.stringify(summary.data.members).includes('revenuecat_app_user_id'), false);
+  assert.equal(JSON.stringify(summary.data.members).includes('personal@example.com'), false);
+  const removed = await call(`/v1/portal/members/${activated.data.membershipId}/remove`, {}, employer);
+  assert.equal(removed.response.status, 200);
+  assert.equal(DB.prepare('SELECT status FROM app_accounts WHERE id = ?').bind(account.account.id).first().status, 'active');
+  const reinvite = await call('/v1/portal/invitations', { email: 'work@example.com' }, employer);
+  assert.equal(reinvite.response.status, 201);
+  const reactivated = await call('/v1/app/employee-invitations/accept', { token: emailToken(latestEmail(DB, 'employee_invitation')) }, null,
+    { Authorization: `Bearer ${account.token}` });
+  assert.equal(reactivated.response.status, 200);
+  assert.equal(DB.prepare('SELECT COUNT(*) AS count FROM organisation_memberships').first().count, 1);
+  const outsider = await cookieFor(env, 'other@example.com', 'other-org');
+  assert.equal((await call(`/v1/portal/members/${activated.data.membershipId}/remove`, {}, outsider)).response.status, 404);
+});
+
+test('one-time employer links and account exchanges cannot be redeemed twice concurrently', async () => {
+  const { env } = setup();
+  const token = await issueMagicLink(env, 'admin@example.com', 'sparkfit_admin');
+  const attempts = await Promise.allSettled([consumeMagicLink(env, token), consumeMagicLink(env, token)]);
+  assert.equal(attempts.filter((result) => result.status === 'fulfilled').length, 1);
+  await requestAppVerification(new Request(`${origin}/request`, { method: 'POST', body: JSON.stringify({ email: 'verify@example.com' }) }), env, origin);
+  const verifyToken = emailToken(latestEmail(env.DB, 'app_email_verification'));
+  const verification = await Promise.allSettled([verifyAppEmail(env, verifyToken, origin), verifyAppEmail(env, verifyToken, origin)]);
+  assert.equal(verification.filter((result) => result.status === 'fulfilled').length, 1);
+  const exchange = new URL(verification.find((result) => result.status === 'fulfilled').value).searchParams.get('exchange');
+  const exchanges = await Promise.allSettled([exchangeAppVerification(env, exchange), exchangeAppVerification(env, exchange)]);
+  assert.equal(exchanges.filter((result) => result.status === 'fulfilled').length, 1);
+});
+
+function subscription(status = 'active', extra = {}) {
+  return { id: 'sub_flow', customer: 'cus_flow', status, latest_invoice: { id: 'in_flow', status: 'paid' },
+    items: { data: [{ id: 'si_flow', quantity: 20, current_period_end: Math.floor(Date.now() / 1000) + 365 * 86400, price: { unit_amount: 1666 } }] }, ...extra };
+}
+async function seedOrder(DB) {
+  DB.prepare(`INSERT INTO checkout_orders (id, company_name, billing_email, contact_name, seats, unit_amount_ex_vat,
+    subtotal_ex_vat, discount_bps, pricing_version, created_at, updated_at) VALUES ('ord_flow', 'Paid Test Ltd',
+    'employer@example.com', 'Employer', 20, 1666, 33320, 2000, 'test', ?, ?)`)
+    .bind(new Date().toISOString(), new Date().toISOString()).run();
+}
+
+test('paid subscription waits for payment, converges on duplicate events, renews, suspends and restores employee access', async () => {
+  const { env, DB, call } = setup();
+  await seedOrder(DB);
+  await persistSubscription(env, subscription('incomplete', { latest_invoice: { id: 'in_flow', status: 'open' } }), 'ord_flow', 1);
+  assert.equal(DB.prepare('SELECT status FROM organisations').first().status, 'suspended');
+  const deliveries = await Promise.allSettled([persistSubscription(env, subscription(), 'ord_flow', 2), persistSubscription(env, subscription(), 'ord_flow', 2)]);
+  assert.ok(deliveries.some((result) => result.status === 'fulfilled'));
+  await persistSubscription(env, subscription(), 'ord_flow', 2);
+  assert.equal(DB.prepare('SELECT COUNT(*) AS count FROM organisations').first().count, 1);
+  assert.equal(DB.prepare("SELECT COUNT(*) AS count FROM email_outbox WHERE template='employer_payment_successful'").first().count, 1);
+  const employer = await cookieFor(env, 'employer@example.com', 'org_ord_flow');
+  await call('/v1/portal/invitations', { email: 'employee@example.com' }, employer);
+  const account = await verifiedAccount(env, 'employee@example.com');
+  const activation = await call('/v1/app/employee-invitations/accept', { token: emailToken(latestEmail(DB, 'employee_invitation')) }, null,
+    { Authorization: `Bearer ${account.token}` });
+  assert.equal(activation.response.status, 200);
+  const renewed = subscription();
+  renewed.items.data[0].current_period_end += 365 * 86400;
+  renewed.latest_invoice.id = 'in_renewal';
+  await persistSubscription(env, renewed, 'ord_flow', 3);
+  assert.equal(DB.prepare('SELECT expires_at FROM employer_entitlements').first().expires_at, new Date(renewed.items.data[0].current_period_end * 1000).toISOString());
+  await persistSubscription(env, subscription('canceled'), 'ord_flow', 2);
+  assert.equal(DB.prepare('SELECT status FROM organisations').first().status, 'active', 'older event cannot undo renewal');
+  await persistSubscription(env, subscription('canceled'), 'ord_flow', 4);
+  assert.equal(DB.prepare('SELECT status FROM employer_entitlements').first().status, 'suspended');
+  await persistSubscription(env, renewed, 'ord_flow', 5);
+  assert.equal(DB.prepare('SELECT status FROM employer_entitlements').first().status, 'active');
+  DB.prepare(`UPDATE employer_subscriptions SET status = 'payment_attention', paid_through = ?, grace_ends_at = ?`).bind(
+    new Date(Date.now() - 86400000).toISOString(), new Date(Date.now() - 1000).toISOString()).run();
+  await lifecycle(env);
+  assert.equal(DB.prepare('SELECT status FROM organisations').first().status, 'suspended');
+  assert.equal(DB.prepare('SELECT status FROM employer_entitlements').first().status, 'suspended');
+});
+
+test('unpaid initial subscriptions never get a free payment grace period', () => {
+  assert.equal(subscriptionAccess(subscription('past_due', { latest_invoice: { status: 'open' } })).access, false);
+  const prior = { paid_through: new Date(Date.now() - 1000).toISOString() };
+  const state = subscriptionAccess(subscription('past_due', { latest_invoice: { status: 'open' } }), prior);
+  assert.equal(state.access, true);
+  assert.equal(Math.round((Date.parse(state.graceEnd) - Date.parse(state.failedAt)) / 86400000), 14);
+});
+
+test('email outbox is deduplicated, claims are exclusive, and provider failure retries', async () => {
+  const { env, DB } = setup();
+  env.EMAIL_ENABLED = 'true'; env.RESEND_API_KEY = 'provider-test-key';
+  DB.prepare(`INSERT INTO email_outbox (id, template, recipient, payload, send_after, created_at)
+    VALUES ('mail_test', 'test', 'employer@example.com', ?, ?, ?)`)
+    .bind(JSON.stringify({ subject: 'Test', text: 'Test' }), new Date().toISOString(), new Date().toISOString()).run();
+  const original = globalThis.fetch;
+  let calls = 0;
+  globalThis.fetch = async (_url, options) => { calls++; assert.equal(options.headers['Idempotency-Key'], 'sparkfit-email-mail_test'); return Response.json({ id: 'resend_test' }); };
+  try {
+    await Promise.all([flushEmailOutbox(env), flushEmailOutbox(env)]);
+    assert.equal(calls, 1);
+    assert.equal(DB.prepare('SELECT provider_id FROM email_outbox').first().provider_id, 'resend_test');
+  } finally { globalThis.fetch = original; }
+});
+
+test('pilot upgrade keeps existing employees and the organisation identity', async () => {
+  const { env, DB, call } = setup();
+  const now = new Date().toISOString();
+  DB.prepare(`INSERT INTO organisations (id, name, website, status, plan_type, seat_limit, starts_at, expires_at, created_at, updated_at)
+    VALUES ('org_pilot', 'Upgrade Test', 'https://example.com', 'active', 'pilot', 20, ?, ?, ?, ?)`)
+    .bind(now, new Date(Date.now() + 30 * 86400000).toISOString(), now, now).run();
+  DB.prepare(`INSERT INTO organisation_admins (id, organisation_id, email, status, created_at)
+    VALUES ('admin_upgrade', 'org_pilot', 'employer@example.com', 'active', ?)`).bind(now).run();
+  const employer = await cookieFor(env, 'employer@example.com', 'org_pilot');
+  const originalFetch = globalThis.fetch;
+  let checkoutBody;
+  globalThis.fetch = async (_url, options) => {
+    checkoutBody = new URLSearchParams(options.body);
+    return Response.json({ id: 'cs_upgrade', url: 'https://checkout.stripe.com/test-upgrade' });
+  };
+  try {
+    const result = await call('/v1/checkout/sessions', {
+      organisationId: 'org_pilot', companyName: 'Upgrade Test', companyWebsite: 'www.example.com', billingEmail: 'employer@example.com',
+      contactName: 'Employer', seats: 50, clientRequestId: crypto.randomUUID(),
+    }, employer);
+    assert.equal(result.response.status, 200);
+    assert.equal(checkoutBody.get('success_url').startsWith(`${origin}/checkout-success/`), true);
+    const order = DB.prepare('SELECT * FROM checkout_orders').first();
+    assert.equal(order.organisation_id, 'org_pilot');
+    const paid = subscription(); paid.items.data[0].quantity = 50;
+    await persistSubscription(env, paid, order.id, 1);
+    assert.equal(DB.prepare('SELECT COUNT(*) AS count FROM organisations').first().count, 1);
+    assert.equal(DB.prepare('SELECT plan_type FROM organisations').first().plan_type, 'paid');
+  } finally { globalThis.fetch = originalFetch; }
+});
+
+test('signed webhook retries converge and invalid signatures never mutate the ledger', async () => {
+  const { env, DB } = setup();
+  await seedOrder(DB);
+  const originalFetch = globalThis.fetch;
+  const current = subscription(); current.metadata = { order_id: 'ord_flow' };
+  globalThis.fetch = async () => Response.json(current);
+  async function send(event, valid = true) {
+    const raw = JSON.stringify(event);
+    const timestamp = Math.floor(Date.now() / 1000);
+    const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(env.STRIPE_WEBHOOK_SECRET), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+    const signature = Buffer.from(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(`${timestamp}.${raw}`))).toString('hex');
+    return platform.fetch(new Request(`${origin}/v1/webhooks/stripe`, { method: 'POST', body: raw,
+      headers: { 'Stripe-Signature': `t=${timestamp},v1=${valid ? signature : 'invalid'}` } }), env);
+  }
+  const event = { id: 'evt_flow', type: 'invoice.paid', created: 100, livemode: false,
+    data: { object: { parent: { subscription_details: { subscription: 'sub_flow' } } } } };
+  try {
+    assert.equal((await send(event, false)).status, 400);
+    assert.equal(DB.prepare('SELECT COUNT(*) AS count FROM billing_events').first().count, 0);
+    assert.equal((await send(event)).status, 200);
+    assert.equal((await send(event)).status, 200);
+    const outcomes = await Promise.all([send({ ...event, id: 'evt_concurrent' }), send({ ...event, id: 'evt_concurrent' })]);
+    assert.ok(outcomes.some((result) => result.status === 200));
+    assert.ok(outcomes.every((result) => [200, 409].includes(result.status)));
+    assert.equal(DB.prepare('SELECT COUNT(*) AS count FROM organisations').first().count, 1);
+    assert.equal(DB.prepare("SELECT COUNT(*) AS count FROM email_outbox WHERE template='employer_payment_successful'").first().count, 1);
+  } finally { globalThis.fetch = originalFetch; }
+});
+
+test('Business reconciliation grants, shortens and removes only Business while preserving personal entitlements', async () => {
+  const { env, DB, call } = setup();
+  const applied = await call('/v1/pilot-applications', { companyName: 'Entitlement Test', companyWebsite: 'www.example.com',
+    contactName: 'Employer', jobTitle: 'People lead', businessEmail: 'employer@example.com', companySize: 20, requestedSeats: 20 });
+  const admin = await cookieFor(env, 'admin@example.com', null, 'sparkfit_admin');
+  const approved = await call(`/v1/admin/pilot-applications/${applied.data.applicationId}/decision`, { decision: 'approve' }, admin);
+  const employer = await cookieFor(env, 'employer@example.com', approved.data.organisationId);
+  await call('/v1/portal/invitations', { email: 'work@example.com' }, employer);
+  const account = await verifiedAccount(env, 'personal@example.com');
+  const activation = await call('/v1/app/employee-invitations/accept', { token: emailToken(latestEmail(DB, 'employee_invitation')) }, null,
+    { Authorization: `Bearer ${account.token}` });
+  env.REVENUECAT_WRITES_ENABLED = 'true'; env.REVENUECAT_SECRET_KEY = 'provider-test-key';
+  env.REVENUECAT_PROJECT_ID = 'proj_test'; env.REVENUECAT_BUSINESS_ENTITLEMENT_ID = 'ent_business';
+  const entitlements = new Map([['ent_personal_pro', Date.now() + 365 * 86400000]]);
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url, options) => {
+    assert.ok(String(url).startsWith('https://api.revenuecat.com/v2/projects/proj_test/customers/'));
+    if (options.method === 'GET') return Response.json({ active_entitlements: { items: [...entitlements].map(([entitlement_id, expires_at]) => ({ entitlement_id, expires_at })) } });
+    const data = JSON.parse(options.body);
+    assert.equal(data.entitlement_id, 'ent_business', 'provider writes must never address personal Pro');
+    if (String(url).endsWith('/grant_entitlement')) entitlements.set(data.entitlement_id, data.expires_at);
+    else if (String(url).endsWith('/revoke_granted_entitlement')) entitlements.delete(data.entitlement_id);
+    else assert.fail('Unexpected RevenueCat operation');
+    return Response.json({});
+  };
+  try {
+    assert.equal((await reconcileBusinessEntitlement(env, account.account.id)).active, true);
+    assert.ok(entitlements.has('ent_business'));
+    const shortened = new Date(Date.now() + 86400000).toISOString();
+    DB.prepare('UPDATE employer_entitlements SET expires_at = ?').bind(shortened).run();
+    await reconcileBusinessEntitlement(env, account.account.id);
+    assert.equal(entitlements.get('ent_business'), Date.parse(shortened));
+    assert.equal((await call(`/v1/portal/members/${activation.data.membershipId}/remove`, {}, employer)).response.status, 200);
+    assert.equal(entitlements.has('ent_business'), false);
+    assert.equal(entitlements.has('ent_personal_pro'), true);
+  } finally { globalThis.fetch = originalFetch; }
+});
+
+test('scheduled renewal reduction prevents later invitations from exceeding the reserved quantity', async () => {
+  const { env, DB, call } = setup();
+  await seedOrder(DB);
+  await persistSubscription(env, subscription(), 'ord_flow', 1);
+  DB.prepare('UPDATE organisations SET seat_limit = 50').run();
+  DB.prepare('UPDATE employer_subscriptions SET seats = 50, pending_seats = 20').run();
+  const employer = await cookieFor(env, 'employer@example.com', 'org_ord_flow');
+  for (let i = 0; i < 20; i++) assert.equal((await call('/v1/portal/invitations', { email: `employee${i}@example.com` }, employer)).response.status, 201);
+  assert.equal((await call('/v1/portal/invitations', { email: 'overflow@example.com' }, employer)).response.status, 409);
+  assert.equal((await call('/v1/portal/summary', undefined, employer)).data.seats.available, 0);
+  assert.throws(() => DB.prepare('UPDATE employer_subscriptions SET pending_seats = 19').run(), /seat limit/);
+});
+
+test('signed email delivery events reject tampering, deduplicate retries and retain final failure states', async () => {
+  const { env, DB } = setup();
+  const secretBytes = crypto.getRandomValues(new Uint8Array(32));
+  env.RESEND_WEBHOOK_SECRET = `whsec_${Buffer.from(secretBytes).toString('base64')}`;
+  DB.prepare(`INSERT INTO email_outbox (id, template, recipient, payload, send_after, created_at, status, provider_id)
+    VALUES ('mail_delivery', 'test', 'employer@example.com', '{}', ?, ?, 'sent', 'provider_delivery')`)
+    .bind(new Date().toISOString(), new Date().toISOString()).run();
+  async function send(eventType, eventId, tamper = false) {
+    const raw = JSON.stringify({ type: eventType, created_at: new Date().toISOString(), data: { email_id: 'provider_delivery' } });
+    const timestamp = String(Math.floor(Date.now() / 1000));
+    const key = await crypto.subtle.importKey('raw', secretBytes, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+    const signature = Buffer.from(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(`${eventId}.${timestamp}.${raw}`))).toString('base64');
+    return platform.fetch(new Request(`${origin}/v1/webhooks/resend`, { method: 'POST', body: tamper ? `${raw} ` : raw,
+      headers: { 'svix-id': eventId, 'svix-timestamp': timestamp, 'svix-signature': `v1,${signature}` } }), env);
+  }
+  assert.equal((await send('email.delivered', 'msg_invalid', true)).status, 400);
+  assert.equal((await send('email.delivered', 'msg_delivered')).status, 200);
+  assert.equal((await send('email.delivered', 'msg_delivered')).status, 200);
+  assert.equal(DB.prepare('SELECT COUNT(*) AS count FROM email_delivery_events').first().count, 1);
+  await send('email.delivery_delayed', 'msg_delayed');
+  assert.equal(DB.prepare('SELECT status FROM email_outbox').first().status, 'delivered');
+  await send('email.bounced', 'msg_bounced');
+  await send('email.delivered', 'msg_old_delivery');
+  assert.equal(DB.prepare('SELECT status FROM email_outbox').first().status, 'bounced');
+});

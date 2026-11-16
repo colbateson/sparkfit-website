@@ -18,8 +18,8 @@ export async function requestAppVerification(request, env, serviceOrigin) {
 
 export async function verifyAppEmail(env, token, serviceOrigin) {
   const tokenHash = await sha256(token);
-  const challenge = await env.DB.prepare(`SELECT * FROM app_auth_challenges
-    WHERE token_hash = ? AND consumed_at IS NULL AND expires_at > ?`).bind(tokenHash, nowIso()).first();
+  const challenge = await env.DB.prepare(`UPDATE app_auth_challenges SET consumed_at = ?
+    WHERE token_hash = ? AND consumed_at IS NULL AND expires_at > ? RETURNING *`).bind(nowIso(), tokenHash, nowIso()).first();
   if (!challenge) throw new HttpError(410, 'This verification link is invalid or expired.');
   const now = nowIso();
   let account = await env.DB.prepare(`SELECT * FROM app_accounts WHERE primary_email = ? AND status = 'active'`).bind(challenge.email).first();
@@ -27,9 +27,10 @@ export async function verifyAppEmail(env, token, serviceOrigin) {
     const accountId = `account_${crypto.randomUUID()}`;
     await env.DB.prepare(`INSERT INTO app_accounts
       (id, primary_email, email_verified_at, legacy_revenuecat_app_user_id, status, created_at, updated_at)
-      VALUES (?, ?, ?, ?, 'active', ?, ?)`)
+      VALUES (?, ?, ?, ?, 'active', ?, ?) ON CONFLICT(primary_email) DO NOTHING`)
       .bind(accountId, challenge.email, now, challenge.email, now, now).run();
-    account = await env.DB.prepare(`SELECT * FROM app_accounts WHERE id = ?`).bind(accountId).first();
+    account = await env.DB.prepare(`SELECT * FROM app_accounts WHERE primary_email = ? AND status = 'active'`).bind(challenge.email).first();
+    if (!account) throw new HttpError(409, 'This account is unavailable.');
   }
   const exchangeToken = randomToken();
   await env.DB.batch([
@@ -42,9 +43,13 @@ export async function verifyAppEmail(env, token, serviceOrigin) {
 
 export async function exchangeAppVerification(env, exchangeToken) {
   const tokenHash = await sha256(exchangeToken);
+  const claimed = await env.DB.prepare(`UPDATE app_auth_exchanges SET consumed_at = ?
+    WHERE token_hash = ? AND consumed_at IS NULL AND expires_at > ? RETURNING id`)
+    .bind(nowIso(), tokenHash, nowIso()).first();
+  if (!claimed) throw new HttpError(410, 'This verification exchange is invalid or expired.');
   const exchange = await env.DB.prepare(`SELECT e.*, a.primary_email, a.email_verified_at, a.legacy_revenuecat_app_user_id
     FROM app_auth_exchanges e JOIN app_accounts a ON a.id = e.account_id
-    WHERE e.token_hash = ? AND e.consumed_at IS NULL AND e.expires_at > ? AND a.status = 'active'`)
+    WHERE e.token_hash = ? AND e.expires_at > ? AND a.status = 'active'`)
     .bind(tokenHash, nowIso()).first();
   if (!exchange) throw new HttpError(410, 'This verification exchange is invalid or expired.');
   const sessionToken = randomToken();

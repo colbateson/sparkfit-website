@@ -14,17 +14,25 @@ async function load() {
     const { organisation, seats, members, invitations, subscription } = summary;
     document.querySelector('[data-org-name]').textContent = organisation.name;
     document.querySelector('[data-plan-line]').textContent = `${organisation.plan_type === 'pilot' ? 'Employee pilot' : 'Employer subscription'} | ${organisation.status} | ends ${formatDate(organisation.expires_at)}`;
+    let upgrade = document.querySelector('[data-upgrade]');
+    if (organisation.plan_type === 'pilot' && !upgrade) {
+      upgrade = document.createElement('a'); upgrade.className = 'button'; upgrade.dataset.upgrade = '';
+      upgrade.href = `/buy/?organisationId=${encodeURIComponent(organisation.id)}&seats=${Math.max(20, organisation.seat_limit)}`;
+      upgrade.textContent = 'Continue with annual access'; document.querySelector('.portal-head').append(upgrade);
+    }
     document.querySelector('[data-purchased]').textContent = seats.purchased;
     document.querySelector('[data-active]').textContent = seats.active;
     document.querySelector('[data-pending]').textContent = seats.pending;
     document.querySelector('[data-available]').textContent = seats.available;
-    document.querySelector('[data-adoption]').textContent = `${seats.purchased ? Math.round((seats.allocated / seats.purchased) * 100) : 0}%`;
+    const adoption = document.querySelector('[data-adoption]');
+    if (adoption) adoption.textContent = `${seats.purchased ? Math.round((seats.active / seats.purchased) * 100) : 0}%`;
     const pending = invitations.filter((item) => item.status === 'pending');
     document.querySelector('[data-pending-count]').textContent = `${pending.length} pending`;
     document.querySelector('[data-active-count]').textContent = `${members.filter((item) => item.status === 'active').length} active`;
     document.querySelector('[data-invitations]').innerHTML = table(invitations, [
       { label: 'Employee', render: (row) => escapeHtml(row.email) },
       { label: 'Status', render: (row) => `<span class="tag ${escapeHtml(row.status)}">${escapeHtml(row.status)}</span>` },
+      { label: 'Email delivery', render: (row) => escapeHtml(row.delivery_status || 'queued') },
       { label: 'Expires', render: (row) => escapeHtml(formatDate(row.expires_at)) },
       { label: 'Actions', render: (row) => ['pending', 'expired'].includes(row.status) ? `<div class="inline-actions"><button class="small-button" data-invite-action="resend" data-id="${escapeHtml(row.id)}">Resend</button><button class="small-button" data-invite-action="correct" data-id="${escapeHtml(row.id)}">Correct email</button>${row.status === 'pending' ? `<button class="small-button danger" data-invite-action="revoke" data-id="${escapeHtml(row.id)}">Cancel</button>` : ''}</div>` : '' },
     ]);
@@ -39,6 +47,8 @@ async function load() {
       document.querySelector('[data-sub-status]').textContent = subscription.status;
       document.querySelector('[data-sub-seats]').textContent = subscription.seats;
       document.querySelector('[data-sub-end]').textContent = formatDate(subscription.current_period_end);
+      document.querySelector('[data-seats-form] input').value = subscription.pending_seats || subscription.seats;
+      if (subscription.pending_seats) setStatus(document.querySelector('[data-seats-status]'), `${subscription.pending_seats} seats are scheduled from ${formatDate(subscription.current_period_end)}.`);
     }
     setStatus(pageStatus, '');
   } catch (error) {

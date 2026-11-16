@@ -8,7 +8,8 @@
   const CONFIG = Object.freeze({
     version: 'annual-v1-preview',
     currency: 'GBP',
-    vatRateBps: 2000,
+    vatRateBps: 0,
+    businessBasePennies: 2083,
     consumerAnnualGrossPennies: 2499,
     minimumSeats: 20,
     maximumSeats: 1000,
@@ -45,7 +46,7 @@
   const calculateAnnualPlan = (seats) => {
     const tier = tierForSeats(seats);
     const vatDivisorBps = 10000 + CONFIG.vatRateBps;
-    const directPerSeatExVat = roundDivide(CONFIG.consumerAnnualGrossPennies * 10000, vatDivisorBps);
+    const directPerSeatExVat = CONFIG.businessBasePennies;
     const employerPerSeatExVat = roundDivide(directPerSeatExVat * (10000 - tier.discountBps), 10000);
     const employerPerSeatIncVat = roundDivide(employerPerSeatExVat * vatDivisorBps, 10000);
     const directTotalExVat = directPerSeatExVat * seats;
@@ -85,12 +86,12 @@
     const suffix = vatMode === 'inc' ? 'IncVat' : 'ExVat';
     return Object.freeze({
       vatMode,
-      vatLabel: vatMode === 'inc' ? 'including VAT' : 'excluding VAT',
-      directPerSeat: plan[`directPerSeat${suffix}`],
-      directTotal: plan[`directTotal${suffix}`],
+      vatLabel: 'no VAT charged',
+      directPerSeat: CONFIG.consumerAnnualGrossPennies,
+      directTotal: plan.directTotalIncVat,
       employerPerSeat: plan[`employerPerSeat${suffix}`],
       employerTotal: plan[`employerTotal${suffix}`],
-      saving: plan[`saving${suffix}`],
+      saving: plan.directTotalIncVat - plan[`employerTotal${suffix}`],
       employerMonthlyPerSeat: plan[`employerMonthlyPerSeat${suffix}`],
       employerMonthlyTotal: plan[`employerMonthlyTotal${suffix}`]
     });

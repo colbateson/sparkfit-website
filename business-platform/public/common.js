@@ -29,7 +29,7 @@ export function setStatus(element, message, type = '') {
 
 let publicConfigPromise;
 export function getPublicConfig() {
-  if (!publicConfigPromise) publicConfigPromise = api('/v1/public-config').catch(() => ({ turnstileRequired: false, turnstileSiteKey: '' }));
+  if (!publicConfigPromise) publicConfigPromise = api('/v1/public-config');
   return publicConfigPromise;
 }
 
@@ -52,18 +52,19 @@ function loadTurnstileScript() {
 
 export async function mountTurnstile(container) {
   const config = await getPublicConfig();
-  if (!config.turnstileRequired) return { required: false, getToken: () => '' };
+  if (!config.turnstileSiteKey && !config.turnstileRequired) return { required: false, getToken: () => '' };
   if (!container || !config.turnstileSiteKey) throw new Error('The security check is not configured.');
   await loadTurnstileScript();
   let token = '';
   const widgetId = window.turnstile.render(container, {
     sitekey: config.turnstileSiteKey,
+    action: location.pathname.startsWith('/buy') ? 'checkout_creation' : 'pilot_application',
     callback: (value) => { token = value; },
     'expired-callback': () => { token = ''; },
     'error-callback': () => { token = ''; },
   });
   return {
-    required: true,
+    required: config.turnstileRequired,
     getToken: () => token,
     reset: () => { token = ''; window.turnstile.reset(widgetId); },
   };

@@ -1,9 +1,18 @@
 import { audit, clean, corsHeaders, email, enforceRateLimit, HttpError, id, integer, isoAfterDays, json, normaliseWebsite, nowIso, parseJson, randomToken, sha256, validEmail, verifyTurnstile } from './lib.js';
 import { consumeMagicLink, issueMagicLink, requireSession } from './auth.js';
-import { flushEmailOutbox, queueEmail, templates } from './email.js';
+import { emailWebhook, flushEmailOutbox, queueEmail, templates } from './email.js';
 import { priceAnnual } from './pricing.js';
 import { reconcileBusinessEntitlement } from './revenuecat.js';
-import { createBillingPortalSession, createCheckoutSession, normaliseSubscriptionStatus, updateSubscriptionQuantity, verifyStripeWebhook } from './stripe.js';
+import { enforcePaidLifecycle, persistSubscription } from './billing.js';
+import {
+  createBillingPortalSession,
+  createCheckoutSession,
+  retrieveStripeResource,
+  scheduleSubscriptionQuantity,
+  stripeSubscriptionIdFromInvoice,
+  updateSubscriptionQuantity,
+  verifyStripeWebhook,
+} from './stripe.js';
 import { exchangeAppVerification, requestAppVerification, requireAppSession, revokeAppSession, verifyAppEmail } from './app-auth.js';
 
 const adminEmails = (env) => new Set(String(env.ADMIN_EMAILS || '').split(',').map(email).filter(Boolean));
@@ -14,7 +23,7 @@ async function pilotApplication(request, env) {
   await enforceRateLimit(request, env, 'pilot_application', 5, 600);
   const body = await parseJson(request);
   if (clean(body.website, 200)) return json({ ok: true });
-  if (!(await verifyTurnstile(request, env, clean(body.turnstileToken, 2048)))) throw new HttpError(403, 'Please complete the security check.');
+  if (!(await verifyTurnstile(request, env, clean(body.turnstileToken, 2048), 'pilot_application'))) throw new HttpError(403, 'Please complete the security check.');
   const application = {
     id: id('pilot'),
     companyName: clean(body.companyName, 120),
@@ -83,7 +92,7 @@ async function adminDashboard(request, env) {
     env.DB.prepare(`SELECT COUNT(*) AS count FROM employer_entitlements WHERE provision_status = 'failed'`).first(),
     env.DB.prepare(`SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 50`).all(),
   ]);
-  const paid = await env.DB.prepare(`SELECT COUNT(*) AS organisations, COALESCE(SUM(seats), 0) AS seats,
+  const paid = await env.DB.prepare(`SELECT COUNT(*) AS organisations, COALESCE(SUM(es.seats), 0) AS seats,
     COALESCE(SUM(co.unit_amount_ex_vat * es.seats), 0) AS arr_pence
     FROM employer_subscriptions es LEFT JOIN checkout_orders co ON co.organisation_id = es.organisation_id
     WHERE es.status = 'active'`).first();
@@ -145,7 +154,8 @@ async function portalSummary(request, env) {
   ]);
   const activeCount = (members.results || []).filter((row) => row.status === 'active').length;
   const pendingCount = (invites.results || []).filter((row) => row.status === 'pending' && new Date(row.expires_at) > new Date()).length;
-  return json({ organisation, subscription, seats: { purchased: organisation.seat_limit, active: activeCount, pending: pendingCount, allocated: activeCount + pendingCount, available: Math.max(0, organisation.seat_limit - activeCount - pendingCount) }, members: members.results || [], invitations: invites.results || [] });
+  const invitationLimit = Math.min(organisation.seat_limit, subscription?.pending_seats || organisation.seat_limit);
+  return json({ organisation, subscription, seats: { purchased: organisation.seat_limit, active: activeCount, pending: pendingCount, allocated: activeCount + pendingCount, available: Math.max(0, invitationLimit - activeCount - pendingCount) }, members: members.results || [], invitations: invites.results || [] });
 }
 
 async function createInvitation(request, env) {
@@ -154,7 +164,7 @@ async function createInvitation(request, env) {
   const recipient = email(body.email);
   if (!validEmail(recipient)) throw new HttpError(422, 'Enter a valid employee email.');
   const organisation = await env.DB.prepare(`SELECT * FROM organisations WHERE id = ? AND status = 'active'`).bind(actor.organisationId).first();
-  if (!organisation) throw new HttpError(409, 'The organisation is not active.');
+  if (!organisation || Date.parse(organisation.expires_at) <= Date.now()) throw new HttpError(409, 'The organisation is not active.');
   const capacity = await env.DB.prepare(`SELECT
     (SELECT COUNT(*) FROM organisation_memberships WHERE organisation_id = ? AND status = 'active') AS active,
     (SELECT COUNT(*) FROM employee_invitations WHERE organisation_id = ? AND status = 'pending' AND expires_at > ?) AS pending`)
@@ -162,21 +172,27 @@ async function createInvitation(request, env) {
   if (Number(capacity?.active || 0) + Number(capacity?.pending || 0) >= organisation.seat_limit) throw new HttpError(409, 'No employee seats are available. Pending invitations also reserve seats.');
   const token = randomToken();
   const invitationId = id('inv');
-  const expiresAt = isoAfterDays(7);
+  const expiresAt = new Date(Math.min(Date.now() + 7 * 86400000, Date.parse(organisation.expires_at))).toISOString();
   try {
     const createdAt = nowIso();
     await env.DB.prepare(`INSERT INTO employee_invitations (id, organisation_id, email, token_hash, expires_at, created_by, created_at, last_sent_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(organisation_id, email) DO UPDATE SET token_hash = excluded.token_hash, status = 'pending',
+        expires_at = excluded.expires_at, revoked_at = NULL, delivery_status = 'queued', last_sent_at = excluded.last_sent_at
+      WHERE employee_invitations.status IN ('revoked', 'expired', 'accepted')
+        AND NOT EXISTS (SELECT 1 FROM organisation_memberships WHERE organisation_id = excluded.organisation_id AND email = excluded.email AND status = 'active')`)
       .bind(invitationId, actor.organisationId, recipient, await sha256(token), expiresAt, actor.email, createdAt, createdAt).run();
   } catch (error) {
     if (String(error).includes('seat limit')) throw new HttpError(409, 'No employee seats are available. Pending invitations also reserve seats.');
     throw new HttpError(409, 'This employee already has an invitation for the organisation.');
   }
+  const saved = await env.DB.prepare(`SELECT id, token_hash FROM employee_invitations WHERE organisation_id = ? AND email = ?`).bind(actor.organisationId, recipient).first();
+  if (saved.token_hash !== await sha256(token)) throw new HttpError(409, 'This employee already has an invitation or active membership.');
   const link = `${serviceOrigin(request)}/employee-access/?token=${encodeURIComponent(token)}`;
-  await queueEmail(env, 'employee_invitation', recipient, { ...templates.employeeInvite(organisation.name, link), invitationId });
+  await queueEmail(env, 'employee_invitation', recipient, { ...templates.employeeInvite(organisation.name, link), invitationId: saved.id });
   await flushEmailOutbox(env, 10);
   await audit(env.DB, actor, 'employee.invited', 'employee_invitation', invitationId, actor.organisationId, { recipient });
-  return json({ ok: true, invitationId, expiresAt }, 201);
+  return json({ ok: true, invitationId: saved.id, expiresAt }, 201);
 }
 
 async function invitationAction(request, env, invitationId) {
@@ -271,7 +287,7 @@ async function acceptInvitation(request, env) {
   const invitation = await env.DB.prepare(`SELECT i.*, o.plan_type, o.expires_at AS organisation_expires_at, o.status AS organisation_status
     FROM employee_invitations i JOIN organisations o ON o.id = i.organisation_id
     WHERE i.token_hash = ? AND i.status = 'pending' AND i.expires_at > ?`).bind(tokenHash, nowIso()).first();
-  if (!invitation || invitation.organisation_status !== 'active') throw new HttpError(410, 'This invitation is invalid or expired.');
+  if (!invitation || invitation.organisation_status !== 'active' || Date.parse(invitation.organisation_expires_at) <= Date.now()) throw new HttpError(410, 'This invitation is invalid or expired.');
   if (env.REQUIRE_APP_ACCOUNT_FOR_BUSINESS === 'true') throw new HttpError(409, 'Open this invitation in the SparkFit app and sign in with a verified account.');
   // Current SparkFit releases identify RevenueCat customers by normalised onboarding email.
   // The email comes only from the server-side invitation record after possession of the
@@ -279,16 +295,24 @@ async function acceptInvitation(request, env) {
   const appUserId = invitation.email;
   const accountHash = await sha256(`sparkfit-account:${invitation.email}`);
   const sparkfitAccountId = `acct_${accountHash.slice(0, 32)}`;
-  const membershipId = id('mem');
+  const previousMembership = await env.DB.prepare(`SELECT id FROM organisation_memberships WHERE organisation_id = ? AND email = ?`).bind(invitation.organisation_id, invitation.email).first();
+  const membershipId = previousMembership?.id || id('mem');
   const entitlementId = id('ent');
   const now = nowIso();
   const expiry = invitation.organisation_expires_at;
   try {
     await env.DB.batch([
       env.DB.prepare(`INSERT INTO organisation_memberships (id, organisation_id, invitation_id, email, revenuecat_app_user_id, sparkfit_account_id, joined_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(membershipId, invitation.organisation_id, invitation.id, invitation.email, appUserId, sparkfitAccountId, now),
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(organisation_id, email) DO UPDATE SET invitation_id = excluded.invitation_id,
+          revenuecat_app_user_id = excluded.revenuecat_app_user_id, sparkfit_account_id = excluded.sparkfit_account_id,
+          status = 'active', joined_at = excluded.joined_at, ended_at = NULL WHERE organisation_memberships.status = 'ended'`)
+        .bind(membershipId, invitation.organisation_id, invitation.id, invitation.email, appUserId, sparkfitAccountId, now),
       env.DB.prepare(`INSERT INTO employer_entitlements (id, organisation_id, membership_id, revenuecat_app_user_id, source, status, starts_at, expires_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, 'active', ?, ?, ?)`).bind(entitlementId, invitation.organisation_id, membershipId, appUserId, invitation.plan_type, now, expiry, now),
+        VALUES (?, ?, ?, ?, ?, 'active', ?, ?, ?)
+        ON CONFLICT(organisation_id, membership_id) DO UPDATE SET revenuecat_app_user_id = excluded.revenuecat_app_user_id,
+          status = 'active', source = excluded.source, expires_at = excluded.expires_at, provision_status = 'pending', updated_at = excluded.updated_at`)
+        .bind(entitlementId, invitation.organisation_id, membershipId, appUserId, invitation.plan_type, now, expiry, now),
       env.DB.prepare(`UPDATE employee_invitations SET status = 'accepted', accepted_at = ?, verified_at = ? WHERE id = ?`).bind(now, now, invitation.id),
     ]);
   } catch (error) {
@@ -308,16 +332,24 @@ async function activateInvitationForAccount(request, env) {
   const invitation = await env.DB.prepare(`SELECT i.*, o.plan_type, o.expires_at AS organisation_expires_at, o.status AS organisation_status
     FROM employee_invitations i JOIN organisations o ON o.id = i.organisation_id
     WHERE i.token_hash = ? AND i.status = 'pending' AND i.expires_at > ?`).bind(tokenHash, nowIso()).first();
-  if (!invitation || invitation.organisation_status !== 'active') throw new HttpError(410, 'This invitation is invalid or expired.');
-  const membershipId = id('mem');
+  if (!invitation || invitation.organisation_status !== 'active' || Date.parse(invitation.organisation_expires_at) <= Date.now()) throw new HttpError(410, 'This invitation is invalid or expired.');
+  const previousMembership = await env.DB.prepare(`SELECT id FROM organisation_memberships WHERE organisation_id = ? AND email = ?`).bind(invitation.organisation_id, invitation.email).first();
+  const membershipId = previousMembership?.id || id('mem');
   const entitlementId = id('ent');
   const now = nowIso();
   try {
     await env.DB.batch([
       env.DB.prepare(`INSERT INTO organisation_memberships (id, organisation_id, invitation_id, email, revenuecat_app_user_id, sparkfit_account_id, joined_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(membershipId, invitation.organisation_id, invitation.id, invitation.email, account.id, account.id, now),
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(organisation_id, email) DO UPDATE SET invitation_id = excluded.invitation_id,
+          revenuecat_app_user_id = excluded.revenuecat_app_user_id, sparkfit_account_id = excluded.sparkfit_account_id,
+          status = 'active', joined_at = excluded.joined_at, ended_at = NULL WHERE organisation_memberships.status = 'ended'`)
+        .bind(membershipId, invitation.organisation_id, invitation.id, invitation.email, account.id, account.id, now),
       env.DB.prepare(`INSERT INTO employer_entitlements (id, organisation_id, membership_id, revenuecat_app_user_id, source, status, starts_at, expires_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, 'active', ?, ?, ?)`).bind(entitlementId, invitation.organisation_id, membershipId, account.id, invitation.plan_type, now, invitation.organisation_expires_at, now),
+        VALUES (?, ?, ?, ?, ?, 'active', ?, ?, ?)
+        ON CONFLICT(organisation_id, membership_id) DO UPDATE SET revenuecat_app_user_id = excluded.revenuecat_app_user_id,
+          status = 'active', source = excluded.source, expires_at = excluded.expires_at, provision_status = 'pending', updated_at = excluded.updated_at`)
+        .bind(entitlementId, invitation.organisation_id, membershipId, account.id, invitation.plan_type, now, invitation.organisation_expires_at, now),
       env.DB.prepare(`UPDATE employee_invitations SET status = 'accepted', accepted_at = ?, verified_at = ? WHERE id = ?`).bind(now, now, invitation.id),
     ]);
   } catch (error) {
@@ -354,6 +386,7 @@ async function billingPortal(request, env) {
 async function updateSeats(request, env) {
   const actor = await requireSession(request, env, ['organisation_admin']);
   const body = await parseJson(request);
+  if (env.PAYMENTS_ENABLED !== 'true') throw new HttpError(503, 'Seat purchasing is not enabled in this environment.');
   const seats = Number(body.seats);
   if (!integer(seats, 20, 500)) throw new HttpError(422, 'Seat quantity must be between 20 and 500.');
   const subscription = await env.DB.prepare(`SELECT * FROM employer_subscriptions WHERE organisation_id = ? AND status IN ('active', 'payment_attention') ORDER BY created_at DESC LIMIT 1`)
@@ -364,29 +397,73 @@ async function updateSeats(request, env) {
     (SELECT COUNT(*) FROM employee_invitations WHERE organisation_id = ? AND status = 'pending' AND expires_at > ?) AS count`)
     .bind(actor.organisationId, actor.organisationId, nowIso()).first();
   if (seats < Number(allocated?.count || 0)) throw new HttpError(409, 'Remove employees or cancel pending invitations before reducing below reserved seats.');
-  await updateSubscriptionQuantity(env, subscription.stripe_subscription_item_id, seats);
+  if (seats < Number(subscription.seats)) {
+    // Reserve capacity before calling Stripe. Database triggers close the race
+    // with invitations created after the initial allocation check.
+    try {
+      await env.DB.prepare(`UPDATE employer_subscriptions SET pending_seats = ?, updated_at = ? WHERE id = ?`)
+        .bind(seats, nowIso(), subscription.id).run();
+    } catch (error) {
+      if (String(error).includes('seat limit')) throw new HttpError(409, 'Remove employees or cancel pending invitations before reducing below reserved seats.');
+      throw error;
+    }
+    try { await scheduleSubscriptionQuantity(env, subscription.stripe_subscription_id, seats); }
+    catch (error) {
+      await env.DB.prepare(`UPDATE employer_subscriptions SET pending_seats = ?, updated_at = ? WHERE id = ? AND pending_seats = ?`)
+        .bind(subscription.pending_seats, nowIso(), subscription.id, seats).run();
+      throw error;
+    }
+  } else {
+    await updateSubscriptionQuantity(env, subscription.stripe_subscription_item_id, seats);
+    await env.DB.prepare(`UPDATE employer_subscriptions SET pending_seats = NULL, updated_at = ? WHERE id = ?`).bind(nowIso(), subscription.id).run();
+  }
   await audit(env.DB, actor, 'subscription.seats.requested', 'employer_subscription', subscription.id, actor.organisationId, { seats });
-  return json({ ok: true, pendingWebhookConfirmation: true });
+  return json({ ok: true, effective: seats < Number(subscription.seats) ? 'renewal' : 'after_payment_confirmation', pendingWebhookConfirmation: true });
 }
 
 async function checkout(request, env) {
+  if (env.PAYMENTS_ENABLED !== 'true') throw new HttpError(503, 'Online purchasing is not enabled in this environment.');
   await enforceRateLimit(request, env, 'checkout_creation', 5, 600);
   const body = await parseJson(request);
+  if (!(await verifyTurnstile(request, env, clean(body.turnstileToken, 2048), 'checkout_creation'))) throw new HttpError(403, 'Please complete the security check.');
   const order = {
     id: id('ord'), company_name: clean(body.companyName, 120), company_website: normaliseWebsite(body.companyWebsite),
     billing_email: email(body.billingEmail), contact_name: clean(body.contactName, 120), seats: Number(body.seats),
   };
+  if (body.organisationId) {
+    const actor = await requireSession(request, env, ['organisation_admin']);
+    if (actor.organisationId !== body.organisationId) throw new HttpError(403, 'This organisation is not available to your account.');
+    const organisation = await env.DB.prepare(`SELECT * FROM organisations WHERE id = ?`).bind(actor.organisationId).first();
+    if (organisation?.plan_type !== 'pilot') throw new HttpError(409, 'Use the billing portal to manage your existing subscription.');
+    Object.assign(order, { organisation_id: organisation.id, company_name: organisation.name,
+      company_website: organisation.website, billing_email: actor.email });
+  } else {
+    const existing = await env.DB.prepare(`SELECT organisation_id FROM organisation_admins WHERE email = ? AND status = 'active'`).bind(order.billing_email).first();
+    if (existing) throw new HttpError(409, 'Sign in to your employer portal to upgrade or manage your existing organisation.');
+  }
   if (!order.company_name || order.company_website === null || !validEmail(order.billing_email) || !order.contact_name || !integer(order.seats, 20, 1000)) throw new HttpError(422, 'Please check the order details.');
   const price = priceAnnual(order.seats);
   if (price.provisional) throw new HttpError(409, 'Pricing above 500 seats requires commercial approval.');
   Object.assign(order, { unit_amount_ex_vat: price.unitExVat, subtotal_ex_vat: price.subtotalExVat, discount_bps: price.discountBps, pricing_version: price.pricingVersion });
+  const requestKey = clean(body.clientRequestId, 100) || crypto.randomUUID();
+  if (!/^[a-zA-Z0-9_-]{16,100}$/.test(requestKey)) throw new HttpError(422, 'Please reload the order form and try again.');
+  const prior = await env.DB.prepare(`SELECT * FROM checkout_orders WHERE request_key = ?`).bind(requestKey).first();
+  if (prior) {
+    if (prior.billing_email !== order.billing_email || prior.seats !== order.seats || prior.company_name !== order.company_name) throw new HttpError(409, 'The order details have changed. Reload the form to start a new order.');
+    if (prior.stripe_checkout_session_id) {
+      const existing = await retrieveStripeResource(env, `/checkout/sessions/${encodeURIComponent(prior.stripe_checkout_session_id)}`);
+      if (existing.status === 'open') return json({ checkoutUrl: existing.url, orderId: prior.id });
+      throw new HttpError(409, 'This checkout has finished. Sign in to your employer portal or start a new order.');
+    }
+    Object.assign(order, prior);
+  }
   const now = nowIso();
-  await env.DB.prepare(`INSERT INTO checkout_orders
-    (id, company_name, company_website, billing_email, contact_name, seats, unit_amount_ex_vat, subtotal_ex_vat, discount_bps, pricing_version, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+  if (!prior) await env.DB.prepare(`INSERT INTO checkout_orders
+    (id, company_name, company_website, billing_email, contact_name, seats, unit_amount_ex_vat, subtotal_ex_vat, discount_bps, pricing_version, created_at, updated_at, request_key, organisation_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
     .bind(order.id, order.company_name, order.company_website, order.billing_email, order.contact_name, order.seats, order.unit_amount_ex_vat,
-      order.subtotal_ex_vat, order.discount_bps, order.pricing_version, now, now).run();
-  const session = await createCheckoutSession(env, order, `${appOrigin(env)}/business/checkout-success/?session_id={CHECKOUT_SESSION_ID}`, `${appOrigin(env)}/business/#pricing`);
+      order.subtotal_ex_vat, order.discount_bps, order.pricing_version, now, now, requestKey, order.organisation_id || null).run();
+  const session = await createCheckoutSession(env, order, `${serviceOrigin(request)}/checkout-success/?session_id={CHECKOUT_SESSION_ID}`, `${serviceOrigin(request)}/buy/?seats=${order.seats}`);
   await env.DB.prepare(`UPDATE checkout_orders SET stripe_checkout_session_id = ?, status = 'checkout_created', updated_at = ? WHERE id = ?`).bind(session.id, nowIso(), order.id).run();
   return json({ checkoutUrl: session.url, orderId: order.id });
 }
@@ -395,32 +472,46 @@ async function stripeWebhook(request, env) {
   const raw = await request.text();
   if (!(await verifyStripeWebhook(raw, request.headers.get('Stripe-Signature'), env.STRIPE_WEBHOOK_SECRET))) throw new HttpError(400, 'Invalid Stripe signature.');
   const event = JSON.parse(raw);
+  if (!event.id || !event.type || event.livemode === true && env.ENVIRONMENT !== 'production') throw new HttpError(400, 'Unexpected Stripe event.');
   const exists = await env.DB.prepare(`SELECT stripe_event_id, status FROM billing_events WHERE stripe_event_id = ?`).bind(event.id).first();
   if (exists?.status === 'completed') return json({ received: true, duplicate: true });
-  if (!exists) {
-    await env.DB.prepare(`INSERT INTO billing_events (stripe_event_id, event_type, payload, processed_at, status, attempts) VALUES (?, ?, ?, ?, 'processing', 1)`)
-      .bind(event.id, event.type, raw, nowIso()).run();
-  } else {
-    await env.DB.prepare(`UPDATE billing_events SET status = 'processing', attempts = attempts + 1, processing_error = NULL WHERE stripe_event_id = ?`).bind(event.id).run();
-  }
+  const claimed = await env.DB.prepare(`INSERT INTO billing_events
+    (stripe_event_id, event_type, payload, processed_at, status, attempts, event_created, processing_started_at)
+    VALUES (?, ?, ?, ?, 'processing', 1, ?, ?)
+    ON CONFLICT(stripe_event_id) DO UPDATE SET status = 'processing', attempts = attempts + 1,
+      processing_started_at = excluded.processing_started_at, processing_error = NULL
+    WHERE billing_events.status = 'failed' OR
+      (billing_events.status = 'processing' AND billing_events.processing_started_at < ?)
+    RETURNING stripe_event_id`)
+    .bind(event.id, event.type, raw, nowIso(), Number(event.created || 0), nowIso(), new Date(Date.now() - 5 * 60000).toISOString()).first();
+  if (!claimed) throw new HttpError(409, 'This Stripe event is already processing.');
   try {
     const object = event.data?.object || {};
     const orderId = object.metadata?.order_id || object.parent?.subscription_details?.metadata?.order_id;
-    if (event.type === 'checkout.session.completed' && orderId) {
-      await env.DB.prepare(`UPDATE checkout_orders SET status = 'checkout_completed', stripe_checkout_session_id = ?, updated_at = ? WHERE id = ?`)
-        .bind(object.id, nowIso(), orderId).run();
+    if (['checkout.session.completed', 'checkout.session.async_payment_succeeded'].includes(event.type) && orderId) {
+      const paid = object.payment_status !== 'unpaid';
+      await env.DB.prepare(`UPDATE checkout_orders SET status = ?, stripe_checkout_session_id = ?, updated_at = ? WHERE id = ?`)
+        .bind(paid ? 'checkout_completed' : 'checkout_pending_payment', object.id, nowIso(), orderId).run();
+      if (paid && object.subscription) {
+        const subscription = await retrieveStripeResource(env, `/subscriptions/${encodeURIComponent(object.subscription)}?expand[]=latest_invoice`);
+        await upsertPaidSubscription(env, subscription, orderId, event.created);
+      }
     }
-    if (event.type.startsWith('customer.subscription.') && orderId) await upsertPaidSubscription(env, object, orderId);
-    if (event.type === 'invoice.payment_failed') {
-      await env.DB.prepare(`UPDATE employer_subscriptions SET status = 'payment_attention', updated_at = ? WHERE stripe_subscription_id = ?`).bind(nowIso(), object.subscription).run();
-      const row = await env.DB.prepare(`SELECT o.name, oa.email FROM employer_subscriptions es JOIN organisations o ON o.id = es.organisation_id
-        JOIN organisation_admins oa ON oa.organisation_id = o.id AND oa.status = 'active' WHERE es.stripe_subscription_id = ? LIMIT 1`).bind(object.subscription).first();
-      if (row) await queueEmail(env, 'employer_payment_failed', row.email, templates.paymentFailed(row.name));
+    if (event.type === 'checkout.session.async_payment_failed' && orderId) {
+      await env.DB.prepare(`UPDATE checkout_orders SET status = 'payment_failed', updated_at = ? WHERE id = ?`).bind(nowIso(), orderId).run();
     }
-    if (event.type === 'invoice.paid') {
-      const row = await env.DB.prepare(`SELECT o.name, oa.email FROM employer_subscriptions es JOIN organisations o ON o.id = es.organisation_id
-        JOIN organisation_admins oa ON oa.organisation_id = o.id AND oa.status = 'active' WHERE es.stripe_subscription_id = ? LIMIT 1`).bind(object.subscription).first();
-      if (row) await queueEmail(env, 'employer_payment_successful', row.email, templates.paymentSuccessful(row.name));
+    if (event.type.startsWith('customer.subscription.') || ['invoice.paid', 'invoice.payment_failed'].includes(event.type)) {
+      const subscriptionId = event.type.startsWith('customer.subscription.') ? object.id : stripeSubscriptionIdFromInvoice(object);
+      if (subscriptionId) {
+        const subscription = await retrieveStripeResource(env, `/subscriptions/${encodeURIComponent(subscriptionId)}?expand[]=latest_invoice`);
+        const existingOrder = await env.DB.prepare(`SELECT co.id FROM checkout_orders co JOIN employer_subscriptions es
+          ON co.organisation_id = es.organisation_id WHERE es.stripe_subscription_id = ? ORDER BY co.created_at DESC LIMIT 1`).bind(subscriptionId).first();
+        const resolvedOrderId = existingOrder?.id || subscription.metadata?.order_id;
+        if (resolvedOrderId) await upsertPaidSubscription(env, subscription, resolvedOrderId, event.created);
+      }
+    }
+    if (['charge.dispute.created', 'charge.refunded', 'radar.early_fraud_warning.created'].includes(event.type)) {
+      await recordStripeRiskEvent(env, event, object, raw);
     }
     await env.DB.prepare(`UPDATE billing_events SET status = 'completed', processed_at = ?, processing_error = NULL WHERE stripe_event_id = ?`).bind(nowIso(), event.id).run();
     return json({ received: true });
@@ -430,37 +521,35 @@ async function stripeWebhook(request, env) {
   }
 }
 
-async function upsertPaidSubscription(env, subscription, orderId) {
-  const order = await env.DB.prepare(`SELECT * FROM checkout_orders WHERE id = ?`).bind(orderId).first();
-  if (!order) throw new Error(`Unknown checkout order ${orderId}`);
-  let organisationId = order.organisation_id;
-  const now = nowIso();
-  const periodEnd = subscription.items?.data?.[0]?.current_period_end || subscription.current_period_end;
-  if (!organisationId) {
-    organisationId = id('org');
-    await env.DB.batch([
-      env.DB.prepare(`INSERT INTO organisations (id, name, website, status, plan_type, seat_limit, starts_at, expires_at, stripe_customer_id, created_at, updated_at)
-        VALUES (?, ?, ?, 'active', 'paid', ?, ?, ?, ?, ?, ?)`).bind(organisationId, order.company_name, order.company_website, order.seats, now, periodEnd ? new Date(periodEnd * 1000).toISOString() : null, subscription.customer, now, now),
-      env.DB.prepare(`INSERT INTO organisation_admins (id, organisation_id, email, role, status, created_at) VALUES (?, ?, ?, 'organisation_admin', 'active', ?)`)
-        .bind(id('oadm'), organisationId, order.billing_email, now),
-      env.DB.prepare(`UPDATE checkout_orders SET organisation_id = ?, status = 'subscription_created', updated_at = ? WHERE id = ?`).bind(organisationId, now, orderId),
-    ]);
+async function recordStripeRiskEvent(env, event, object, raw) {
+  let charge = event.type === 'charge.refunded' ? object : null;
+  const chargeId = charge?.id || object.charge;
+  if (!charge && chargeId) charge = await retrieveStripeResource(env, `/charges/${encodeURIComponent(chargeId)}`);
+  let subscriptionId = null;
+  if (charge?.invoice) {
+    const invoiceId = typeof charge.invoice === 'string' ? charge.invoice : charge.invoice.id;
+    const invoice = await retrieveStripeResource(env, `/invoices/${encodeURIComponent(invoiceId)}`);
+    subscriptionId = stripeSubscriptionIdFromInvoice(invoice);
   }
-  const status = normaliseSubscriptionStatus(subscription.status);
-  await env.DB.prepare(`INSERT INTO employer_subscriptions
-    (id, organisation_id, stripe_customer_id, stripe_subscription_id, stripe_subscription_item_id, status, seats, current_period_end, cancel_at_period_end, updated_at, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(stripe_subscription_id) DO UPDATE SET status = excluded.status, seats = excluded.seats, current_period_end = excluded.current_period_end,
-      cancel_at_period_end = excluded.cancel_at_period_end, updated_at = excluded.updated_at`)
-    .bind(id('sub'), organisationId, subscription.customer, subscription.id, subscription.items?.data?.[0]?.id || null, status,
-      Number(subscription.items?.data?.[0]?.quantity || order.seats), periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
-      subscription.cancel_at_period_end ? 1 : 0, now, now).run();
-  await env.DB.prepare(`UPDATE organisations SET status = ?, seat_limit = ?, expires_at = ?, updated_at = ? WHERE id = ?`)
-    .bind(status === 'active' ? 'active' : status, Number(subscription.items?.data?.[0]?.quantity || order.seats), periodEnd ? new Date(periodEnd * 1000).toISOString() : null, now, organisationId).run();
+  const customerId = typeof charge?.customer === 'string' ? charge.customer : charge?.customer?.id || null;
+  await env.DB.prepare(`INSERT OR IGNORE INTO stripe_risk_events
+    (stripe_event_id, event_type, stripe_object_id, stripe_customer_id, stripe_subscription_id, payload, occurred_at, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
+    .bind(event.id, event.type, object.id || null, customerId, subscriptionId, raw,
+      new Date(Number(event.created || 0) * 1000).toISOString(), nowIso()).run();
+  const row = await env.DB.prepare(`SELECT o.name FROM employer_subscriptions es JOIN organisations o ON o.id = es.organisation_id
+    WHERE es.stripe_subscription_id = ? OR es.stripe_customer_id = ? LIMIT 1`).bind(subscriptionId, customerId).first();
+  if (env.PARTNERSHIPS_EMAIL) await queueEmail(env, 'stripe_risk_alert', env.PARTNERSHIPS_EMAIL,
+    templates.stripeRiskAlert(row?.name || 'an unknown organisation', event.type, object.id));
+}
+
+async function upsertPaidSubscription(env, subscription, orderId, stripeEventCreated = 0) {
+  return persistSubscription(env, subscription, orderId, stripeEventCreated);
 }
 
 async function lifecycle(env) {
   const now = nowIso();
+  await enforcePaidLifecycle(env);
   await env.DB.prepare(`UPDATE employee_invitations SET status = 'expired' WHERE status = 'pending' AND expires_at <= ?`).bind(now).run();
   const upgradeLink = `${appOrigin(env)}/business/#pricing`;
   for (const days of [7, 3]) {
@@ -499,6 +588,10 @@ async function lifecycle(env) {
     }
     ended += 1;
   }
+  const retries = await env.DB.prepare(`SELECT DISTINCT revenuecat_app_user_id FROM employer_entitlements WHERE provision_status IN ('pending', 'failed') LIMIT 100`).all();
+  for (const user of retries.results || []) {
+    try { await reconcileBusinessEntitlement(env, user.revenuecat_app_user_id); } catch { /* Retry next run. */ }
+  }
   const emailResult = await flushEmailOutbox(env);
   return { ended, email: emailResult };
 }
@@ -508,10 +601,19 @@ async function route(request, env) {
   const path = url.pathname.replace(/\/$/, '') || '/';
   if (request.method === 'GET' && path === '/health') return json({ ok: true, environment: env.ENVIRONMENT, paymentsEnabled: env.PAYMENTS_ENABLED === 'true', revenueCatWritesEnabled: env.REVENUECAT_WRITES_ENABLED === 'true', emailEnabled: env.EMAIL_ENABLED === 'true' });
   if (request.method === 'GET' && path === '/v1/public-config') return json({
+    testMode: env.ENVIRONMENT !== 'production',
+    paymentsEnabled: env.PAYMENTS_ENABLED === 'true',
     turnstileRequired: env.TURNSTILE_REQUIRED === 'true',
     turnstileSiteKey: env.TURNSTILE_SITE_KEY || '',
     requireAppAccountForBusiness: env.REQUIRE_APP_ACCOUNT_FOR_BUSINESS === 'true',
   });
+  if (request.method === 'GET' && path === '/v1/checkout/status') {
+    const sessionId = clean(url.searchParams.get('session_id'), 200);
+    if (!sessionId.startsWith('cs_')) throw new HttpError(422, 'The checkout reference is invalid.');
+    const order = await env.DB.prepare(`SELECT status, organisation_id FROM checkout_orders WHERE stripe_checkout_session_id = ?`).bind(sessionId).first();
+    if (!order) throw new HttpError(404, 'The checkout reference was not found.');
+    return json({ status: order.status, ready: order.status === 'subscription_created', signInUrl: `${serviceOrigin(request)}/sign-in/` });
+  }
   if (request.method === 'POST' && path === '/v1/app-auth/request') {
     await enforceRateLimit(request, env, 'app_auth_request', 5, 600);
     return json(await requestAppVerification(request, env, serviceOrigin(request)));
@@ -553,16 +655,22 @@ async function route(request, env) {
   if (request.method === 'POST' && path === '/v1/portal/seats') return updateSeats(request, env);
   if (request.method === 'POST' && path === '/v1/checkout/sessions') return checkout(request, env);
   if (request.method === 'POST' && path === '/v1/webhooks/stripe') return stripeWebhook(request, env);
+  if (request.method === 'POST' && path === '/v1/webhooks/resend') return emailWebhook(request, env);
   if (['GET', 'HEAD'].includes(request.method) && env.ASSETS) return env.ASSETS.fetch(request);
   throw new HttpError(404, 'Route not found.');
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const cors = corsHeaders(request, env);
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
     try {
+      const origin = request.headers.get('Origin');
+      const allowed = new Set([env.PUBLIC_APP_ORIGIN, env.SERVICE_ORIGIN, new URL(request.url).origin]);
+      if (env.ENVIRONMENT !== 'production') { allowed.add('http://localhost:4173'); allowed.add('http://127.0.0.1:4173'); }
+      if (!['GET', 'HEAD'].includes(request.method) && origin && !allowed.has(origin)) throw new HttpError(403, 'This request origin is not allowed.');
       const response = await route(request, env);
+      if (ctx?.waitUntil && request.method === 'POST') ctx.waitUntil(flushEmailOutbox(env).catch(() => {}));
       const headers = new Headers(response.headers);
       for (const [key, value] of Object.entries(cors)) headers.set(key, value);
       headers.set('Referrer-Policy', 'no-referrer');

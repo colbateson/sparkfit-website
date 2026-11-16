@@ -1,6 +1,7 @@
 export const PRICING_VERSION = 'annual-v1-preview';
 export const ANNUAL_CONSUMER_GROSS_PENCE = 2499;
-export const VAT_BPS = 2000;
+export const VAT_BPS = 0;
+export const BUSINESS_BASE_PENCE = 2083;
 export const MIN_SEATS = 20;
 export const MAX_SEATS = 1000;
 export const APPROVED_MAX_SEATS = 500;
@@ -17,7 +18,7 @@ export const TIERS = Object.freeze([
 export function priceAnnual(seats) {
   if (!Number.isInteger(seats) || seats < MIN_SEATS || seats > MAX_SEATS) throw new RangeError(`Seats must be a whole number from ${MIN_SEATS} to ${MAX_SEATS}.`);
   const tier = [...TIERS].reverse().find((candidate) => seats >= candidate.min);
-  const directUnitExVat = Math.round(ANNUAL_CONSUMER_GROSS_PENCE * 10000 / (10000 + VAT_BPS));
+  const directUnitExVat = BUSINESS_BASE_PENCE;
   const unitExVat = Math.round(directUnitExVat * (10000 - tier.discountBps) / 10000);
   return {
     seats,

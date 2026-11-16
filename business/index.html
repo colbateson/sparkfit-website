@@ -333,11 +333,7 @@
             <h2>Build Your Team's SparkFit Plan</h2>
             <p>Choose how many employees you'd like to support and see exactly how much your business saves compared with individual SparkFit subscriptions.</p>
           </div>
-          <div class="vat-toggle vat-toggle-shared" role="group" aria-label="Show all pricing">
-            <span>Show all prices</span>
-            <button class="is-active" type="button" data-vat-mode="ex" aria-pressed="true">Excluding VAT</button>
-            <button type="button" data-vat-mode="inc" aria-pressed="false">Including VAT</button>
-          </div>
+          <p class="vat-toggle vat-toggle-shared">SparkFit is not VAT registered. No VAT is added.</p>
         </div>
 
         <div class="pricing-principles" aria-label="How SparkFit annual employer pricing works">
@@ -354,8 +350,8 @@
             <p>The public annual subscription is £24.99 per employee including VAT.</p>
           </div>
           <div class="direct-annual-price">
-            <span data-direct-price-label>Per employee, excluding VAT</span>
-            <strong data-direct-price>£20.83</strong>
+            <span data-direct-price-label>Per employee, App Store or Google Play</span>
+            <strong data-direct-price>£24.99</strong>
             <small>One year of SparkFit Premium</small>
           </div>
         </div>
@@ -367,17 +363,17 @@
         <div class="package-grid" aria-label="Suggested annual subscription packages">
           <button class="package-card" type="button" data-package-seats="20">
             <span class="package-name">Starter</span><strong>20 employees</strong><em data-package-discount>20% volume discount</em>
-            <span class="package-price" data-package-total>£333.20</span><small data-package-vat>per year, excluding VAT</small>
+            <span class="package-price" data-package-total>£333.20</span><small data-package-vat>per year, no VAT charged</small>
             <span data-package-monthly>£27.77 monthly equivalent</span><span data-package-saving>Save £83.40 annually</span><b>Full SparkFit Premium access</b>
           </button>
           <button class="package-card package-card-featured" type="button" data-package-seats="50">
             <span class="package-name">Growth</span><strong>50 employees</strong><em data-package-discount>25% volume discount</em>
-            <span class="package-price" data-package-total>£781.00</span><small data-package-vat>per year, excluding VAT</small>
+            <span class="package-price" data-package-total>£781.00</span><small data-package-vat>per year, no VAT charged</small>
             <span data-package-monthly>£65.08 monthly equivalent</span><span data-package-saving>Save £260.50 annually</span><b>Full SparkFit Premium access</b>
           </button>
           <button class="package-card" type="button" data-package-seats="100">
             <span class="package-name">Business</span><strong>100 employees</strong><em data-package-discount>35% volume discount</em>
-            <span class="package-price" data-package-total>£1,354.00</span><small data-package-vat>per year, excluding VAT</small>
+            <span class="package-price" data-package-total>£1,354.00</span><small data-package-vat>per year, no VAT charged</small>
             <span data-package-monthly>£112.83 monthly equivalent</span><span data-package-saving>Save £729.00 annually</span><b>Full SparkFit Premium access</b>
           </button>
         </div>
@@ -402,18 +398,18 @@
           <div class="annual-plan-results" aria-live="polite">
             <div class="plan-results-heading"><span>Your Team's Annual SparkFit Plan</span><strong><span data-result-seats>50</span> employee licences</strong></div>
             <div class="comparison-price">
-              <span data-direct-total-label>Direct individual purchasing, excluding VAT</span>
+              <span data-direct-total-label>Direct App Store or Google Play purchasing</span>
               <del data-direct-total>£1,041.50</del>
               <small><span data-direct-per-seat>£20.83</span> per employee per year</small>
             </div>
             <div class="discount-result"><span>Volume discount</span><strong data-result-discount>25%</strong></div>
-            <div class="employer-price-result"><span data-employer-total-label>Employer annual subscription, excluding VAT</span><strong data-employer-total>£781.00</strong></div>
-            <div class="saving-result"><span data-saving-label>Annual saving, excluding VAT</span><strong data-saving>£260.50</strong></div>
+            <div class="employer-price-result"><span data-employer-total-label>Employer annual subscription, no VAT charged</span><strong data-employer-total>£781.00</strong></div>
+            <div class="saving-result"><span data-saving-label>Annual saving against direct purchasing</span><strong data-saving>£468.50</strong></div>
             <div class="monthly-results">
               <div><span>Cost per employee</span><strong data-monthly-per-seat>£1.30</strong><small>monthly equivalent</small></div>
               <div><span>Total subscription</span><strong data-monthly-total>£65.08</strong><small>monthly equivalent</small></div>
             </div>
-            <p class="calculator-note" data-price-note>50 annual employee licences with a 25% volume discount. Prices are shown excluding VAT.</p>
+            <p class="calculator-note" data-price-note>50 annual employee licences with a 25% discount from the £20.83 business base price. No VAT is charged.</p>
             <a class="button button-primary" href="#enquire" data-price-order>Get Started with 50 Employees</a>
           </div>
         </div>
@@ -423,7 +419,7 @@
           <a class="button button-dark" href="#enquire" data-enterprise-link>Contact Partnerships</a>
         </div>
 
-        <p class="pricing-terms"><strong>Important pricing information.</strong> Employer prices default to excluding VAT. The toggle provides an illustrative 20% UK VAT view and uses like-for-like tax treatment for every comparison. Actual tax will be determined by the future server-side billing and tax system. The current website prepares an enquiry only and does not take payment. Annual automatic billing through Stripe is planned, not currently live.</p>
+        <p class="pricing-terms"><strong>Pricing information.</strong> SparkFit is not VAT registered and does not add VAT to employer orders. The agreed business base price is £20.83 per employee per year, before the published volume discount. Savings compare your employer total with the £24.99 annual App Store or Google Play consumer price. Annual billing is being tested in staging and is not yet available for live purchases.</p>
       </div>
     </section>
 
@@ -526,15 +522,15 @@
           </details>
           <details>
             <summary>Why is employer pricing lower than direct app purchasing?<span aria-hidden="true">+</span></summary>
-            <div><p>Employer pricing applies the published volume discount to the annual consumer reference price excluding VAT. The calculator compares like-for-like totals so the displayed saving reflects the volume price rather than a VAT mismatch.</p></div>
+            <div><p>Employer pricing applies the published volume discount to the £20.83 annual business base price. Savings show the difference between your employer order and employees buying individual £24.99 annual subscriptions directly from the App Store or Google Play.</p></div>
           </details>
           <details>
             <summary>Why does the consumer reference price include VAT?<span aria-hidden="true">+</span></summary>
-            <div><p>The public £24.99 annual App Store and Google Play price is a consumer price and includes VAT. Employer discounts are calculated from its £20.83 VAT-exclusive equivalent.</p></div>
+            <div><p>The £24.99 price is what an individual pays directly through the App Store or Google Play. Store tax treatment is separate from SparkFit employer orders. SparkFit is not VAT registered and charges no VAT on employer orders.</p></div>
           </details>
           <details>
-            <summary>What does the VAT toggle change?<span aria-hidden="true">+</span></summary>
-            <div><p>It changes every displayed estimate, including package prices, direct comparisons, annual totals, monthly equivalents, per-employee costs and savings. It uses an illustrative 20% UK VAT rate. Actual tax will be determined by the future checkout and server-side tax system.</p></div>
+            <summary>Will VAT be added to my order?<span aria-hidden="true">+</span></summary>
+            <div><p>No. SparkFit is not VAT registered, so no VAT is added to employer orders. The displayed employer total is the amount due.</p></div>
           </details>
           <details>
             <summary>Do employees need to pay?<span aria-hidden="true">+</span></summary>

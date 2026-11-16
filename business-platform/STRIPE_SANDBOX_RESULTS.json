@@ -1,0 +1,82 @@
+{
+  "runId": "e2e_ae7e5ec6d74c4d54a0e10b7e6e422421",
+  "startedAt": "2026-11-15T22:22:44.233Z",
+  "checks": [
+    {
+      "name": "Checkout 20 seats",
+      "result": "passed",
+      "subtotalExVat": 33320
+    },
+    {
+      "name": "Successful sandbox invoice",
+      "result": "passed"
+    },
+    {
+      "name": "Customer Portal session",
+      "result": "passed"
+    },
+    {
+      "name": "Prorated increase with volume repricing",
+      "result": "passed"
+    },
+    {
+      "name": "Seat reduction scheduled at renewal",
+      "result": "passed"
+    },
+    {
+      "name": "Cancellation retains current paid term",
+      "result": "passed"
+    },
+    {
+      "name": "Checkout 50 seats",
+      "result": "passed",
+      "subtotalExVat": 78100
+    },
+    {
+      "name": "Checkout 500 seats",
+      "result": "passed",
+      "subtotalExVat": 521000
+    }
+  ],
+  "fixtures": [
+    {
+      "type": "product",
+      "id": "prod_VdSkZUyjaECvF7"
+    },
+    {
+      "type": "checkout",
+      "id": "cs_test_a0HejtW1W4JXxwmxZqoRPC7U1N9yc3nyaE1b3huCeyXY9Q5GnAAD66VGYz",
+      "seats": 20,
+      "status": "expired"
+    },
+    {
+      "type": "customer",
+      "id": "cus_VdSkEs5Q9P2qWo"
+    },
+    {
+      "type": "subscription",
+      "id": "sub_1UcBp02SRn2PAsMsz3l6pYZF"
+    },
+    {
+      "type": "checkout",
+      "id": "cs_test_a02ww29RQqrS4OYY2K0R9nFv1Fd4FwU8Z1IHK4ThaemjzWB7JGcmSCOdEV",
+      "seats": 50,
+      "status": "expired"
+    },
+    {
+      "type": "checkout",
+      "id": "cs_test_a0wvtEKVDifhC3MGLpF20Ugvc4UiiV2heg0rGYrCcdGn2h3KimREExmbsb",
+      "seats": 500,
+      "status": "expired"
+    }
+  ],
+  "completed": true,
+  "taxRegistrations": [],
+  "taxCheck": {
+    "mode": "not_vat_registered",
+    "addedVat": 0,
+    "invoiceTotal": 33320
+  },
+  "subscriptionCleanup": "canceled test subscription",
+  "finishedAt": "2026-11-15T22:23:11.985Z"
+}

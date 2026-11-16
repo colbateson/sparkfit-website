@@ -1,0 +1,15 @@
+{
+  "runId": "ord_e2e_a38fdd7dedfc4326a63aa57d6180b673",
+  "checks": [
+    "Real Stripe payment creates paid organisation through the deployed webhook",
+    "Period-end cancellation retains employer access in the deployed ledger",
+    "Replayed older Stripe event does not undo cancellation state",
+    "Paid organisation is not duplicated",
+    "Subscription removal suspends employer access through the deployed webhook"
+  ],
+  "completed": true,
+  "startedAt": "2026-11-16T06:51:51.269Z",
+  "subscriptionId": "sub_1UcJlh2SRn2PAsMseqPHKaZC",
+  "organisationId": "org_ord_e2e_a38fdd7dedfc4326a63aa57d6180b673",
+  "finishedAt": "2026-11-16T06:52:12.220Z"
+}

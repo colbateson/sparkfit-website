@@ -19,13 +19,12 @@ export async function issueMagicLink(env, userEmail, role, organisationId = null
 
 export async function consumeMagicLink(env, token) {
   const hash = await sha256(token);
-  const row = await env.DB.prepare(`SELECT * FROM auth_tokens WHERE token_hash = ? AND consumed_at IS NULL AND expires_at > ?`).bind(hash, nowIso()).first();
+  const row = await env.DB.prepare(`UPDATE auth_tokens SET consumed_at = ? WHERE token_hash = ? AND consumed_at IS NULL AND expires_at > ? RETURNING *`).bind(nowIso(), hash, nowIso()).first();
   if (!row) throw new HttpError(401, 'This sign-in link is invalid or expired.');
   const sessionToken = randomToken();
   const sessionId = id('ses');
   const expiresAt = new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString();
   await env.DB.batch([
-    env.DB.prepare('UPDATE auth_tokens SET consumed_at = ? WHERE id = ?').bind(nowIso(), row.id),
     env.DB.prepare(`INSERT INTO sessions (id, email, role, organisation_id, token_hash, expires_at, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?)`)
       .bind(sessionId, row.email, row.role, row.organisation_id, await sha256(sessionToken), expiresAt, nowIso()),

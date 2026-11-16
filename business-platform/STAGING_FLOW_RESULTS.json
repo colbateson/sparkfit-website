@@ -1,0 +1,44 @@
+{
+  "runId": "flow_8b113620193c4e51a9934d75862d9517",
+  "startedAt": "2026-11-16T07:01:28.722Z",
+  "checks": [
+    "Administrator email sign-in",
+    "Pilot application, approval and employer sign-in",
+    "Stable account creation and email verification",
+    "Real RevenueCat Business entitlement grant",
+    "Activation-only employer reporting",
+    "Real Business entitlement removal with account retained",
+    "Removed employee can be invited again"
+  ],
+  "completed": true,
+  "organisationId": "org_3f58c421ad864862beb45ba0f5db4841",
+  "emailDeliveries": [
+    {
+      "template": "magic_link",
+      "status": "delivered",
+      "attempts": 1
+    },
+    {
+      "template": "pilot_approved",
+      "status": "delivered",
+      "attempts": 1
+    },
+    {
+      "template": "employee_invitation",
+      "status": "delivered",
+      "attempts": 1
+    },
+    {
+      "template": "app_email_verification",
+      "status": "delivered",
+      "attempts": 1
+    },
+    {
+      "template": "employee_invitation",
+      "status": "delivered",
+      "attempts": 1
+    }
+  ],
+  "cleanup": "test pilot ended",
+  "finishedAt": "2026-11-16T07:01:44.638Z"
+}

@@ -13,7 +13,7 @@ This document turns the agreed product model into practical default rules for St
 - Maximum self-service order: 500 employee seats.
 - Larger orders: quoted by SparkFit Partnerships.
 - Paid billing period: annual.
-- Business pricing: quoted excluding VAT, with applicable VAT added at checkout.
+- Business pricing: SparkFit is not VAT registered. No VAT is charged on employer subscriptions. The agreed business base price is £20.83 per employee per year before volume discounts.
 - Employer reporting: invitation and activation status only.
 - Employee activity and health information: never available to the employer.
 
@@ -23,7 +23,7 @@ This document turns the agreed product model into practical default rules for St
 2. The initial term is 12 months.
 3. The subscription renews for another 12 months unless the organisation cancels before the renewal date.
 4. SparkFit sends renewal reminders 30 days and 7 days before renewal.
-5. The reminder states the renewal date, current seat quantity, current annual price excluding VAT and how to cancel or request a seat reduction.
+5. The reminder states the renewal date, current seat quantity, annual price with no VAT charged and how to cancel or request a seat reduction.
 6. Price changes are notified at least 30 days before renewal.
 7. No pilot converts to a paid subscription automatically.
 
@@ -122,7 +122,7 @@ Do not retain invitation plaintext tokens. The current platform stores only toke
 The final employer agreement should cover:
 
 - Service description and eligibility.
-- Seat quantity and price excluding VAT.
+- Seat quantity and total price, with no VAT charged while SparkFit is not VAT registered.
 - Subscription start and renewal dates.
 - Automatic renewal and cancellation method.
 - Seat increase and reduction rules.
@@ -143,7 +143,7 @@ The final employer agreement should cover:
 Configure Stripe Billing to reflect the approved version of these policies:
 
 - Annual recurring subscription.
-- Automatic tax calculation.
+- Automatic tax disabled while SparkFit is not VAT registered, with no VAT charged.
 - Cancellation at period end through Customer Portal.
 - Seat increases with proration.
 - Seat reductions scheduled for renewal rather than applied immediately.

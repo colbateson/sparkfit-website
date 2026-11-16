@@ -8,7 +8,8 @@ const { CONFIG, calculateAnnualPlan, valuesForVatMode, buildEnquirySummary, vali
 
 test('keeps the approved annual consumer reference and VAT configuration', () => {
   assert.equal(CONFIG.consumerAnnualGrossPennies, 2499);
-  assert.equal(CONFIG.vatRateBps, 2000);
+  assert.equal(CONFIG.vatRateBps, 0);
+  assert.equal(CONFIG.businessBasePennies, 2083);
   assert.equal(calculateAnnualPlan(20).directPerSeatExVat, 2083);
 });
 
@@ -33,9 +34,9 @@ test('preserves every published discount milestone', () => {
 test('calculates VAT-exclusive and VAT-inclusive annual totals consistently', () => {
   const plan = calculateAnnualPlan(100);
   assert.equal(plan.employerPerSeatExVat, 1354);
-  assert.equal(plan.employerPerSeatIncVat, 1625);
+  assert.equal(plan.employerPerSeatIncVat, 1354);
   assert.equal(plan.employerTotalExVat, 135400);
-  assert.equal(plan.employerTotalIncVat, 162500);
+  assert.equal(plan.employerTotalIncVat, 135400);
   assert.equal(plan.directTotalExVat, 208300);
   assert.equal(plan.directTotalIncVat, 249900);
 });
@@ -48,15 +49,15 @@ test('calculates like-for-like savings and monthly equivalents', () => {
   assert.equal(incVat.saving, incVat.directTotal - incVat.employerTotal);
   assert.equal(exVat.employerMonthlyPerSeat, 130);
   assert.equal(exVat.employerMonthlyTotal, 6508);
-  assert.equal(incVat.employerMonthlyTotal, 7808);
+  assert.equal(incVat.employerMonthlyTotal, 6508);
 });
 
 test('uses consistent penny rounding at the 20-seat starting point', () => {
   const plan = calculateAnnualPlan(20);
   assert.equal(plan.employerPerSeatExVat, 1666);
-  assert.equal(plan.employerPerSeatIncVat, 1999);
+  assert.equal(plan.employerPerSeatIncVat, 1666);
   assert.equal(plan.employerTotalExVat, 33320);
-  assert.equal(plan.employerTotalIncVat, 39980);
+  assert.equal(plan.employerTotalIncVat, 33320);
 });
 
 test('documents the expected whole-order pricing cliffs and no others', () => {
@@ -84,7 +85,7 @@ test('builds enquiry data from the same calculated values', () => {
   const summary = buildEnquirySummary(calculateAnnualPlan(100), 'ex');
   assert.match(summary, /100 employee licences/);
   assert.match(summary, /35% volume discount applied/);
-  assert.match(summary, /£1,354\.00 annual employer subscription excluding VAT/);
-  assert.match(summary, /£729\.00 annual saving excluding VAT/);
+  assert.match(summary, /£1,354\.00 annual employer subscription no VAT charged/);
+  assert.match(summary, /£1,145\.00 annual saving no VAT charged/);
   assert.doesNotMatch(summary, /app-store price/);
 });

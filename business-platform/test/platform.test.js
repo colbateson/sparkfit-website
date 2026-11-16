@@ -2,15 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { priceAnnual, TIERS } from '../src/pricing.js';
-import { normaliseSubscriptionStatus, verifyStripeWebhook } from '../src/stripe.js';
+import { createCheckoutSession, normaliseSubscriptionStatus, stripeSubscriptionIdFromInvoice, verifyStripeWebhook } from '../src/stripe.js';
 import { revenueCatPolicy } from '../src/revenuecat.js';
-import { normaliseWebsite } from '../src/lib.js';
+import { normaliseWebsite, verifyTurnstile } from '../src/lib.js';
+import platform from '../src/index.js';
 
 const schema = readFileSync(new URL('../migrations/0001_init.sql', import.meta.url), 'utf8');
 const lifecycleSchema = readFileSync(new URL('../migrations/0002_lifecycle_and_webhook_state.sql', import.meta.url), 'utf8');
 const emailActivationSchema = readFileSync(new URL('../migrations/0003_verified_email_activation.sql', import.meta.url), 'utf8');
 const rateLimitSchema = readFileSync(new URL('../migrations/0004_rate_limits.sql', import.meta.url), 'utf8');
 const appAccountSchema = readFileSync(new URL('../migrations/0005_app_accounts.sql', import.meta.url), 'utf8');
+const stripeResilienceSchema = readFileSync(new URL('../migrations/0006_stripe_resilience.sql', import.meta.url), 'utf8');
 const worker = readFileSync(new URL('../src/index.js', import.meta.url), 'utf8');
 const config = readFileSync(new URL('../wrangler.toml', import.meta.url), 'utf8');
 const commonClient = readFileSync(new URL('../public/common.js', import.meta.url), 'utf8');
@@ -49,6 +51,9 @@ test('verifies Stripe webhook HMAC and rejects altered payloads', async () => {
     .map((byte) => byte.toString(16).padStart(2, '0')).join('');
   assert.equal(await verifyStripeWebhook(body, `t=${timestamp},v1=${signature}`, secret), true);
   assert.equal(await verifyStripeWebhook(`${body}x`, `t=${timestamp},v1=${signature}`, secret), false);
+  assert.equal(await verifyStripeWebhook(body, `t=${timestamp},v1=${signature},v1=old-signature`, secret), true);
+  assert.equal(await verifyStripeWebhook(body, `t=NaN,v1=${signature}`, secret), false);
+  assert.equal(await verifyStripeWebhook(body, `t=${timestamp - 600},v1=${signature}`, secret), false);
 });
 
 test('maps Stripe subscription states without granting on a success page', () => {
@@ -57,6 +62,55 @@ test('maps Stripe subscription states without granting on a success page', () =>
   assert.equal(normaliseSubscriptionStatus('canceled'), 'ended');
   assert.match(worker, /checkout\.session\.completed/);
   assert.match(worker, /customer\.subscription\./);
+  assert.match(worker, /checkout\.session\.async_payment_succeeded/);
+  assert.match(worker, /charge\.dispute\.created/);
+  assert.match(worker, /radar\.early_fraud_warning\.created/);
+});
+
+test('creates tax-aware annual Checkout with a pinned API version and idempotency', async () => {
+  const originalFetch = globalThis.fetch;
+  let request;
+  globalThis.fetch = async (url, options) => {
+    request = { url, options };
+    return new Response(JSON.stringify({ id: 'cs_test', url: 'https://checkout.stripe.com/test' }), { status: 200 });
+  };
+  try {
+    await createCheckoutSession({ PAYMENTS_ENABLED: 'true', STRIPE_SECRET_KEY: 'sk_test_only' }, {
+      id: 'ord_test', billing_email: 'billing@example.com', seats: 20, unit_amount_ex_vat: 1666, pricing_version: 'annual-v1-preview',
+    }, 'https://example.com/success', 'https://example.com/cancel');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+  const body = new URLSearchParams(request.options.body);
+  assert.equal(request.options.headers['Stripe-Version'], '2026-10-28.endive');
+  assert.equal(request.options.headers['Idempotency-Key'], 'checkout-ord_test');
+  assert.equal(body.get('automatic_tax[enabled]'), 'false');
+  assert.equal(body.get('tax_id_collection[enabled]'), 'true');
+  assert.equal(body.get('line_items[0][price_data][tax_behavior]'), 'exclusive');
+  assert.equal(body.get('line_items[0][price_data][product_data][tax_code]'), 'txcd_10103101');
+  assert.equal(body.has('payment_method_types'), false);
+});
+
+test('reads subscription identifiers from current and legacy invoice shapes', () => {
+  assert.equal(stripeSubscriptionIdFromInvoice({ subscription: 'sub_legacy' }), 'sub_legacy');
+  assert.equal(stripeSubscriptionIdFromInvoice({ parent: { subscription_details: { subscription: 'sub_current' } } }), 'sub_current');
+});
+
+test('disabled purchasing and missing Turnstile token reject before order writes', async () => {
+  let writes = 0;
+  const env = {
+    PAYMENTS_ENABLED: 'false',
+    RATE_LIMITING_ENABLED: 'false',
+    TURNSTILE_REQUIRED: 'true',
+    DB: { prepare() { writes += 1; throw new Error('Unexpected database write'); } },
+  };
+  const request = () => new Request('https://staging.example.com/v1/checkout/sessions', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}',
+  });
+  assert.equal((await platform.fetch(request(), env)).status, 503);
+  env.PAYMENTS_ENABLED = 'true';
+  assert.equal((await platform.fetch(request(), env)).status, 403);
+  assert.equal(writes, 0);
 });
 
 test('keeps consumer and employer RevenueCat sources separate', () => {
@@ -77,6 +131,9 @@ test('schema enforces core isolation, idempotency and seat controls', () => {
   assert.match(emailActivationSchema, /sparkfit_account_id/);
   assert.match(emailActivationSchema, /verified_at/);
   assert.match(lifecycleSchema, /lifecycle_notifications/);
+  assert.match(stripeResilienceSchema, /stripe_event_created/);
+  assert.match(stripeResilienceSchema, /stripe_risk_events/);
+  assert.match(stripeResilienceSchema, /grace_ends_at/);
 });
 
 test('employee activation is email-link driven and rejects client supplied RevenueCat identities', () => {
@@ -94,10 +151,12 @@ test('revocation targets the immutable stored RevenueCat mapping and preserves c
   assert.match(revenueCatPolicy.revokeRule, /Never revoke Pro/);
 });
 
-test('staging config disables external side effects by default', () => {
+test('staging integrations are enabled while production remains closed by default', () => {
+  const production = readFileSync(new URL('../wrangler.production.example.toml', import.meta.url), 'utf8');
   assert.match(config, /PAYMENTS_ENABLED = "false"/);
-  assert.match(config, /REVENUECAT_WRITES_ENABLED = "false"/);
-  assert.match(config, /EMAIL_ENABLED = "false"/);
+  assert.match(config, /REVENUECAT_WRITES_ENABLED = "true"/);
+  assert.match(config, /EMAIL_ENABLED = "true"/);
+  for (const flag of ['PAYMENTS_ENABLED', 'REVENUECAT_WRITES_ENABLED', 'EMAIL_ENABLED']) assert.match(production, new RegExp(`${flag} = "false"`));
   assert.doesNotMatch(`${worker}\n${schema}`, /sk_live_|whsec_[A-Za-z0-9]/);
 });
 
@@ -105,10 +164,26 @@ test('protects public routes with configurable Turnstile and persisted rate limi
   assert.match(rateLimitSchema, /CREATE TABLE IF NOT EXISTS api_rate_limits/);
   for (const scope of ['pilot_application', 'sign_in_request', 'employee_activation', 'checkout_creation']) assert.match(worker, new RegExp(scope));
   assert.match(config, /RATE_LIMITING_ENABLED = "true"/);
-  assert.match(config, /TURNSTILE_REQUIRED = "false"/);
+  assert.match(config, /TURNSTILE_REQUIRED = "true"/);
   assert.match(commonClient, /challenges\.cloudflare\.com\/turnstile/);
   assert.match(pilotClient, /turnstileToken/);
   assert.match(buyClient, /turnstileToken/);
+});
+
+test('Turnstile requires a successful token for the intended hostname and action', async () => {
+  const originalFetch = globalThis.fetch;
+  const env = { TURNSTILE_REQUIRED: 'true', TURNSTILE_SECRET_KEY: 'test-secret', TURNSTILE_ALLOWED_HOSTNAMES: 'business.example.com' };
+  const request = new Request('https://business.example.com/v1/pilot-applications');
+  let result = { success: true, hostname: 'business.example.com', action: 'pilot_application' };
+  globalThis.fetch = async () => Response.json(result);
+  try {
+    assert.equal(await verifyTurnstile(request, env, 'test-token', 'pilot_application'), true);
+    assert.equal(await verifyTurnstile(request, env, 'test-token', 'checkout_creation'), false);
+    result = { ...result, hostname: 'different.example.com' };
+    assert.equal(await verifyTurnstile(request, env, 'test-token', 'pilot_application'), false);
+    result = { ...result, hostname: 'business.example.com', success: false };
+    assert.equal(await verifyTurnstile(request, env, 'test-token', 'pilot_application'), false);
+  } finally { globalThis.fetch = originalFetch; }
 });
 
 test('supports verified app accounts with stable server-issued RevenueCat identity', () => {

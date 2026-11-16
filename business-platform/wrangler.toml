@@ -13,18 +13,36 @@ enabled = true
 
 [vars]
 ENVIRONMENT = "staging"
+SERVICE_ORIGIN = "https://sparkfit-business-platform-staging.colbateson.workers.dev"
 PUBLIC_APP_ORIGIN = "https://spark-fit.com"
 PILOT_DEFAULT_DAYS = "30"
 PILOT_MAX_SEATS = "20"
 PAYMENTS_ENABLED = "false"
-REVENUECAT_WRITES_ENABLED = "false"
-EMAIL_ENABLED = "false"
-TURNSTILE_REQUIRED = "false"
-TURNSTILE_SITE_KEY = ""
+STRIPE_API_VERSION = "2026-10-28.endive"
+STRIPE_PRODUCT_ID = "prod_VdSiz9mECAEbw3"
+STRIPE_AUTOMATIC_TAX_ENABLED = "false"
+STRIPE_PORTAL_CONFIGURATION_ID = "bpc_1Uc7312SRn2PAsMsKTgnOiqM"
+STRIPE_PRODUCT_TAX_CODE = "txcd_10103101"
+REVENUECAT_WRITES_ENABLED = "true"
+REVENUECAT_PROJECT_ID = "proj6f23ac58"
+REVENUECAT_BUSINESS_ENTITLEMENT_ID = "entl736559a420"
+EMAIL_ENABLED = "true"
+STAGING_EMAIL_ALLOWLIST = "partnerships@spark-fit.com"
+EMAIL_FROM = "SparkFit Partnerships <partnerships@mail.spark-fit.com>"
+EMAIL_REPLY_TO = "partnerships@spark-fit.com"
+PARTNERSHIPS_EMAIL = "partnerships@spark-fit.com"
+TURNSTILE_REQUIRED = "true"
+TURNSTILE_SITE_KEY = "0x4AAAAAAGCgtp7XL2gnTxR4"
+TURNSTILE_ALLOWED_HOSTNAMES = "sparkfit-business-platform-staging.colbateson.workers.dev,business-staging.spark-fit.com"
+
 RATE_LIMITING_ENABLED = "true"
-REQUIRE_APP_ACCOUNT_FOR_BUSINESS = "false"
-ADMIN_EMAILS = ""
+REQUIRE_APP_ACCOUNT_FOR_BUSINESS = "true"
+ADMIN_EMAILS = "partnerships@spark-fit.com"
 PRICING_VERSION = "annual-v1-preview"
+
+[[routes]]
+pattern = "business-staging.spark-fit.com"
+custom_domain = true
 
 [[d1_databases]]
 binding = "DB"
@@ -33,4 +51,4 @@ database_id = "916e9abf-845e-46e0-b395-b36e4b55c03d"
 migrations_dir = "migrations"
 
 [triggers]
-crons = ["15 8 * * *"]
+crons = ["*/5 * * * *"]

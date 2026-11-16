@@ -14,6 +14,11 @@ enabled = true
 [vars]
 ENVIRONMENT = "production"
 PUBLIC_APP_ORIGIN = "https://business.spark-fit.com"
+SERVICE_ORIGIN = "https://business.spark-fit.com"
+STRIPE_AUTOMATIC_TAX_ENABLED = "false"
+STRIPE_API_VERSION = "2026-10-28.endive"
+STRIPE_PRODUCT_ID = "replace_with_live_product_id"
+STRIPE_PORTAL_CONFIGURATION_ID = "replace_with_live_portal_configuration_id"
 PILOT_DEFAULT_DAYS = "30"
 PILOT_MAX_SEATS = "20"
 PAYMENTS_ENABLED = "false"
@@ -38,4 +43,4 @@ database_id = "replace_with_production_d1_database_id"
 migrations_dir = "migrations"
 
 [triggers]
-crons = ["15 8 * * *"]
+crons = ["*/5 * * * *"]

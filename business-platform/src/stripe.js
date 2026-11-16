@@ -1,4 +1,5 @@
 import { HttpError } from './lib.js';
+import { priceAnnual } from './pricing.js';
 
 const encoder = new TextEncoder();
 
@@ -8,13 +9,19 @@ function formEncode(entries) {
   return params.toString();
 }
 
-async function stripeRequest(env, path, values) {
-  if (env.PAYMENTS_ENABLED !== 'true') throw new HttpError(503, 'Online purchasing is not enabled in this environment.');
+async function stripeRequest(env, path, values, options = {}) {
   if (!env.STRIPE_SECRET_KEY) throw new Error('Stripe is not configured.');
+  if (env.ENVIRONMENT === 'staging' && !/^(sk|rk)_test_/.test(env.STRIPE_SECRET_KEY)) throw new Error('Staging requires a Stripe test-mode key.');
+  const headers = {
+    Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
+    'Content-Type': 'application/x-www-form-urlencoded',
+    'Stripe-Version': env.STRIPE_API_VERSION || '2026-10-28.endive',
+  };
+  if (options.idempotencyKey) headers['Idempotency-Key'] = options.idempotencyKey;
   const response = await fetch(`https://api.stripe.com/v1${path}`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`, 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: formEncode(values),
+    method: options.method || 'POST',
+    headers,
+    body: options.method === 'GET' ? undefined : formEncode(values),
   });
   const payload = await response.json();
   if (!response.ok) throw new HttpError(502, payload?.error?.message || `Stripe returned ${response.status}.`);
@@ -22,19 +29,23 @@ async function stripeRequest(env, path, values) {
 }
 
 export function createCheckoutSession(env, order, successUrl, cancelUrl) {
+  if (env.PAYMENTS_ENABLED !== 'true') throw new HttpError(503, 'Online purchasing is not enabled in this environment.');
   return stripeRequest(env, '/checkout/sessions', {
     mode: 'subscription',
+    'managed_payments[enabled]': 'false',
     customer_email: order.billing_email,
     client_reference_id: order.id,
     success_url: successUrl,
     cancel_url: cancelUrl,
-    'automatic_tax[enabled]': 'true',
-    'customer_update[name]': 'auto',
-    'customer_update[address]': 'auto',
+    'automatic_tax[enabled]': env.STRIPE_AUTOMATIC_TAX_ENABLED === 'true' ? 'true' : 'false',
     'billing_address_collection': 'required',
+    'tax_id_collection[enabled]': 'true',
     'line_items[0][price_data][currency]': 'gbp',
-    'line_items[0][price_data][product_data][name]': 'SparkFit Annual Employer Subscription',
-    'line_items[0][price_data][product_data][metadata][pricing_version]': order.pricing_version,
+    ...(env.STRIPE_PRODUCT_ID ? { 'line_items[0][price_data][product]': env.STRIPE_PRODUCT_ID } : {
+      'line_items[0][price_data][product_data][name]': 'SparkFit Annual Employer Subscription',
+      'line_items[0][price_data][product_data][tax_code]': env.STRIPE_PRODUCT_TAX_CODE || 'txcd_10103101',
+      'line_items[0][price_data][product_data][metadata][pricing_version]': order.pricing_version,
+    }),
     'line_items[0][price_data][recurring][interval]': 'year',
     'line_items[0][price_data][tax_behavior]': 'exclusive',
     'line_items[0][price_data][unit_amount]': order.unit_amount_ex_vat,
@@ -43,26 +54,95 @@ export function createCheckoutSession(env, order, successUrl, cancelUrl) {
     'subscription_data[metadata][seats]': order.seats,
     'subscription_data[metadata][pricing_version]': order.pricing_version,
     'metadata[order_id]': order.id,
-  });
+    integration_identifier: `sparkfit_business_${order.id.slice(-8).split('').map((letter) => String.fromCharCode(97 + letter.charCodeAt(0) % 26)).join('')}`,
+  }, { idempotencyKey: `checkout-${order.id}` });
 }
 
 export function createBillingPortalSession(env, customerId, returnUrl) {
   return stripeRequest(env, '/billing_portal/sessions', {
     customer: customerId,
+    configuration: env.STRIPE_PORTAL_CONFIGURATION_ID,
     return_url: returnUrl,
   });
 }
 
-export function updateSubscriptionQuantity(env, itemId, seats) {
-  return stripeRequest(env, `/subscription_items/${encodeURIComponent(itemId)}`, {
-    quantity: seats,
-    proration_behavior: 'create_prorations',
+async function annualPrice(env, product, seats) {
+  const amount = priceAnnual(seats).unitExVat;
+  return stripeRequest(env, '/prices', { currency: 'gbp', product, unit_amount: amount,
+    tax_behavior: 'exclusive', 'recurring[interval]': 'year' }, { idempotencyKey: `annual-price-${product}-${amount}` });
+}
+
+export async function updateSubscriptionQuantity(env, itemId, seats) {
+  const item = await retrieveStripeResource(env, `/subscription_items/${encodeURIComponent(itemId)}`);
+  const subscription = await retrieveStripeResource(env, `/subscriptions/${encodeURIComponent(item.subscription)}`);
+  if (subscription.pending_update) throw new HttpError(409, 'Complete the pending payment before changing seats again.');
+  if (subscription.cancel_at_period_end) throw new HttpError(409, 'Resume the subscription before changing seats.');
+  if (subscription.schedule) {
+    const scheduleId = typeof subscription.schedule === 'string' ? subscription.schedule : subscription.schedule.id;
+    await stripeRequest(env, `/subscription_schedules/${encodeURIComponent(scheduleId)}/release`, {});
+  }
+  const price = await annualPrice(env, item.price.product, seats);
+  return stripeRequest(env, `/subscriptions/${encodeURIComponent(subscription.id)}`, {
+    'items[0][id]': itemId, 'items[0][quantity]': seats, 'items[0][price]': price.id,
+    payment_behavior: 'pending_if_incomplete', proration_behavior: 'always_invoice',
   });
 }
 
+export function retrieveStripeResource(env, path) {
+  return stripeRequest(env, path, {}, { method: 'GET' });
+}
+
+export async function scheduleSubscriptionQuantity(env, subscriptionId, seats) {
+  const subscription = await retrieveStripeResource(env, `/subscriptions/${encodeURIComponent(subscriptionId)}`);
+  if (subscription.pending_update) throw new HttpError(409, 'Complete the pending payment before changing seats again.');
+  if (subscription.cancel_at_period_end) throw new HttpError(409, 'Resume the subscription before scheduling a seat change.');
+  let schedule;
+  if (subscription.schedule) {
+    const scheduleId = typeof subscription.schedule === 'string' ? subscription.schedule : subscription.schedule.id;
+    schedule = await retrieveStripeResource(env, `/subscription_schedules/${encodeURIComponent(scheduleId)}`);
+  } else {
+    schedule = await stripeRequest(env, '/subscription_schedules', { from_subscription: subscriptionId }, {
+      idempotencyKey: `seat-reduction-schedule-${subscriptionId}-${seats}`,
+    });
+  }
+  const now = Math.floor(Date.now() / 1000);
+  const current = schedule.phases?.find((phase) => phase.start_date <= now && phase.end_date > now) || schedule.phases?.[0];
+  const item = current?.items?.[0];
+  const priceId = typeof item?.price === 'string' ? item.price : item?.price?.id;
+  if (!current?.start_date || !current?.end_date || !priceId) throw new Error('Stripe did not return a schedulable subscription phase.');
+  const subscriptionItem = subscription.items.data[0];
+  const nextPrice = await annualPrice(env, subscriptionItem.price.product, seats);
+  return stripeRequest(env, `/subscription_schedules/${encodeURIComponent(schedule.id)}`, {
+    end_behavior: 'release',
+    'phases[0][start_date]': current.start_date,
+    'phases[0][end_date]': current.end_date,
+    'phases[0][items][0][price]': priceId,
+    'phases[0][items][0][quantity]': item.quantity,
+    'phases[0][proration_behavior]': 'none',
+    'phases[1][start_date]': current.end_date,
+    'phases[0][automatic_tax][enabled]': subscription.automatic_tax?.enabled ? 'true' : 'false',
+    'phases[1][items][0][price]': nextPrice.id,
+    'phases[1][items][0][quantity]': seats,
+    'phases[1][duration][interval]': 'year',
+    'phases[1][duration][interval_count]': 1,
+    'phases[1][automatic_tax][enabled]': subscription.automatic_tax?.enabled ? 'true' : 'false',
+    'phases[1][proration_behavior]': 'none',
+  });
+}
+
+export function stripeSubscriptionIdFromInvoice(invoice) {
+  return invoice?.subscription
+    || invoice?.parent?.subscription_details?.subscription
+    || invoice?.lines?.data?.find((line) => line.parent?.subscription_item_details)?.parent?.subscription_item_details?.subscription
+    || null;
+}
+
 function parseSignature(header) {
-  const values = Object.fromEntries(String(header || '').split(',').map((part) => part.split('=').map((item) => item.trim())));
-  return { timestamp: Number(values.t), signature: values.v1 || '' };
+  const parts = String(header || '').split(',').map((part) => part.trim().split('='));
+  return {
+    timestamp: Number(parts.find(([name]) => name === 't')?.[1]),
+    signatures: parts.filter(([name]) => name === 'v1').map(([, value]) => value),
+  };
 }
 
 function hex(buffer) { return [...new Uint8Array(buffer)].map((byte) => byte.toString(16).padStart(2, '0')).join(''); }
@@ -76,11 +156,11 @@ function constantTimeEqual(a, b) {
 
 export async function verifyStripeWebhook(rawBody, signatureHeader, secret, toleranceSeconds = 300) {
   if (!secret) throw new Error('Stripe webhook secret is not configured.');
-  const { timestamp, signature } = parseSignature(signatureHeader);
-  if (!timestamp || !signature || Math.abs(Date.now() / 1000 - timestamp) > toleranceSeconds) return false;
+  const { timestamp, signatures } = parseSignature(signatureHeader);
+  if (!Number.isFinite(timestamp) || !timestamp || !signatures.length || Math.abs(Date.now() / 1000 - timestamp) > toleranceSeconds) return false;
   const key = await crypto.subtle.importKey('raw', encoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
   const expected = hex(await crypto.subtle.sign('HMAC', key, encoder.encode(`${timestamp}.${rawBody}`)));
-  return constantTimeEqual(expected, signature);
+  return signatures.some((signature) => constantTimeEqual(expected, signature));
 }
 
 export function normaliseSubscriptionStatus(status) {

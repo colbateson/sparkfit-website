@@ -114,19 +114,19 @@
     setText('[data-result-seats]', plan.seats.toLocaleString('en-GB'));
     setText('[data-result-discount]', plan.discountLabel);
     setText('[data-direct-price]', pricingApi.formatPounds(values.directPerSeat));
-    setText('[data-direct-price-label]', `Per employee, ${values.vatLabel}`);
+    setText('[data-direct-price-label]', 'Per employee, App Store or Google Play');
     setText('[data-direct-total]', pricingApi.formatPounds(values.directTotal));
     setText('[data-direct-per-seat]', pricingApi.formatPounds(values.directPerSeat));
-    setText('[data-direct-total-label]', `Direct individual purchasing, ${values.vatLabel}`);
+    setText('[data-direct-total-label]', 'Direct App Store or Google Play purchasing');
     setText('[data-employer-total]', pricingApi.formatPounds(values.employerTotal));
     setText('[data-employer-total-label]', `Employer annual subscription, ${values.vatLabel}`);
     setText('[data-saving]', pricingApi.formatPounds(values.saving));
-    setText('[data-saving-label]', `Annual saving, ${values.vatLabel}`);
+    setText('[data-saving-label]', 'Annual saving against direct purchasing');
     setText('[data-monthly-per-seat]', pricingApi.formatPounds(values.employerMonthlyPerSeat));
     setText('[data-monthly-total]', pricingApi.formatPounds(values.employerMonthlyTotal));
     if (priceNote) {
       const approval = plan.provisional ? ' This provisional 501 to 1,000 seat extension requires commercial approval.' : '';
-      priceNote.textContent = `${plan.seats.toLocaleString('en-GB')} annual employee licences with a ${plan.discountLabel} volume discount. Prices are shown ${values.vatLabel}.${approval}`;
+      priceNote.textContent = `${plan.seats.toLocaleString('en-GB')} annual employee licences with a ${plan.discountLabel} discount from the £20.83 business base price. No VAT is charged.${approval}`;
     }
     renderPackages();
   };

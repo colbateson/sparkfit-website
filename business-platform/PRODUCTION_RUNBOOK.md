@@ -2,6 +2,8 @@
 
 This is the ordered implementation and launch guide for SparkFit Business. Follow it from top to bottom. Do not enable payments, outgoing email or RevenueCat writes until the relevant acceptance gate says it is safe.
 
+For the latest completed configuration, CLI recovery instructions and outstanding integration checks, read [STAGING_SETUP_STATUS.md](./STAGING_SETUP_STATUS.md) first. Code implemented behind a flag is not a completed end-to-end test.
+
 ## 1. Current position
 
 The following foundation is complete on the staging branch:
@@ -14,9 +16,9 @@ The following foundation is complete on the staging branch:
 - Activation reporting without personal app usage reporting.
 - Employee removal and seat recovery.
 - Separate employer entitlement ledger and audit history.
-- RevenueCat grant, revoke and reconciliation integration behind a disabled flag.
+- RevenueCat grant, revoke and reconciliation tested with staging writes; production remains disabled.
 - Stripe annual checkout, webhook and Customer Portal integration behind a disabled flag.
-- Lifecycle email queue behind a disabled flag.
+- Lifecycle email queue enabled for the monitored staging allowlist; production remains disabled.
 - Daily pilot expiry and reminder processing.
 - Cloudflare D1 migrations and staging Worker deployment.
 
@@ -57,7 +59,7 @@ TURNSTILE_REQUIRED=false
 - Agree final commercial terms, VAT wording, refunds, cancellation rules, payment-failure grace period and renewal wording.
 - Configure Stripe in test mode and complete every lifecycle test in section 9.
 - Confirm the annual prices and volume tiers in `src/pricing.js` are commercially approved.
-- Decide whether a seat reduction takes effect immediately or at renewal. The current implementation sends the requested subscription item quantity to Stripe.
+- Test the proposed renewal-only seat reduction schedule against a real Stripe test subscription. Confirm that increases, scheduled changes and cancellation interact correctly before launch.
 
 ### Required before production data is retained
 
@@ -268,9 +270,9 @@ npx wrangler secret put TURNSTILE_SECRET_KEY
 
 Add Cloudflare rate limiting for at least:
 
-- `POST /api/pilot-applications`
-- `POST /api/checkout`
-- `POST /api/auth/request-link`
+- `POST /v1/pilot-applications`
+- `POST /v1/checkout/sessions`
+- `POST /v1/auth/request`
 - Invitation activation requests
 
 Start with conservative per-IP limits and log blocked requests. Ensure shared company networks are not permanently locked out. Test the configured limits before production.
@@ -293,7 +295,7 @@ Complete this section in Stripe test mode first.
 ### Stripe account configuration
 
 1. Confirm the SparkFit legal entity and bank details.
-2. Enable Stripe Tax or approve an alternative tax calculation process.
+2. Keep automatic tax disabled while SparkFit is not VAT registered. No VAT is charged. Review registrations before changing that status.
 3. Configure the Customer Portal for payment method changes, invoices and the approved cancellation policy.
 4. Confirm customer emails and invoice branding.
 5. Confirm the statement descriptor and support contact.
@@ -313,11 +315,16 @@ Create the webhook endpoint using the staging hostname and subscribe to:
 
 ```text
 checkout.session.completed
+checkout.session.async_payment_succeeded
+checkout.session.async_payment_failed
 invoice.paid
 invoice.payment_failed
 customer.subscription.created
 customer.subscription.updated
 customer.subscription.deleted
+charge.dispute.created
+charge.refunded
+radar.early_fraud_warning.created
 ```
 
 Keep `PAYMENTS_ENABLED=false` until the webhook endpoint verifies successfully.
@@ -331,7 +338,7 @@ Test every item:
 3. Purchase 500 seats.
 4. Confirm a request above 500 routes to Partnerships instead of checkout.
 5. Confirm the displayed guide price matches the server-created Stripe line item.
-6. Confirm VAT is calculated and displayed correctly.
+6. Confirm no VAT is added while SparkFit is not VAT registered and the displayed price matches the invoice.
 7. Complete a successful payment.
 8. Confirm the organisation and subscription are created once.
 9. Replay the same webhook and confirm it is idempotent.
@@ -411,6 +418,7 @@ npx wrangler d1 migrations apply sparkfit-business-production --remote --config 
 ```sh
 npx wrangler secret put ADMIN_API_TOKEN --config wrangler.production.toml
 npx wrangler secret put RESEND_API_KEY --config wrangler.production.toml
+npx wrangler secret put RESEND_WEBHOOK_SECRET --config wrangler.production.toml
 npx wrangler secret put STRIPE_SECRET_KEY --config wrangler.production.toml
 npx wrangler secret put STRIPE_WEBHOOK_SECRET --config wrangler.production.toml
 npx wrangler secret put REVENUECAT_SECRET_KEY --config wrangler.production.toml

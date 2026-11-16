@@ -1,0 +1,22 @@
+{
+  "runId": "template_7b95f5c64d264954b70b26e2b51bdc75",
+  "startedAt": "2026-11-16T07:01:08.327Z",
+  "templatesQueued": [
+    "appEmailVerification",
+    "pilotReceived",
+    "pilotAdmin",
+    "pilotApproved",
+    "employeeInvite",
+    "employeeInviteReminder",
+    "pilotExpiring",
+    "pilotExpired",
+    "paymentSuccessful",
+    "paymentFailed",
+    "subscriptionCancelled",
+    "stripeRiskAlert"
+  ],
+  "recipient": "partnerships@spark-fit.com",
+  "placementVerified": false,
+  "providerConfirmedDelivered": 12,
+  "deliveryVerification": "All 12 preview outbox records have delivered status from signed Resend callbacks, with one send attempt each. Inbox or spam placement requires mailbox-owner review."
+}

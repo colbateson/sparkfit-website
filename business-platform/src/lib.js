@@ -53,7 +53,9 @@ export async function parseJson(request, limit = 30000) {
   if (!(request.headers.get('Content-Type') || '').toLowerCase().includes('application/json')) throw new HttpError(415, 'JSON is required.');
   const length = Number(request.headers.get('Content-Length') || 0);
   if (length > limit) throw new HttpError(413, 'Request is too large.');
-  try { return await request.json(); } catch { throw new HttpError(400, 'Invalid JSON.'); }
+  const raw = await request.text();
+  if (encoder.encode(raw).length > limit) throw new HttpError(413, 'Request is too large.');
+  try { return JSON.parse(raw); } catch { throw new HttpError(400, 'Invalid JSON.'); }
 }
 
 export class HttpError extends Error {
@@ -73,7 +75,7 @@ export function corsHeaders(request, env) {
   };
 }
 
-export async function verifyTurnstile(request, env, token) {
+export async function verifyTurnstile(request, env, token, expectedAction) {
   if (env.TURNSTILE_REQUIRED !== 'true') return true;
   if (!env.TURNSTILE_SECRET_KEY || !token) return false;
   const body = new FormData();
@@ -83,7 +85,9 @@ export async function verifyTurnstile(request, env, token) {
   if (ip) body.append('remoteip', ip);
   const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body });
   if (!response.ok) return false;
-  return (await response.json()).success === true;
+  const result = await response.json();
+  const allowed = new Set(String(env.TURNSTILE_ALLOWED_HOSTNAMES || new URL(request.url).hostname).split(',').map((value) => value.trim()));
+  return result.success === true && allowed.has(result.hostname) && (!expectedAction || result.action === expectedAction);
 }
 
 export async function enforceRateLimit(request, env, scope, limit, periodSeconds = 60) {
