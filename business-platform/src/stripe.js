@@ -28,8 +28,8 @@ async function stripeRequest(env, path, values, options = {}) {
   return payload;
 }
 
-export function createCheckoutSession(env, order, successUrl, cancelUrl, { allowWhenPaymentsDisabled = false } = {}) {
-  if (env.PAYMENTS_ENABLED !== 'true' && !allowWhenPaymentsDisabled) throw new HttpError(503, 'Online purchasing is not enabled in this environment.');
+export function createCheckoutSession(env, order, successUrl, cancelUrl) {
+  if (env.PAYMENTS_ENABLED !== 'true') throw new HttpError(503, 'Online purchasing is not enabled in this environment.');
   const managedPayments = env.STRIPE_MANAGED_PAYMENTS_ENABLED === 'true';
   return stripeRequest(env, '/checkout/sessions', {
     mode: 'subscription',

@@ -154,43 +154,6 @@ async function adminDashboard(request, env) {
   return json({ applications: applicationCounts.results || [], organisations: organisationCounts.results || [], organisationOverview: organisationOverview.results || [], seats, paid, failedProvisioning: Number(failed?.count || 0), audits: audits.results || [] });
 }
 
-async function prepareFirstLiveCheckout(request, env) {
-  if (env.ENVIRONMENT !== 'production' || env.LAUNCH_ENABLED === 'true' || env.FIRST_LIVE_CHECKOUT_ENABLED !== 'true') {
-    throw new HttpError(404, 'This checkout preparation page is unavailable.');
-  }
-  const actor = await requireSession(request, env, ['sparkfit_admin']);
-  await enforceRateLimit(request, env, 'admin_first_live_checkout', 2, 3600);
-  const existing = await env.DB.prepare(`SELECT * FROM checkout_orders WHERE request_key = 'production-first-live-checkout-v1'`).first();
-  if (existing?.stripe_checkout_session_id) {
-    const session = await retrieveStripeResource(env, `/checkout/sessions/${encodeURIComponent(existing.stripe_checkout_session_id)}`);
-    if (session.status === 'open') return json({ checkoutUrl: session.url, orderId: existing.id, reused: true });
-    throw new HttpError(409, 'The first live Checkout has already been completed or expired. Review Stripe before creating another.');
-  }
-  const price = priceAnnual(20);
-  const order = existing || {
-    id: id('ord'), company_name: 'SparkFit', company_website: 'https://spark-fit.com/',
-    billing_email: 'partnerships@spark-fit.com', contact_name: 'SparkFit Partnerships', seats: 20,
-    unit_amount_ex_vat: price.unitExVat, subtotal_ex_vat: price.subtotalExVat,
-    discount_bps: price.discountBps, pricing_version: price.pricingVersion,
-  };
-  const now = nowIso();
-  if (!existing) {
-    await env.DB.prepare(`INSERT INTO checkout_orders
-      (id, company_name, company_website, billing_email, contact_name, seats, unit_amount_ex_vat, subtotal_ex_vat, discount_bps, pricing_version, created_at, updated_at, request_key)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'production-first-live-checkout-v1')`)
-      .bind(order.id, order.company_name, order.company_website, order.billing_email, order.contact_name, order.seats,
-        order.unit_amount_ex_vat, order.subtotal_ex_vat, order.discount_bps, order.pricing_version, now, now).run();
-    await audit(env.DB, actor, 'billing.first_live_checkout.prepared', 'checkout_order', order.id, null,
-      { seats: order.seats, subtotalExVat: order.subtotal_ex_vat, discountBps: order.discount_bps });
-  }
-  const session = await createCheckoutSession(env, order,
-    `${serviceOrigin(request)}/checkout-success/?session_id={CHECKOUT_SESSION_ID}`,
-    `${serviceOrigin(request)}/buy/?seats=${order.seats}`, { allowWhenPaymentsDisabled: true });
-  await env.DB.prepare(`UPDATE checkout_orders SET stripe_checkout_session_id = ?, status = 'checkout_created', updated_at = ? WHERE id = ?`)
-    .bind(session.id, nowIso(), order.id).run();
-  return json({ checkoutUrl: session.url, orderId: order.id, reused: false });
-}
-
 async function listPilots(request, env) {
   await requireSession(request, env, ['sparkfit_admin']);
   const rows = await env.DB.prepare(`SELECT * FROM pilot_applications ORDER BY created_at DESC LIMIT 200`).all();
@@ -781,7 +744,6 @@ async function route(request, env) {
   if (['GET', 'POST'].includes(request.method) && path === '/v1/auth/consume') return consumeSignIn(request, env);
   if (request.method === 'GET' && path === '/v1/admin/pilot-applications') return listPilots(request, env);
   if (request.method === 'GET' && path === '/v1/admin/dashboard') return adminDashboard(request, env);
-  if (request.method === 'POST' && path === '/v1/admin/first-live-checkout') return prepareFirstLiveCheckout(request, env);
   const pilotMatch = path.match(/^\/v1\/admin\/pilot-applications\/([^/]+)\/decision$/);
   if (request.method === 'POST' && pilotMatch) return decidePilot(request, env, pilotMatch[1]);
   const organisationActionMatch = path.match(/^\/v1\/admin\/organisations\/([^/]+)\/action$/);

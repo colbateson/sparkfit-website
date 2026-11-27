@@ -387,13 +387,13 @@ The production Turnstile hostname and keys, live Stripe product/price and restri
 Complete the remaining acceptance work in this order while keeping the customer launch gate closed:
 
 1. Verify the public config, required environment bindings and secret names without displaying secret values.
-2. Perform the controlled production email send and delivery/failure callback check described in section 7.
-3. Live product category, annual price, 20–500 server-validated quantity, Smart Retry settings, overdue handling, Customer Portal cancellation/payment/invoice options, invoice PDF/brand colours and 11-event webhook coverage have been verified. Add the published terms/privacy URLs in Stripe settings, inspect the live Checkout tax and total for the chosen buyer, and have the account owner complete the first paid order.
-4. After verification, prepare Checkout for the actual first purchasing organisation. The account owner must review and submit the payment on Stripe-hosted Checkout; the agent must not submit the charge.
-5. Release and acceptance-test the mobile UUID and Business entitlement changes on iOS and Android.
-6. Perform a controlled internal live purchase and employee grant/removal only after mobile release. The account owner must complete the first real Stripe Checkout payment.
-7. Enable customer launch, payments and RevenueCat writes only after the owner has completed the first Checkout and the mobile app is released with employee identity support. Email stays enabled for approved transactional routes. Enable retention only after the privacy notice is published and verify the first scheduled retention run.
-8. Update public business website links to production, then monitor webhooks, email delivery, billing and entitlement reconciliation.
+2. Successful production email delivery and its signed delivered callback are confirmed. Review spam placement and provider-supported failed, bounced and complained message scenarios.
+3. Live product category, annual price, 20–500 server-validated quantity, Smart Retry settings, overdue handling, Customer Portal cancellation/payment/invoice options, invoice PDF/brand colours and 11-event webhook coverage have been verified. The approved Terms and Privacy URLs are published and linked in Stripe.
+4. A live Stripe Checkout is prepared for SparkFit, 20 seats, billing contact `partnerships@spark-fit.com`. The displayed amount is £333.20/year before applicable tax (£16.66 per seat); Checkout calculates tax after the buyer enters the billing address. The owner must review the final tax-inclusive amount and recurring terms, then submit the payment. The agent must not submit the charge.
+5. Release and acceptance-test the mobile UUID and Business entitlement changes on iOS and Android. This release is owned by SparkFit.
+6. Perform a controlled internal employee grant/removal only after mobile release. Verify reconciliation and preservation of personal Pro/Trial access.
+7. Enable customer launch, payments and RevenueCat writes only after the owner has completed the first Checkout and the mobile app is released with employee identity support. Approved transactional email and the approved retention policy are enabled; verify the scheduled retention run.
+8. The business website legal links are live. After the acceptance gate is met, open public routes and monitor webhooks, email delivery, billing and entitlement reconciliation.
 
 ## 12. Production launch order
 
@@ -433,17 +433,17 @@ If email, payment or entitlement behaviour is wrong:
 
 ## 14. Launch acceptance gate
 
-Production is ready only when every item is true:
+The public production launch gate remains closed until every required item is true:
 
-- [ ] Commercial and legal terms are approved.
-- [ ] Data retention and deletion rules are implemented.
+- [x] Commercial and legal terms are approved, published, and linked from Stripe.
+- [x] Data retention and deletion rules are implemented, approved, and enabled.
 - [ ] The exposed MyPT Stripe key has been rotated and removed from source.
 - [ ] Stable app accounts and verified email are released on iOS and Android.
 - [ ] Existing paid and trial customers migrate without losing access.
 - [ ] The app recognises the separate Business entitlement.
 - [ ] Different-email invitation linking works safely.
 - [ ] RevenueCat grant and revoke tests preserve consumer access.
-- [ ] Email domain authentication and all templates pass delivery tests.
+- [ ] Email domain authentication and all templates pass delivery tests; successful production delivery is confirmed, while spam and failure-path review remain.
 - [ ] Turnstile is present on both public forms.
 - [ ] Public API rate limiting is active.
 - [ ] Stripe test mode lifecycle tests all pass.
@@ -453,7 +453,7 @@ Production is ready only when every item is true:
 - [ ] Production secrets are stored only in Cloudflare.
 - [ ] Rollback has been rehearsed.
 - [ ] One internal live employee journey passes.
-- [ ] One approved live billing journey passes.
+- [ ] Owner completes the prepared first live billing journey after reviewing Checkout tax, total, and recurring terms.
 - [ ] The business website points only to the production hostname.
 
 ## 15. Routine operation after launch
