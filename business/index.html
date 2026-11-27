@@ -13,7 +13,7 @@
   <meta property="og:description" content="A practical employee wellbeing benefit with transparent annual subscription pricing and volume discounts for UK organisations.">
   <meta property="og:image" content="https://spark-fit.com/assets/business/screenshots/01_15_Minute_Workouts_Android_1440x2560.jpg">
   <link rel="icon" href="../icon.png" type="image/png">
-  <link rel="stylesheet" href="./business.css?v=20261127-business-production">
+  <link rel="stylesheet" href="./business.css?v=20261127-business-guide-v2">
   <script src="./pricing.js?v=20261127-business-production" defer></script>
   <script src="./business.js?v=20261127-business-production" defer></script>
   <script type="application/ld+json">
@@ -43,6 +43,7 @@
       <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation" data-nav>
         <a href="#product">Employee benefits</a>
         <a href="#options">Partnership options</a>
+        <a href="#process">How it works</a>
         <a href="#pricing">Pricing</a>
         <a href="#evidence">Evidence</a>
         <a href="#faq">FAQ</a>
@@ -421,32 +422,50 @@
       </div>
     </section>
 
-    <section class="section journey-section">
-      <div class="shell journey-grid">
-        <div class="journey-intro">
-          <p class="eyebrow"><span></span> How SparkFit Works for Your Business</p>
-          <h2>Simple for your organisation. Private for employees.</h2>
-          <p>Your organisation funds annual access. Employees activate and use their own SparkFit accounts independently.</p>
-          <div class="delivery-status">
-            <p><strong>Available now:</strong> activation instructions, employee activation and activation-status reporting.</p>
-            <p><strong>Planned:</strong> automated Stripe billing, annual renewal, seat changes and a self-service employer licence dashboard.</p>
-          </div>
-        </div>
-        <ol class="journey-list">
-          <li><span>01</span><div><h3>Choose your team size</h3><p>Select the number of employees you want to support. Your volume discount is calculated automatically.</p></div></li>
-          <li><span>02</span><div><h3>Set up your subscription</h3><p>Your business pays one annual subscription covering your selected employee licences. Until Stripe Billing is introduced, this is confirmed through the partnership enquiry process.</p></div></li>
-          <li><span>03</span><div><h3>Invite your employees</h3><p>Share secure activation instructions so employees can activate their own SparkFit Premium access without paying individually.</p></div></li>
-          <li><span>04</span><div><h3>Manage your licences</h3><p>Invite employees, track pending and active access, remove employees and reuse their seats. Request seat increases or schedule a reduction for the next renewal from the employer portal.</p></div></li>
+    <section class="section journey-section" id="process">
+      <div class="shell journey-shell">
+        <header class="journey-heading">
+          <p class="eyebrow"><span></span> How it works</p>
+          <h2>From your first click to your team using SparkFit.</h2>
+          <p>Follow the full journey through the business website, secure checkout, both business portals, the employee invitation and the SparkFit app.</p>
+        </header>
+
+        <ol class="journey-flow" aria-label="Seven steps from employer purchase to employee access">
+          <li class="journey-step">
+            <div class="journey-copy"><span class="journey-number">01</span><p class="journey-kicker">Business website</p><h3>Choose how many people to support</h3><p>Set your team size in the pricing calculator. Your annual volume price updates immediately, with applicable tax shown at checkout.</p></div>
+            <figure class="journey-window window-pricing"><div class="window-bar"><span class="window-dots"><i></i><i></i><i></i></span><span>spark-fit.com/business</span><b>01 / 07</b></div><div class="pricing-preview"><div class="preview-brand"><span class="preview-mark">ϟ</span><span>SPARKFIT <small>PARTNERSHIPS</small></span></div><div class="preview-eyebrow">ANNUAL TEAM ACCESS</div><h4>How many employees?</h4><div class="seat-picker"><span>Employee licences</span><strong>20 <small>people</small></strong></div><div class="price-preview-row"><span>Annual total before tax</span><strong>£333.20</strong></div><div class="price-preview-row muted"><span>Volume discount</span><strong>20% off</strong></div><div class="preview-button">Continue to secure checkout <span>↗</span></div></div><figcaption><span class="screen-chip">Your business website</span><span>Pricing updates as you choose seats</span></figcaption></figure>
+          </li>
+
+          <li class="journey-step is-reversed">
+            <div class="journey-copy"><span class="journey-number">02</span><p class="journey-kicker">Stripe Checkout</p><h3>Pay securely for the annual licences</h3><p>Review the organisation, seat count and recurring annual price. Stripe calculates applicable tax from the billing details and displays the final amount before payment.</p></div>
+            <figure class="journey-window window-checkout"><div class="window-bar"><span class="window-dots"><i></i><i></i><i></i></span><span>Secure checkout</span><b>02 / 07</b></div><div class="checkout-preview"><div class="checkout-brand"><span class="preview-mark">ϟ</span><strong>SparkFit Business</strong><span class="secure-lock">⌑ Secure</span></div><div class="checkout-grid"><div class="checkout-form-preview"><span class="preview-eyebrow">BILLING DETAILS</span><div class="fake-input">Business name</div><div class="fake-input">Billing email</div><div class="fake-input">Billing address</div><div class="fake-input">Payment method</div></div><div class="checkout-summary"><span class="preview-eyebrow">YOUR ORDER</span><strong>Annual employee access</strong><span>20 licences · billed annually</span><hr><div><span>Subtotal</span><b>£333.20</b></div><div><span>Tax</span><b>Calculated at checkout</b></div><p>Final total shown before you pay</p></div></div></div><figcaption><span class="screen-chip">Hosted Stripe checkout</span><span>Clear annual price and tax before payment</span></figcaption></figure>
+          </li>
+
+          <li class="journey-step">
+            <div class="journey-copy"><span class="journey-number">03</span><p class="journey-kicker">SparkFit admin · internal</p><h3>Your organisation is visible in the admin dashboard</h3><p>The SparkFit team can review organisation details, billing state, renewal timing, seat usage and provisioning issues. This private dashboard is for SparkFit staff only.</p></div>
+            <figure class="journey-window window-admin"><div class="window-bar"><span class="window-dots"><i></i><i></i><i></i></span><span>business.spark-fit.com/admin</span><b>03 / 07</b></div><div class="admin-preview"><aside class="preview-sidebar"><div class="preview-brand compact"><span class="preview-mark">ϟ</span><span>SPARKFIT <small>ADMIN</small></span></div><span class="sidebar-active">Organisations</span><span>Applications</span><span>Audit activity</span></aside><div class="admin-main"><div class="admin-heading"><div><span class="preview-eyebrow">INTERNAL DASHBOARD</span><h4>Employer partnerships</h4></div><span class="screen-chip">Private to SparkFit</span></div><div class="admin-stats"><div><small>Paid organisations</small><strong>—</strong></div><div><small>Paid seats</small><strong>—</strong></div><div><small>Renewals to review</small><strong>—</strong></div></div><div class="admin-table"><div class="admin-table-head"><span>ORGANISATION</span><span>SUBSCRIPTION</span><span>SEATS</span><span>RENEWAL</span></div><div class="admin-table-row"><strong>Organisation details</strong><span><i class="status-dot-small"></i> Live status</span><span>Active / pending</span><span>Next renewal</span></div><div class="admin-table-row"><strong>Billing contact</strong><span>Invoices</span><span>Available seats</span><span>Billing history</span></div></div></div></div><figcaption><span class="screen-chip">SparkFit admin dashboard</span><span>Operations, billing and renewal visibility</span></figcaption></figure>
+          </li>
+
+          <li class="journey-step is-reversed">
+            <div class="journey-copy"><span class="journey-number">04</span><p class="journey-kicker">Employer portal</p><h3>Sign in and see your subscription at a glance</h3><p>Your billing contact signs in with a one-time secure link. The portal shows total, active, pending and available seats, plus subscription dates and billing access.</p></div>
+            <figure class="journey-window window-portal"><div class="window-bar"><span class="window-dots"><i></i><i></i><i></i></span><span>business.spark-fit.com/portal</span><b>04 / 07</b></div><div class="portal-preview"><div class="portal-top"><div class="preview-brand compact"><span class="preview-mark">ϟ</span><span>SPARKFIT <small>EMPLOYER PORTAL</small></span></div><span class="outline-pill">Manage billing</span></div><div class="portal-title"><span class="preview-eyebrow">YOUR ORGANISATION</span><h4>SparkFit access</h4><p>Annual subscription · renews 21 Nov 2027</p></div><div class="seat-metrics"><div class="seat-metric total"><small>Total seats</small><strong>20</strong></div><div class="seat-metric"><small>Active</small><strong>1</strong></div><div class="seat-metric"><small>Pending</small><strong>1</strong></div><div class="seat-metric available"><small>Available</small><strong>18</strong></div></div><div class="privacy-strip">Employee workouts and personal progress stay private.</div></div><figcaption><span class="screen-chip">Employer portal</span><span>Subscription and seats in one view</span></figcaption></figure>
+          </li>
+
+          <li class="journey-step">
+            <div class="journey-copy"><span class="journey-number">05</span><p class="journey-kicker">Invite · manage · reclaim</p><h3>Invite people and free seats when they leave</h3><p>Send individual or bulk invitations, check delivery and resend or correct an address. Remove employer-funded access when someone leaves; their seat becomes available again.</p></div>
+            <figure class="journey-window window-invites"><div class="window-bar"><span class="window-dots"><i></i><i></i><i></i></span><span>Employer portal · team access</span><b>05 / 07</b></div><div class="invite-preview"><div class="invite-head"><div><span class="preview-eyebrow">TEAM ACCESS</span><h4>Invite employees</h4></div><span class="screen-chip">1 of 20 seats active</span></div><div class="invite-form-preview"><span>employee@company.com</span><b>Send invitation</b></div><div class="invite-table"><div class="invite-table-head"><span>EMPLOYEE</span><span>STATUS</span><span>ACTION</span></div><div class="invite-table-row"><span><i class="avatar-dot">A</i> alex@company.com</span><b class="pending-pill">Invitation sent</b><span class="text-action">Resend</span></div><div class="invite-table-row"><span><i class="avatar-dot active">J</i> jordan@company.com</span><b class="active-pill">Active</b><span class="remove-action">Remove access</span></div></div><div class="seat-release-note"><span>↻</span><span><strong>When someone leaves</strong> their Business access ends and their seat returns to the available total. Their personal SparkFit account stays theirs.</span></div></div><figcaption><span class="screen-chip">Employer portal · invitations</span><span>Invite, follow up, remove and reuse seats</span></figcaption></figure>
+          </li>
+
+          <li class="journey-step is-reversed">
+            <div class="journey-copy"><span class="journey-number">06</span><p class="journey-kicker">Employee invitation</p><h3>Employees accept on their own SparkFit account</h3><p>The employee opens the secure invitation, signs in or verifies their email, then accepts access in the app. If their SparkFit account uses another email, they sign in to that account first.</p><div class="journey-privacy"><span aria-hidden="true">✓</span><span>The employer sees activation status only, never workouts, nutrition, messages or personal progress.</span></div></div>
+            <figure class="journey-window window-activation"><div class="window-bar"><span class="window-dots"><i></i><i></i><i></i></span><span>business.spark-fit.com/employee-access</span><b>06 / 07</b></div><div class="activation-preview"><img src="./screenshots/employee-invitation-page.jpeg" alt="SparkFit employee access invitation page with instructions to open the invitation in SparkFit" loading="lazy"><div class="activation-caption"><span class="screen-chip">Secure employee access page</span><span>Open the invitation in SparkFit</span></div></div><figcaption><span class="screen-chip">Employee invitation</span><span>Verify or sign in, then accept in the app</span></figcaption></figure>
+          </li>
+
+          <li class="journey-step journey-step-app">
+            <div class="journey-copy"><span class="journey-number">07</span><p class="journey-kicker">SparkFit app</p><h3>Premium access opens in the employee’s app</h3><p>After activation, the Business entitlement unlocks SparkFit Premium in the employee’s own account. Their personal purchases and wellbeing data remain private if their employer access later ends.</p></div>
+            <figure class="journey-window window-app"><div class="window-bar"><span class="window-dots"><i></i><i></i><i></i></span><span>SparkFit · iOS and Android</span><b>07 / 07</b></div><div class="app-preview"><div class="app-copy"><span class="preview-eyebrow">IN THEIR SPARKFIT ACCOUNT</span><h4>One account.<br>Employer-funded Premium.</h4><p>Workouts, nutrition and coaching are ready in the SparkFit app.</p><div class="app-privacy-tag"><span>✓</span> Personal activity stays private</div></div><img src="../screenshots/sparkfit-02-daily-plan.png" alt="SparkFit app daily plan with nutrition targets, meals and a workout" loading="lazy"></div><figcaption><span class="screen-chip">SparkFit app preview</span><span>Business access, personal account</span></figcaption></figure>
+          </li>
         </ol>
-      </div>
-      <div class="shell journey-visuals" aria-label="Screens from the SparkFit employee access journey">
-        <div class="section-heading"><p class="eyebrow"><span></span> See the experience</p><h2>From employer portal to employee access.</h2><p>Here is what employers and employees see as access is set up and activated.</p></div>
-        <div class="journey-screen-grid">
-          <figure><div class="journey-screen crop-invites"><img src="../business-platform/docs/assets/employer-flow/employer-invitations.png" alt="Employer portal invitation status and resend controls" loading="lazy"></div><figcaption><strong>1. Invite your team</strong><span>Send invitations, check delivery, and resend or correct an address.</span></figcaption></figure>
-          <figure><div class="journey-screen crop-employee"><img src="../business-platform/docs/assets/employer-flow/employee-invitation-page.jpeg" alt="Employee invitation page explaining employer-funded SparkFit access" loading="lazy"></div><figcaption><strong>2. Employees activate</strong><span>Employees sign in or verify their account, then activate access in SparkFit.</span></figcaption></figure>
-          <figure><div class="journey-screen crop-seats"><img src="../business-platform/docs/assets/employer-flow/employer-portal.jpeg" alt="Employer subscription and seat overview" loading="lazy"></div><figcaption><strong>3. Track access and seats</strong><span>See active employees, pending invitations, available seats, and subscription dates.</span></figcaption></figure>
-        </div>
-        <p class="journey-removal"><strong>When someone leaves:</strong> remove their employer-funded access in the portal. Their seat becomes available again, while their personal SparkFit account and purchases stay theirs.</p>
       </div>
       <div class="shell subscription-facts" aria-label="Employer subscription details">
         <article><strong>One account per licence</strong><p>Each active employer-funded licence supports one employee account.</p></article>
@@ -506,7 +525,7 @@
           <article><span aria-hidden="true">✓</span><h3>Private individual use</h3><p>Employers do not see workouts, nutrition choices, conversations, measurements or personal progress.</p></article>
           <article><span aria-hidden="true">✓</span><h3>Low administration</h3><p>Your team shares the activation information. Employees then get started and use the app independently.</p></article>
         </div>
-        <p class="privacy-footnote">The enquiry form only asks for information needed to discuss a business partnership. We will confirm appropriate privacy and data-handling arrangements before any launch. Read our <a href="../privacy.html">Privacy Policy</a> or email <a href="mailto:partnerships@spark-fit.com">partnerships@spark-fit.com</a>.</p>
+        <p class="privacy-footnote">We use organisation and employee contact details to manage access, billing and support. Employers receive activation status only; personal app activity stays private. Read the <a href="./privacy.html">Business privacy information</a> or email <a href="mailto:partnerships@spark-fit.com">partnerships@spark-fit.com</a>.</p>
       </div>
     </section>
 
@@ -521,7 +540,7 @@
         <div class="accordion" data-accordion>
           <details open>
             <summary>How does the annual employer subscription work?<span aria-hidden="true">+</span></summary>
-            <div><p>Your organisation chooses the number of employee licences and receives a volume discount. Each licence funds one active employee's SparkFit Premium access for a year. The current website sends a priced enquiry for confirmation and does not take payment.</p></div>
+            <div><p>Choose your employee licence count on this page, then complete the annual subscription through secure Stripe Checkout. Checkout displays any applicable tax and the final amount before payment.</p></div>
           </details>
           <details>
             <summary>How are volume discounts calculated?<span aria-hidden="true">+</span></summary>
@@ -536,14 +555,12 @@
             <div><p>Website prices are before applicable tax. Stripe Managed Payments calculates tax based on the transaction and customer location, and shows the final amount in Checkout before you pay. The £24.99 consumer reference price is the annual App Store or Google Play price including VAT where applicable.</p></div>
           </details>
           <details>
-          </details>
-          <details>
             <summary>Do employees need to pay?<span aria-hidden="true">+</span></summary>
             <div><p>No. The organisation funds the selected annual licences. Employees use the employer-funded activation route rather than purchasing Premium individually.</p></div>
           </details>
           <details>
             <summary>How do employees activate their licences?<span aria-hidden="true">+</span></summary>
-            <div><p>Your organisation shares the activation instructions supplied by SparkFit Partnerships. Employees activate their own SparkFit accounts and use the app independently.</p></div>
+            <div><p>Invite employees from the employer portal. Each employee opens their secure invitation, signs in or verifies their email, and accepts access in SparkFit. They keep using their own account.</p></div>
           </details>
           <details>
             <summary>Can licences be reassigned?<span aria-hidden="true">+</span></summary>
