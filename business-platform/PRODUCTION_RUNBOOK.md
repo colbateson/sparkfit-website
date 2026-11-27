@@ -1,6 +1,6 @@
 # SparkFit Business Production Runbook
 
-This is the ordered implementation and launch guide for SparkFit Business. Follow it from top to bottom. Customer-facing launch, public payments and RevenueCat writes stay off until the relevant acceptance gate says they are safe. Production email is enabled for allowlisted internal admin and approved transactional workflows while public launch remains gated.
+This runbook documents the SparkFit Business implementation and production operation. On 27 November 2026, the owner explicitly enabled customer-facing launch, public payments and RevenueCat writes while waiving the internal live purchase and app-store acceptance checks. Complete the remaining post-launch checks promptly and be ready to disable affected flags if a live issue appears.
 
 For the latest completed configuration, CLI recovery instructions and outstanding integration checks, read [STAGING_SETUP_STATUS.md](./STAGING_SETUP_STATUS.md) first. Code implemented behind a flag is not a completed end-to-end test.
 
@@ -16,11 +16,11 @@ The following foundation is complete on local `main` and deployed to staging:
 - Activation reporting without personal app usage reporting.
 - Employee removal and seat recovery.
 - Separate employer entitlement ledger and audit history.
-- RevenueCat grant, revoke and reconciliation tested with staging writes; production remains disabled.
-- Stripe annual checkout, webhooks, Customer Portal and tested renewal failure and recovery. Live product category, price, quantity limit, Managed Payments eligibility, portal, invoice branding, retry and webhook settings have been reviewed; public purchasing remains disabled. The account owner must complete the first real hosted Checkout.
+- RevenueCat grant, revoke and reconciliation tested with staging writes; production writes are enabled by owner direction.
+- Stripe annual checkout, webhooks, Customer Portal and tested renewal failure and recovery. Live product category, price, quantity limit, Managed Payments eligibility, portal, invoice branding, retry and webhook settings have been reviewed; public purchasing is enabled. No live purchase has yet occurred.
 - Lifecycle email queue and Resend verification are enabled in staging. A controlled production admin email was received and its signed delivered callback recorded in production D1; failure-path acceptance remains.
-- Automated business-data retention and legal-hold safeguards are deployed to staging; production retention remains disabled.
-- Mobile identity source is on local `main`, but has not been built or released to devices.
+- Automated business-data retention and legal-hold safeguards are enabled in production.
+- Mobile identity source is on local `main`; compatibility of current store builds with Business entitlement support remains unverified.
 - Daily pilot expiry and reminder processing.
 - Cloudflare D1 migrations and staging Worker deployment.
 
@@ -28,13 +28,13 @@ Staging URL:
 
 `https://sparkfit-business-platform-staging.colbateson.workers.dev`
 
-The production customer-launch gates are deliberately disabled while the owner prepares the first paid Checkout:
+Current production flags:
 
 ```text
-LAUNCH_ENABLED=false
-PAYMENTS_ENABLED=false
-REVENUECAT_WRITES_ENABLED=false
-EMAIL_ENABLED=true (approved transactional mail only)
+LAUNCH_ENABLED=true
+PAYMENTS_ENABLED=true
+REVENUECAT_WRITES_ENABLED=true
+EMAIL_ENABLED=true
 TURNSTILE_REQUIRED=true
 RETENTION_ENABLED=true (approved retention policy)
 STRIPE_MANAGED_PAYMENTS_ENABLED=true
@@ -378,22 +378,20 @@ Run this exact sequence:
 
 Repeat the employee activation, removal and restore cases on both iOS and Android.
 
-## 11. Current production state and final gates
+## 11. Current production state and post-launch checks
 
-Production D1 migrations `0001` through `0009` are applied. The production Worker is deployed to `business.spark-fit.com`; launch, public payments and RevenueCat writes are off. Approved transactional email and the approved retention policy are on. `/health` reports production, payments disabled, RevenueCat writes disabled and email enabled. The public config reports `testMode=false`, Turnstile required and app accounts required. Cloudflare Worker settings confirm the production D1 binding and expected production secret names.
+Production D1 migrations `0001` through `0009` are applied. The production Worker is deployed to `business.spark-fit.com`; launch, public payments and RevenueCat writes are on by explicit owner direction. Approved transactional email and retention are on. `/health` verifies production, payments enabled, RevenueCat writes enabled and email enabled. Public config verifies `testMode=false`, payments enabled, Turnstile required and app accounts required.
 
-The production Turnstile hostname and keys, live Stripe product/price and restricted credentials, RevenueCat credentials, and verified Resend domain and credentials have been configured. Live Stripe has an active £20.83/year base price; the Worker calculates volume prices from the approved server-side schedule. The live product uses tax category `txcd_10103101`; Managed Payments is enabled by default, and the Worker production config sets its Managed Payments flag to true while public payments remain disabled. The active webhook has 11 required events. The Customer Portal enables payment-method updates, invoice access/downloads and end-of-period cancellation, with plan changes disabled. Invoice colours use SparkFit purple; Stripe has no uploaded SparkFit logo yet. Smart Retries run for up to 8 attempts over 2 weeks, and the final failure action leaves the subscription overdue so SparkFit can apply day-14 suspension/day-30 closure. Secret values are stored in Cloudflare and must never be copied into source or chat.
+The production Turnstile hostname and keys, live Stripe product/price and restricted credentials, RevenueCat credentials, and verified Resend domain and credentials have been configured. Live Stripe has an active £20.83/year base price; the Worker calculates volume prices from the approved server-side schedule. The live product uses tax category `txcd_10103101`; Managed Payments is enabled. The active webhook has 11 required events. The Customer Portal enables payment-method updates, invoice access/downloads and end-of-period cancellation, with plan changes disabled. Invoice colours use SparkFit purple; Stripe has no uploaded SparkFit logo yet. Smart Retries run for up to 8 attempts over 2 weeks, and the final failure action leaves the subscription overdue so SparkFit can apply day-14 suspension/day-30 closure. Secret values are stored in Cloudflare and must never be copied into source or chat.
 
-Complete the remaining acceptance work in this order while keeping the customer launch gate closed:
+The owner opened production before the remaining checks below. Complete them promptly and use the rollback plan if a live check fails:
 
 1. Verify the public config, required environment bindings and secret names without displaying secret values.
 2. Successful production email delivery and its signed delivered callback are confirmed. Review spam placement and provider-supported failed, bounced and complained message scenarios.
-3. Live product category, annual price, 20–500 server-validated quantity, Smart Retry settings, overdue handling, Customer Portal cancellation/payment/invoice options, invoice PDF/brand colours and 11-event webhook coverage have been verified. The approved Terms and Privacy URLs are published and linked in Stripe.
-4. A live Stripe Checkout is prepared for SparkFit, 20 seats, billing contact `partnerships@spark-fit.com`. The displayed amount is £333.20/year before applicable tax (£16.66 per seat); Checkout calculates tax after the buyer enters the billing address. The owner must review the final tax-inclusive amount and recurring terms, then submit the payment. The agent must not submit the charge.
-5. Release and acceptance-test the mobile UUID and Business entitlement changes on iOS and Android. This release is owned by SparkFit.
-6. Perform a controlled internal employee grant/removal only after mobile release. Verify reconciliation and preservation of personal Pro/Trial access.
-7. Enable customer launch, payments and RevenueCat writes only after the owner has completed the first Checkout and the mobile app is released with employee identity support. Approved transactional email and the approved retention policy are enabled; verify the scheduled retention run.
-8. The business website legal links are live. After the acceptance gate is met, open public routes and monitor webhooks, email delivery, billing and entitlement reconciliation.
+3. Live Stripe settings, published Terms/Privacy links, tax behavior, 20–500 server-validated quantity and 11-event webhook coverage have been reviewed. The owner waived the internal live purchase; monitor the first customer checkout, tax, invoice and payment webhook.
+4. Acceptance-test the current iOS and Android app builds for UUID identity and Business entitlement support. If activation fails, disable RevenueCat writes and employee invitation/activation routes until fixed.
+5. Run a controlled internal employee grant/removal, verify reconciliation, and confirm personal Pro/Trial access survives removal.
+6. Public routes and payments are already enabled. Monitor webhooks, email delivery, billing and entitlement reconciliation closely.
 
 ## 12. Production launch order
 
@@ -433,12 +431,12 @@ If email, payment or entitlement behaviour is wrong:
 
 ## 14. Launch acceptance gate
 
-The public production launch gate remains closed until every required item is true:
+Production is open by owner direction, with these checks outstanding or waived:
 
 - [x] Commercial and legal terms are approved, published, and linked from Stripe.
 - [x] Data retention and deletion rules are implemented, approved, and enabled.
 - [ ] The exposed MyPT Stripe key has been rotated and removed from source.
-- [ ] Stable app accounts and verified email are released on iOS and Android.
+- [ ] Stable app accounts and verified email are confirmed in the current iOS and Android builds.
 - [ ] Existing paid and trial customers migrate without losing access.
 - [ ] The app recognises the separate Business entitlement.
 - [ ] Different-email invitation linking works safely.
@@ -453,7 +451,7 @@ The public production launch gate remains closed until every required item is tr
 - [ ] Production secrets are stored only in Cloudflare.
 - [ ] Rollback has been rehearsed.
 - [ ] One internal live employee journey passes.
-- [ ] Owner completes the prepared first live billing journey after reviewing Checkout tax, total, and recurring terms.
+- [ ] First live billing journey passes; the owner waived the internal purchase, so observe and verify the first customer transaction.
 - [ ] The business website points only to the production hostname.
 
 ## 15. Routine operation after launch
