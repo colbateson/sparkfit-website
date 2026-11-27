@@ -1,9 +1,9 @@
-export const PRICING_VERSION = 'annual-v1-preview';
+export const PRICING_VERSION = 'annual-v1';
 export const ANNUAL_CONSUMER_GROSS_PENCE = 2499;
 export const VAT_BPS = 0;
 export const BUSINESS_BASE_PENCE = 2083;
 export const MIN_SEATS = 20;
-export const MAX_SEATS = 1000;
+export const MAX_SEATS = 500;
 export const APPROVED_MAX_SEATS = 500;
 
 export const TIERS = Object.freeze([

@@ -5,29 +5,50 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
   <title>Buy for your team | SparkFit Business</title>
-  <link rel="stylesheet" href="/common.css">
-  <script type="module" src="/buy/buy.js"></script>
+  <link rel="stylesheet" href="../common.css">
+  <link rel="stylesheet" href="./buy.css">
+  <script defer src="./boot.js"></script>
 </head>
-<body>
-  <header class="site-head"><div class="shell head-inner"><a class="brand" href="https://spark-fit.com/business/"><img src="https://spark-fit.com/icon.webp" alt=""><span><strong>SPARKFIT</strong><small>PARTNERSHIPS</small></span></a><nav class="nav"><a href="https://spark-fit.com/business/#pricing">Pricing</a><a class="pill" href="/sign-in/">Employer sign in</a></nav></div></header>
-  <main>
-    <section class="hero"><div class="shell hero-grid"><div><div class="eyebrow">Annual employer access</div><h1>Fund SparkFit Premium for your team.</h1><p>Choose how many employees to support, review your annual price and volume saving, then continue to secure checkout.</p></div><div class="hero-card"><strong data-hero-seats>50</strong><span>employee seats selected for one annual subscription.</span></div></div></section>
-    <section class="section"><div class="shell"><div class="heading"><h2>Order details</h2><p>SparkFit is not VAT registered. No VAT is added to your employer subscription.</p></div>
-      <form class="form-card" data-buy-form>
+<body class="purchase-page">
+  <header class="site-head"><div class="shell head-inner"><a class="brand" href="https://spark-fit.com/business/"><img src="https://spark-fit.com/icon.webp" alt=""><span><strong>SPARKFIT</strong><small>FOR BUSINESS</small></span></a><nav class="nav"><a href="https://spark-fit.com/business/#pricing">Back to pricing</a><a class="pill" href="../sign-in/">Employer sign in</a></nav></div></header>
+  <main class="purchase shell">
+    <div class="purchase-intro"><p class="eyebrow">Invest in your team's wellbeing</p><h1>A healthier team starts here.</h1><p>Give your employees a year of SparkFit Premium. Simple access for them, straightforward administration for you.</p></div>
+    <p class="notice local-preview" id="local-preview" hidden>This is a local design preview. <a href="https://business-staging.spark-fit.com/buy/">Open the secure staging page</a> to test the calculator and checkout.</p>
+    <form class="purchase-layout" data-buy-form>
+      <section class="order-card" aria-labelledby="order-heading">
+        <div class="step-label"><span>1</span> Your organisation</div>
+        <h2 id="order-heading">Who are we supporting?</h2>
+        <p class="card-intro">We will use these details for your invoice and employer portal.</p>
         <div class="form-grid">
-          <div class="field"><label>Company name *</label><input name="companyName" autocomplete="organization" maxlength="120" required></div>
-          <div class="field"><label>Company website</label><input name="companyWebsite" type="text" inputmode="url" maxlength="300" placeholder="www.example.com"><span class="help">You can enter the domain without https://</span></div>
-          <div class="field"><label>Billing contact *</label><input name="contactName" autocomplete="name" maxlength="120" required></div>
-          <div class="field"><label>Billing email *</label><input name="billingEmail" type="email" autocomplete="email" maxlength="180" required></div>
-          <div class="field"><label>Employee seats *</label><input name="seats" type="number" min="20" max="500" value="50" required><span class="help">For more than 500 employees, contact SparkFit Partnerships.</span></div>
+          <div class="field full"><label for="company-name">Company name <span aria-hidden="true">*</span></label><input id="company-name" name="companyName" autocomplete="organization" maxlength="120" placeholder="Your organisation" required></div>
+          <div class="field full"><label for="company-website">Company website <span class="optional">Optional</span></label><input id="company-website" name="companyWebsite" type="text" inputmode="url" maxlength="300" placeholder="www.example.com"></div>
+          <div class="field"><label for="contact-name">Billing contact <span aria-hidden="true">*</span></label><input id="contact-name" name="contactName" autocomplete="name" maxlength="120" placeholder="Full name" required></div>
+          <div class="field"><label for="billing-email">Billing email <span aria-hidden="true">*</span></label><input id="billing-email" name="billingEmail" type="email" autocomplete="email" maxlength="180" placeholder="you@company.com" required></div>
         </div>
-        <div class="price-summary"><div><span>Volume discount</span><strong data-discount>25%</strong></div><div><span>Annual price per employee</span><strong data-unit>£15.62</strong></div><div><span>Annual total, no VAT charged</span><strong data-total>£781.00</strong></div></div>
-        <label class="check"><input type="checkbox" required><span>I understand this is an annual employer subscription. No VAT is charged. *</span></label>
-        <div data-turnstile></div>
-        <div class="actions"><button class="button" type="submit">Continue to secure checkout</button><a class="button ghost" href="mailto:partnerships@spark-fit.com">Contact partnerships</a></div><p class="status" data-status></p>
-      </form>
-    </div></section>
+        <div class="seat-section"><div><label for="employee-seats">How many employees?</label><p>One seat gives one employee Premium access.</p></div><input id="employee-seats" name="seats" type="number" min="20" max="500" step="1" value="50" required></div>
+        <p class="seat-help">20 to 500 seats online. <a href="mailto:partnerships@spark-fit.com">Talk to us about larger teams.</a></p>
+        <div class="privacy-note"><span aria-hidden="true">✓</span><p><strong>Their wellbeing stays personal.</strong> You see invitations and activations, never employees' workouts, nutrition or personal progress.</p></div>
+      </section>
+      <aside class="order-card order-summary" aria-labelledby="summary-heading">
+        <div class="step-label"><span>2</span> Your annual plan</div>
+        <h2 id="summary-heading">One app. Everyday support.</h2>
+        <ul class="plan-benefits"><li>15-minute home and gym workouts</li><li>Meal plans, recipes and shopping lists</li><li>AI coach and progress tools</li><li>Employee activation portal and reporting</li></ul>
+        <div class="price-summary" aria-live="polite" aria-atomic="true">
+          <div><span>Employee seats</span><strong data-hero-seats>50</strong></div>
+          <div><span>Volume saving</span><strong data-discount>25%</strong></div>
+          <div><span>Per employee, per year</span><strong data-unit>£15.62</strong></div>
+          <div class="order-total"><span>Annual total</span><strong data-total>£781.00</strong></div>
+        </div>
+        <p class="tax-note">Prices exclude applicable tax. Stripe Managed Payments calculates any tax due and shows the final total before payment.</p>
+        <label class="check"><input type="checkbox" name="annualConsent" required><span>I agree to the <a href="https://spark-fit.com/business/terms.html" target="_blank" rel="noopener">SparkFit Business subscription terms</a> and have read the <a href="https://spark-fit.com/business/privacy.html" target="_blank" rel="noopener">Business privacy information</a>. This annual subscription renews for 12 months unless I cancel before renewal. Applicable tax is shown in Checkout.</span></label>
+        <div class="security-check" data-turnstile></div>
+        <button class="button checkout-button" type="submit">Continue to secure checkout <span aria-hidden="true">→</span></button>
+        <p class="checkout-help">Pay securely with Stripe. Employee access starts after payment is confirmed.</p>
+        <p class="status" data-status role="status" aria-live="polite"></p>
+      </aside>
+    </form>
+    <p class="purchase-support">Need a hand choosing? <a href="mailto:partnerships@spark-fit.com">partnerships@spark-fit.com</a></p>
   </main>
-  <footer class="footer"><div class="shell"><span>© <span data-year></span> SparkFit Partnerships</span><span>Payments disabled in staging</span></div></footer>
+  <footer class="footer"><div class="shell"><span>© <span data-year>2026</span> SparkFit Partnerships</span><nav aria-label="Legal"><a href="https://spark-fit.com/business/terms.html">Business terms</a> · <a href="https://spark-fit.com/business/privacy.html">Business privacy</a> · <a href="https://spark-fit.com/privacy.html">Privacy policy</a></nav></div></footer>
 </body>
 </html>

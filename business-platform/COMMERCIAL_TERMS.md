@@ -1,6 +1,6 @@
-# SparkFit Business Commercial Policy Draft
+# SparkFit Business Commercial Policy
 
-Status: proposed operating policy for legal, tax and commercial review before launch.
+Status: approved by SparkFit owner on 27 November 2026 for production wording and operating configuration. These terms do not replace mandatory statutory rights.
 
 This document turns the agreed product model into practical default rules for Stripe Billing, the employer agreement and customer support. It is not a substitute for legal or tax advice.
 
@@ -13,7 +13,7 @@ This document turns the agreed product model into practical default rules for St
 - Maximum self-service order: 500 employee seats.
 - Larger orders: quoted by SparkFit Partnerships.
 - Paid billing period: annual.
-- Business pricing: SparkFit is not VAT registered. No VAT is charged on employer subscriptions. The agreed business base price is £20.83 per employee per year before volume discounts.
+- Business pricing: the agreed business base price is £20.83 per employee per year before volume discounts and before applicable tax. SparkFit is not UK VAT registered. Stripe Managed Payments is enabled for eligible orders and may calculate, collect and remit applicable taxes based on the transaction and customer location. The final tax and total due are shown in Checkout.
 - Employer reporting: invitation and activation status only.
 - Employee activity and health information: never available to the employer.
 
@@ -23,7 +23,7 @@ This document turns the agreed product model into practical default rules for St
 2. The initial term is 12 months.
 3. The subscription renews for another 12 months unless the organisation cancels before the renewal date.
 4. SparkFit sends renewal reminders 30 days and 7 days before renewal.
-5. The reminder states the renewal date, current seat quantity, annual price with no VAT charged and how to cancel or request a seat reduction.
+5. The reminder states the renewal date, current seat quantity, annual price before applicable tax and how to cancel or request a seat reduction.
 6. Price changes are notified at least 30 days before renewal.
 7. No pilot converts to a paid subscription automatically.
 
@@ -96,7 +96,7 @@ This policy prevents unexpected mid-year entitlement removal and simplifies invo
 
 ## Proposed data retention schedule
 
-Retention must be confirmed against UK GDPR, accounting requirements, insurance requirements and the final privacy notice.
+The retention periods in this table are approved operating periods. Financial and tax records remain subject to statutory retention requirements and legal holds.
 
 | Record | Proposed retention | End-of-period action |
 | --- | --- | --- |
@@ -107,22 +107,24 @@ Retention must be confirmed against UK GDPR, accounting requirements, insurance 
 | Active membership and activation status | While access is active | Move to ended membership rule |
 | Ended membership | 24 months after access ends | Delete or anonymise email and account linkage |
 | Organisation administrator access | Contract term plus 90 days | Disable immediately at end; delete after 90 days unless needed for dispute handling |
-| Employer contract and billing records | 7 years after the relevant financial year | Secure deletion, subject to accounting advice |
-| Stripe event record | 7 years when part of the billing record | Secure deletion |
+| Employer contract and billing records | Proposed 8 calendar years after the record date until the exact accounting retention duty is confirmed | Secure deletion, subject to accounting advice and legal hold |
+| Stripe event record | Proposed 8 calendar years after processing for completed billing events | Secure deletion, subject to accounting advice and legal hold |
 | Security and administrator audit log | 24 months | Delete or anonymise |
 | Email delivery metadata | 12 months | Delete or anonymise |
-| Customer support correspondence | 24 months after closure | Delete unless attached to a continuing dispute |
+| Customer support correspondence | 24 months after closure, subject to dispute or legal hold | This correspondence is not stored in the business platform retention job |
 | Marketing consent record | Until consent is withdrawn, plus a minimal suppression record | Keep only what is needed to honour opt-out |
 | Operational backups | 35 days | Automatic expiry |
 
 Do not retain invitation plaintext tokens. The current platform stores only token hashes.
+
+The automated platform routine currently deletes completed billing events after an eight-calendar-year cutoff because the accounting year end is not recorded in this database. This is a conservative implementation rule, not a confirmed statutory retention period. The exact accounting period and the separate Stripe record retention settings need accountant review before production.
 
 ## Employer agreement points
 
 The final employer agreement should cover:
 
 - Service description and eligibility.
-- Seat quantity and total price, with no VAT charged while SparkFit is not VAT registered.
+- Seat quantity and total price before applicable tax; Checkout displays any tax calculated and collected by Stripe Managed Payments.
 - Subscription start and renewal dates.
 - Automatic renewal and cancellation method.
 - Seat increase and reduction rules.
@@ -143,7 +145,7 @@ The final employer agreement should cover:
 Configure Stripe Billing to reflect the approved version of these policies:
 
 - Annual recurring subscription.
-- Automatic tax disabled while SparkFit is not VAT registered, with no VAT charged.
+- Managed Payments enabled for eligible business Checkout sessions; Stripe Managed Payments calculates, collects and remits applicable transaction taxes. Keep SparkFit's separate Stripe Tax `automatic_tax` and tax-ID collection parameters disabled for Managed Payments Checkout.
 - Cancellation at period end through Customer Portal.
 - Seat increases with proration.
 - Seat reductions scheduled for renewal rather than applied immediately.
@@ -151,4 +153,4 @@ Configure Stripe Billing to reflect the approved version of these policies:
 - Renewal reminders at 30 days and 7 days.
 - Invoice and receipt emails enabled.
 
-Do not activate these live settings until the final employer agreement and customer-facing wording match them.
+The SparkFit owner approved these defaults for production on 27 November 2026. Publish the matching customer-facing wording and preserve the final hosted Checkout handoff to the owner for the first real payment.

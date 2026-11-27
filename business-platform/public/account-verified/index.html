@@ -1,1 +1,44 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Email verified | SparkFit</title><link rel="stylesheet" href="/common.css"></head><body><main class="auth-wrap"><section class="auth-card"><div class="eyebrow" style="color:#6c2ff2">Email verified</div><h1>Return to SparkFit</h1><p>Your email has been verified. Continue in the SparkFit app to finish signing in.</p><a class="button" data-open-app href="#">Open SparkFit</a><p class="help">This sign-in exchange expires after 10 minutes and can be used once.</p></section></main><script>const exchange=new URLSearchParams(location.search).get('exchange')||'';const link=document.querySelector('[data-open-app]');link.href=`sparkfit://account-verified?exchange=${encodeURIComponent(exchange)}`;</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Email verified | SparkFit</title>
+  <link rel="stylesheet" href="/common.css">
+</head>
+<body>
+  <main class="auth-wrap">
+    <section class="auth-card">
+      <div class="eyebrow" style="color:#6c2ff2">Email verified</div>
+      <h1>Return to SparkFit</h1>
+      <p>Your email is verified. Continue in the SparkFit app to finish signing in and return to your invitation.</p>
+      <a class="button" data-open-app href="#">Continue in SparkFit</a>
+      <div class="install-links" data-install-links hidden>
+        <strong>Need the app?</strong>
+        <div>
+          <a href="https://apps.apple.com/gb/app/sparkfit-15-min-workouts/id6754826325">Download for iPhone</a>
+          <a href="https://play.google.com/store/apps/details?id=app.spark.fit">Download for Android</a>
+        </div>
+      </div>
+      <p class="help">If SparkFit is not installed, install it, then return to this page and tap “Continue in SparkFit”. This sign-in link expires after 10 minutes and works once.</p>
+      <p class="status" data-status role="status" aria-live="polite"></p>
+    </section>
+  </main>
+  <script>
+    const exchange = new URLSearchParams(location.search).get('exchange') || '';
+    const ios = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const link = document.querySelector('[data-open-app]');
+    if (exchange) {
+      link.href = `${ios ? 'app.sparkfit' : 'myapp'}://account-verified?exchange=${encodeURIComponent(exchange)}`;
+      document.querySelector('[data-install-links]').hidden = false;
+    } else {
+      link.removeAttribute('href');
+      link.setAttribute('aria-disabled', 'true');
+      link.classList.add('disabled');
+      document.querySelector('[data-status]').textContent = 'This verification link is incomplete. Request a new sign-in email and open its link on this device.';
+      document.querySelector('[data-install-links]').hidden = false;
+    }
+  </script>
+</body>
+</html>

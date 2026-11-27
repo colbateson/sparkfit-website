@@ -61,7 +61,7 @@
   const licenceQuantity = qs('[name="licenceQuantity"]');
   const requirements = qs('[name="requirements"]');
   const resultPanel = qs('.annual-plan-results');
-  const businessPlatformOrigin = 'https://sparkfit-business-platform-staging.colbateson.workers.dev';
+  const businessPlatformOrigin = 'https://business.spark-fit.com';
   let vatMode = 'ex';
   let currentPlan = null;
 
@@ -110,7 +110,7 @@
       }
     }
     if (priceBand) priceBand.textContent = `${plan.tierMinimum}-seat band · ${plan.discountLabel} volume discount`;
-    if (provisionalNote) provisionalNote.hidden = !plan.provisional;
+    if (provisionalNote) provisionalNote.hidden = true;
     setText('[data-result-seats]', plan.seats.toLocaleString('en-GB'));
     setText('[data-result-discount]', plan.discountLabel);
     setText('[data-direct-price]', pricingApi.formatPounds(values.directPerSeat));
@@ -119,14 +119,13 @@
     setText('[data-direct-per-seat]', pricingApi.formatPounds(values.directPerSeat));
     setText('[data-direct-total-label]', 'Direct App Store or Google Play purchasing');
     setText('[data-employer-total]', pricingApi.formatPounds(values.employerTotal));
-    setText('[data-employer-total-label]', `Employer annual subscription, ${values.vatLabel}`);
+    setText('[data-employer-total-label]', 'Employer annual subscription, before applicable tax');
     setText('[data-saving]', pricingApi.formatPounds(values.saving));
-    setText('[data-saving-label]', 'Annual saving against direct purchasing');
+    setText('[data-saving-label]', 'Indicative difference before applicable tax');
     setText('[data-monthly-per-seat]', pricingApi.formatPounds(values.employerMonthlyPerSeat));
     setText('[data-monthly-total]', pricingApi.formatPounds(values.employerMonthlyTotal));
     if (priceNote) {
-      const approval = plan.provisional ? ' This provisional 501 to 1,000 seat extension requires commercial approval.' : '';
-      priceNote.textContent = `${plan.seats.toLocaleString('en-GB')} annual employee licences with a ${plan.discountLabel} discount from the £20.83 business base price. No VAT is charged.${approval}`;
+      priceNote.textContent = `${plan.seats.toLocaleString('en-GB')} annual employee licences with a ${plan.discountLabel} discount from the £20.83 business base price. Applicable tax is calculated at Checkout and added to this estimate.`;
     }
     renderPackages();
   };
@@ -140,8 +139,8 @@
     if (!calculatorError) return;
     if (!Number.isInteger(quantity)) calculatorError.textContent = 'Enter a whole number of employees.';
     else if (quantity < 20) calculatorError.textContent = 'The minimum annual subscription is 20 employee licences.';
-    else if (quantity > 1000) calculatorError.textContent = 'For more than 1,000 employees, contact us for tailored enterprise pricing.';
-    else calculatorError.textContent = 'Enter a whole number from 20 to 1,000.';
+    else if (quantity > 500) calculatorError.textContent = 'For more than 500 employees, contact us for tailored enterprise pricing.';
+    else calculatorError.textContent = 'Enter a whole number from 20 to 500.';
   };
 
   const updateCalculator = () => {
@@ -180,8 +179,8 @@
     const next = event.key === 'Home'
       ? 20
       : event.key === 'End'
-        ? 1000
-        : Math.min(1000, Math.max(20, current + (event.key === 'ArrowRight' || event.key === 'ArrowUp' ? 1 : -1)));
+        ? 500
+        : Math.min(500, Math.max(20, current + (event.key === 'ArrowRight' || event.key === 'ArrowUp' ? 1 : -1)));
     seatSlider.value = String(next);
     if (priceQuantity) priceQuantity.value = String(next);
     updateCalculator();
@@ -202,7 +201,7 @@
     updateAnnualFields();
     if (requirements) {
       const existingLines = requirements.value.split('\n').filter((line) => !line.startsWith('Enterprise pricing request:') && !line.startsWith('Pricing selection:'));
-      requirements.value = ['Enterprise pricing request: More than 1,000 employee licences.', ...existingLines].filter(Boolean).join('\n');
+      requirements.value = ['Enterprise pricing request: More than 500 employee licences.', ...existingLines].filter(Boolean).join('\n');
     }
   }));
   updateVatControls();

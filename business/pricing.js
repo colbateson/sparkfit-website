@@ -6,15 +6,14 @@
   'use strict';
 
   const CONFIG = Object.freeze({
-    version: 'annual-v1-preview',
+    version: 'annual-v1',
     currency: 'GBP',
     vatRateBps: 0,
     businessBasePennies: 2083,
     consumerAnnualGrossPennies: 2499,
     minimumSeats: 20,
-    maximumSeats: 1000,
+    maximumSeats: 500,
     approvedMaximumSeats: 500,
-    provisionalExtensionDiscountBps: 5000,
     tiers: Object.freeze([
       Object.freeze({ minimum: 500, discountBps: 5000 }),
       Object.freeze({ minimum: 250, discountBps: 4000 }),
@@ -86,7 +85,7 @@
     const suffix = vatMode === 'inc' ? 'IncVat' : 'ExVat';
     return Object.freeze({
       vatMode,
-      vatLabel: 'no VAT charged',
+      vatLabel: 'before applicable tax',
       directPerSeat: CONFIG.consumerAnnualGrossPennies,
       directTotal: plan.directTotalIncVat,
       employerPerSeat: plan[`employerPerSeat${suffix}`],
@@ -99,8 +98,7 @@
 
   const buildEnquirySummary = (plan, vatMode = 'ex') => {
     const values = valuesForVatMode(plan, vatMode);
-    const provisionalText = plan.provisional ? ', provisional 501 to 1,000 seat pricing requiring commercial approval' : '';
-    return `Pricing selection: Annual subscription, ${plan.seats} employee licences, ${plan.discountLabel} volume discount applied, ${formatPounds(values.employerTotal)} annual employer subscription ${values.vatLabel}, ${formatPounds(values.saving)} annual saving ${values.vatLabel}, ${values.vatLabel} display selected${provisionalText}.`;
+    return `Pricing selection: Annual subscription, ${plan.seats} employee licences, ${plan.discountLabel} volume discount applied, ${formatPounds(values.employerTotal)} annual employer subscription before applicable tax, ${formatPounds(values.saving)} indicative difference before employer tax. Applicable tax is calculated at Checkout.`;
   };
 
   return Object.freeze({

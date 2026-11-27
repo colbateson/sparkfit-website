@@ -1,6 +1,7 @@
 import { HttpError, id, nowIso } from './lib.js';
 import { reconcileBusinessEntitlement } from './revenuecat.js';
 import { queueEmail, templates } from './email.js';
+import { cancelStripeSubscription } from './stripe.js';
 
 const iso = (seconds) => seconds ? new Date(seconds * 1000).toISOString() : null;
 
@@ -91,11 +92,12 @@ export async function persistSubscription(env, subscription, orderId, eventCreat
   await syncOrganisationAccess(env, organisationId, state.access, state.expiresAt);
   if (state.status === 'active' && (previous?.status !== 'active' || previous?.last_invoice_id !== subscription.latest_invoice?.id)) {
     await queueEmail(env, 'employer_payment_successful', order.billing_email,
-      { ...templates.paymentSuccessful(order.company_name), text: `${templates.paymentSuccessful(order.company_name).text}\n\nEmployer portal: ${env.SERVICE_ORIGIN || 'https://sparkfit-business-platform-staging.colbateson.workers.dev'}/sign-in/` },
+      { ...templates.paymentSuccessful(order.company_name), actionUrl: `${env.SERVICE_ORIGIN || 'https://sparkfit-business-platform-staging.colbateson.workers.dev'}/sign-in/`, actionLabel: 'Open employer portal' },
       now, `invoice-paid:${subscription.latest_invoice?.id}`);
   }
   if (state.failedAt && !previous?.payment_failed_at) {
-    await queueEmail(env, 'employer_payment_failed', order.billing_email, templates.paymentFailed(order.company_name), now,
+    const billingLink = `${env.SERVICE_ORIGIN || 'https://sparkfit-business-platform-staging.colbateson.workers.dev'}/portal/`;
+    await queueEmail(env, 'employer_payment_failed', order.billing_email, templates.paymentFailed(order.company_name, billingLink), now,
       `payment-failed:${subscription.id}:${state.failedAt}`);
   }
   if (state.status === 'ended' && previous?.status !== 'ended') {
@@ -110,6 +112,31 @@ export async function persistSubscription(env, subscription, orderId, eventCreat
 export async function enforcePaidLifecycle(env) {
   const rows = await env.DB.prepare(`SELECT * FROM employer_subscriptions WHERE status IN ('active', 'payment_attention', 'pending', 'ended')`).all();
   for (const row of rows.results || []) {
+    const failureAt = row.payment_failed_at ? Date.parse(row.payment_failed_at) : NaN;
+    const failedDays = Number.isFinite(failureAt) ? (Date.now() - failureAt) / 86400000 : -1;
+    if (row.status === 'payment_attention' && failedDays >= 0 && failedDays < 30) {
+      const reminderDay = [3, 7, 12].find((day) => failedDays >= day && failedDays < day + (10 / 1440));
+      if (reminderDay) {
+        const admin = await env.DB.prepare(`SELECT email FROM organisation_admins WHERE organisation_id = ? AND status = 'active' LIMIT 1`).bind(row.organisation_id).first();
+        if (admin) {
+          const billingLink = `${env.SERVICE_ORIGIN || 'https://business.spark-fit.com'}/portal/`;
+          await queueEmail(env, 'employer_payment_failed_reminder', admin.email,
+            templates.paymentFailedReminder('your organisation', reminderDay, billingLink), nowIso(),
+            `payment-failed-reminder:${row.stripe_subscription_id}:${row.payment_failed_at}:${reminderDay}`);
+        }
+      }
+    }
+    if (row.status === 'payment_attention' && failedDays >= 30 && row.stripe_subscription_id) {
+      await cancelStripeSubscription(env, row.stripe_subscription_id);
+      await env.DB.prepare(`UPDATE employer_subscriptions SET status = 'ended', cancel_at_period_end = 0, updated_at = ? WHERE id = ? AND status = 'payment_attention'`)
+        .bind(nowIso(), row.id).run();
+      await env.DB.prepare(`UPDATE organisations SET status = 'suspended', updated_at = ? WHERE id = ?`).bind(nowIso(), row.organisation_id).run();
+      const admin = await env.DB.prepare(`SELECT email FROM organisation_admins WHERE organisation_id = ? AND status = 'active' LIMIT 1`).bind(row.organisation_id).first();
+      if (admin) await queueEmail(env, 'employer_subscription_cancelled', admin.email,
+        templates.subscriptionCancelled('your organisation'), nowIso(), `subscription-ended-after-payment-failure:${row.stripe_subscription_id}`);
+      await syncOrganisationAccess(env, row.organisation_id, false, row.paid_through);
+      continue;
+    }
     const paid = row.paid_through && Date.parse(row.paid_through) > Date.now();
     const grace = row.paid_through && row.grace_ends_at && Date.parse(row.grace_ends_at) > Date.now();
     const access = row.status !== 'ended' && Boolean(paid || grace);
@@ -121,7 +148,9 @@ export async function enforcePaidLifecycle(env) {
         const admin = await env.DB.prepare(`SELECT email FROM organisation_admins WHERE organisation_id = ? AND status = 'active' LIMIT 1`).bind(row.organisation_id).first();
         if (admin) await queueEmail(env, 'subscription_renewal_reminder', admin.email, {
           subject: `Your SparkFit employer subscription renews in ${days} days`,
-          text: `Your annual employer subscription renews on ${row.current_period_end.slice(0, 10)} for ${row.pending_seats || row.seats} seats. Sign in to review billing, update seats, or cancel before renewal.\n\n${env.SERVICE_ORIGIN}/sign-in/\n\nSparkFit Partnerships`,
+          heading: `Renewal in ${days} days`, eyebrow: 'SparkFit employer subscription',
+          actionUrl: `${env.SERVICE_ORIGIN || 'https://sparkfit-business-platform-staging.colbateson.workers.dev'}/sign-in/`, actionLabel: 'Review your subscription',
+          text: `Your annual employer subscription renews on ${row.current_period_end.slice(0, 10)} for ${row.pending_seats || row.seats} seats. Sign in to review billing, update seats, or cancel before renewal.`,
         }, nowIso(), `renewal:${row.stripe_subscription_id}:${row.current_period_end}:${days}`);
       }
     }

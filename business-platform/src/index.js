@@ -4,6 +4,7 @@ import { emailWebhook, flushEmailOutbox, queueEmail, templates } from './email.j
 import { priceAnnual } from './pricing.js';
 import { reconcileBusinessEntitlement } from './revenuecat.js';
 import { enforcePaidLifecycle, persistSubscription } from './billing.js';
+import { runRetention } from './retention.js';
 import {
   createBillingPortalSession,
   createCheckoutSession,
@@ -54,49 +55,140 @@ async function pilotApplication(request, env) {
   return json({ ok: true, applicationId: application.id, status: 'pending_approval' }, 201);
 }
 
-async function requestSignIn(request, env) {
-  await enforceRateLimit(request, env, 'sign_in_request', 10, 600);
+async function requestSignIn(request, env, destination = 'employer') {
+  await enforceRateLimit(request, env, destination === 'admin' ? 'admin_sign_in_request' : 'sign_in_request', 10, 600);
   const body = await parseJson(request);
   const address = email(body.email);
   if (!validEmail(address)) throw new HttpError(422, 'Enter a valid business email.');
   let role = null;
   let organisationId = null;
-  if (adminEmails(env).has(address)) role = 'sparkfit_admin';
-  else {
-    const admin = await env.DB.prepare(`SELECT email, organisation_id, role FROM organisation_admins WHERE email = ? AND status = 'active'`).bind(address).first();
+  if (destination === 'admin') {
+    if (adminEmails(env).has(address)) role = 'sparkfit_admin';
+  } else {
+    const admin = await env.DB.prepare(`SELECT oa.email, oa.organisation_id, oa.role FROM organisation_admins oa
+      JOIN organisations o ON o.id = oa.organisation_id
+      WHERE oa.email = ? AND oa.status = 'active' AND o.status = 'active'
+      ORDER BY oa.created_at DESC LIMIT 1`).bind(address).first();
     if (admin) { role = admin.role; organisationId = admin.organisation_id; }
   }
   // Always return the same response to prevent account enumeration.
   if (!role) return json({ ok: true });
   const token = await issueMagicLink(env, address, role, organisationId);
   const link = `${new URL(request.url).origin}/v1/auth/consume?token=${encodeURIComponent(token)}`;
-  await queueEmail(env, 'magic_link', address, { subject: 'Your secure SparkFit Partnerships sign-in link', text: `Use this one-time link within 30 minutes:\n\n${link}` });
+  const destinationLabel = role === 'sparkfit_admin' ? 'SparkFit admin dashboard' : 'employer portal';
+  await queueEmail(env, 'magic_link', address, { subject: 'Your secure SparkFit sign-in link', heading: 'Your secure sign-in link', eyebrow: destinationLabel, preheader: 'This one-time sign-in link expires in 30 minutes.', actionUrl: link, actionLabel: `Continue to ${destinationLabel}`, text: `Use this one-time link to sign in to the ${destinationLabel}. It expires after 30 minutes and can only be used once.` });
   await flushEmailOutbox(env, 10);
   return json({ ok: true, ...(env.ENVIRONMENT === 'test' ? { testToken: token } : {}) });
 }
 
+const MAGIC_LINK_COOKIE = 'sparkfit_employer_magic_link';
+
+function signInConfirmation(token) {
+  const safeToken = clean(token, 200);
+  if (!safeToken) throw new HttpError(400, 'This sign-in link is invalid or expired. Request a new link.');
+  const body = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><title>Confirm sign-in | SparkFit Business</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f7f5fb;color:#171321;font:16px/1.5 system-ui,sans-serif}.card{box-sizing:border-box;width:min(92vw,480px);padding:36px;border:1px solid #e5e0ec;border-radius:24px;background:#fff;box-shadow:0 18px 50px #24144212}h1{font-size:30px;line-height:1.1;margin:0 0 14px}p{color:#655d70}.button{width:100%;margin:16px 0 0;padding:15px;border:0;border-radius:999px;background:#6c2ff2;color:white;font:700 16px system-ui;cursor:pointer}.note{font-size:13px}</style></head><body><main class="card"><h1>Confirm your sign-in</h1><p>Your secure link is ready. Press Continue to open your SparkFit dashboard in this browser.</p><form method="post" action="/v1/auth/consume"><button class="button" type="submit">Continue to SparkFit</button></form><p class="note">If you did not request this link, close this page. The link expires after 30 minutes.</p></main></body></html>`;
+  const headers = new Headers({
+    'Content-Type': 'text/html; charset=utf-8',
+    'Cache-Control': 'no-store, max-age=0',
+    'Referrer-Policy': 'no-referrer',
+    'X-Content-Type-Options': 'nosniff',
+    'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
+    'Set-Cookie': `${MAGIC_LINK_COOKIE}=${encodeURIComponent(safeToken)}; Path=/v1/auth/consume; HttpOnly; Secure; SameSite=Strict; Max-Age=1800`,
+  });
+  return new Response(body, { status: 200, headers });
+}
+
+function magicLinkToken(request) {
+  const header = request.headers.get('Cookie') || '';
+  const value = header.split(';').map((part) => part.trim()).find((part) => part.startsWith(`${MAGIC_LINK_COOKIE}=`));
+  return value ? clean(decodeURIComponent(value.slice(MAGIC_LINK_COOKIE.length + 1)), 200) : '';
+}
+
 async function consumeSignIn(request, env) {
-  const token = clean(new URL(request.url).searchParams.get('token'), 200);
+  if (request.method === 'GET') return signInConfirmation(new URL(request.url).searchParams.get('token'));
+  const token = magicLinkToken(request);
+  if (!token) throw new HttpError(401, 'Open your sign-in link in this browser and try again.');
   const result = await consumeMagicLink(env, token);
   const target = result.session.role === 'sparkfit_admin' ? '/admin/' : '/portal/';
-  return new Response(null, { status: 302, headers: { Location: `${serviceOrigin(request)}${target}`, 'Set-Cookie': result.cookie, 'Cache-Control': 'no-store' } });
+  const headers = new Headers({ Location: `${serviceOrigin(request)}${target}`, 'Set-Cookie': result.cookie, 'Cache-Control': 'no-store' });
+  headers.append('Set-Cookie', `${MAGIC_LINK_COOKIE}=; Path=/v1/auth/consume; HttpOnly; Secure; SameSite=Strict; Max-Age=0`);
+  return new Response(null, { status: 302, headers });
 }
 
 async function adminDashboard(request, env) {
   await requireSession(request, env, ['sparkfit_admin']);
-  const [applicationCounts, organisationCounts, seats, failed, audits] = await Promise.all([
+  const [applicationCounts, organisationCounts, seats, failed, audits, organisationOverview] = await Promise.all([
     env.DB.prepare(`SELECT status, COUNT(*) AS count FROM pilot_applications GROUP BY status`).all(),
     env.DB.prepare(`SELECT plan_type, status, COUNT(*) AS count FROM organisations GROUP BY plan_type, status`).all(),
     env.DB.prepare(`SELECT COALESCE(SUM(seat_limit), 0) AS purchased,
       (SELECT COUNT(*) FROM organisation_memberships WHERE status = 'active') AS allocated FROM organisations WHERE status = 'active'`).first(),
     env.DB.prepare(`SELECT COUNT(*) AS count FROM employer_entitlements WHERE provision_status = 'failed'`).first(),
     env.DB.prepare(`SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 50`).all(),
+    env.DB.prepare(`SELECT o.id, o.name, o.website, o.status AS organisation_status, o.plan_type, o.seat_limit,
+      o.starts_at, o.expires_at, o.created_at,
+      COALESCE(es.seats, o.seat_limit) AS seats_purchased, es.status AS subscription_status,
+      es.current_period_end, es.cancel_at_period_end, es.pending_seats, es.payment_failed_at, es.grace_ends_at,
+      co.subtotal_ex_vat AS annual_total_ex_vat, co.discount_bps,
+      COALESCE(co.contact_name, (SELECT pa.contact_name FROM pilot_applications pa
+        WHERE pa.organisation_id = o.id ORDER BY pa.created_at LIMIT 1)) AS contact_name,
+      COALESCE(co.billing_email, (SELECT oa.email FROM organisation_admins oa
+        WHERE oa.organisation_id = o.id AND oa.status = 'active' ORDER BY oa.created_at LIMIT 1)) AS billing_contact,
+      COALESCE(co.company_website, o.website) AS contact_website,
+      (SELECT pa.job_title FROM pilot_applications pa WHERE pa.organisation_id = o.id ORDER BY pa.created_at LIMIT 1) AS contact_title,
+      (SELECT pa.company_size FROM pilot_applications pa WHERE pa.organisation_id = o.id ORDER BY pa.created_at LIMIT 1) AS workforce_size,
+      (SELECT pa.message FROM pilot_applications pa WHERE pa.organisation_id = o.id ORDER BY pa.created_at LIMIT 1) AS pilot_message,
+      co.created_at AS purchase_date,
+      (SELECT COUNT(*) FROM organisation_memberships m WHERE m.organisation_id = o.id AND m.status = 'active') AS activated_seats,
+      (SELECT COUNT(*) FROM employee_invitations i WHERE i.organisation_id = o.id AND i.status = 'pending' AND i.expires_at > ?) AS pending_invitations
+      FROM organisations o
+      LEFT JOIN employer_subscriptions es ON es.id = (SELECT es2.id FROM employer_subscriptions es2
+        WHERE es2.organisation_id = o.id ORDER BY es2.created_at DESC LIMIT 1)
+      LEFT JOIN checkout_orders co ON co.id = (SELECT co2.id FROM checkout_orders co2
+        WHERE co2.organisation_id = o.id ORDER BY co2.created_at DESC LIMIT 1)
+      ORDER BY o.created_at DESC LIMIT 250`).bind(nowIso()).all(),
   ]);
   const paid = await env.DB.prepare(`SELECT COUNT(*) AS organisations, COALESCE(SUM(es.seats), 0) AS seats,
     COALESCE(SUM(co.unit_amount_ex_vat * es.seats), 0) AS arr_pence
     FROM employer_subscriptions es LEFT JOIN checkout_orders co ON co.organisation_id = es.organisation_id
     WHERE es.status = 'active'`).first();
-  return json({ applications: applicationCounts.results || [], organisations: organisationCounts.results || [], seats, paid, failedProvisioning: Number(failed?.count || 0), audits: audits.results || [] });
+  return json({ applications: applicationCounts.results || [], organisations: organisationCounts.results || [], organisationOverview: organisationOverview.results || [], seats, paid, failedProvisioning: Number(failed?.count || 0), audits: audits.results || [] });
+}
+
+async function prepareFirstLiveCheckout(request, env) {
+  if (env.ENVIRONMENT !== 'production' || env.LAUNCH_ENABLED === 'true' || env.FIRST_LIVE_CHECKOUT_ENABLED !== 'true') {
+    throw new HttpError(404, 'This checkout preparation page is unavailable.');
+  }
+  const actor = await requireSession(request, env, ['sparkfit_admin']);
+  await enforceRateLimit(request, env, 'admin_first_live_checkout', 2, 3600);
+  const existing = await env.DB.prepare(`SELECT * FROM checkout_orders WHERE request_key = 'production-first-live-checkout-v1'`).first();
+  if (existing?.stripe_checkout_session_id) {
+    const session = await retrieveStripeResource(env, `/checkout/sessions/${encodeURIComponent(existing.stripe_checkout_session_id)}`);
+    if (session.status === 'open') return json({ checkoutUrl: session.url, orderId: existing.id, reused: true });
+    throw new HttpError(409, 'The first live Checkout has already been completed or expired. Review Stripe before creating another.');
+  }
+  const price = priceAnnual(20);
+  const order = existing || {
+    id: id('ord'), company_name: 'SparkFit', company_website: 'https://spark-fit.com/',
+    billing_email: 'partnerships@spark-fit.com', contact_name: 'SparkFit Partnerships', seats: 20,
+    unit_amount_ex_vat: price.unitExVat, subtotal_ex_vat: price.subtotalExVat,
+    discount_bps: price.discountBps, pricing_version: price.pricingVersion,
+  };
+  const now = nowIso();
+  if (!existing) {
+    await env.DB.prepare(`INSERT INTO checkout_orders
+      (id, company_name, company_website, billing_email, contact_name, seats, unit_amount_ex_vat, subtotal_ex_vat, discount_bps, pricing_version, created_at, updated_at, request_key)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'production-first-live-checkout-v1')`)
+      .bind(order.id, order.company_name, order.company_website, order.billing_email, order.contact_name, order.seats,
+        order.unit_amount_ex_vat, order.subtotal_ex_vat, order.discount_bps, order.pricing_version, now, now).run();
+    await audit(env.DB, actor, 'billing.first_live_checkout.prepared', 'checkout_order', order.id, null,
+      { seats: order.seats, subtotalExVat: order.subtotal_ex_vat, discountBps: order.discount_bps });
+  }
+  const session = await createCheckoutSession(env, order,
+    `${serviceOrigin(request)}/checkout-success/?session_id={CHECKOUT_SESSION_ID}`,
+    `${serviceOrigin(request)}/buy/?seats=${order.seats}`, { allowWhenPaymentsDisabled: true });
+  await env.DB.prepare(`UPDATE checkout_orders SET stripe_checkout_session_id = ?, status = 'checkout_created', updated_at = ? WHERE id = ?`)
+    .bind(session.id, nowIso(), order.id).run();
+  return json({ checkoutUrl: session.url, orderId: order.id, reused: false });
 }
 
 async function listPilots(request, env) {
@@ -141,10 +233,9 @@ async function decidePilot(request, env, applicationId) {
 }
 
 async function portalSummary(request, env) {
-  const actor = await requireSession(request, env, ['organisation_admin', 'sparkfit_admin']);
-  const requestedOrg = clean(new URL(request.url).searchParams.get('organisationId'), 100);
-  const organisationId = actor.role === 'sparkfit_admin' ? requestedOrg : actor.organisationId;
-  if (!organisationId) throw new HttpError(422, 'Organisation is required.');
+  const actor = await requireSession(request, env, ['organisation_admin']);
+  const organisationId = actor.organisationId;
+  if (!organisationId) throw new HttpError(401, 'Please sign in to your employer account.');
   const organisation = await env.DB.prepare(`SELECT * FROM organisations WHERE id = ?`).bind(organisationId).first();
   if (!organisation) throw new HttpError(404, 'Organisation not found.');
   const [members, invites, subscription] = await Promise.all([
@@ -155,7 +246,7 @@ async function portalSummary(request, env) {
   const activeCount = (members.results || []).filter((row) => row.status === 'active').length;
   const pendingCount = (invites.results || []).filter((row) => row.status === 'pending' && new Date(row.expires_at) > new Date()).length;
   const invitationLimit = Math.min(organisation.seat_limit, subscription?.pending_seats || organisation.seat_limit);
-  return json({ organisation, subscription, seats: { purchased: organisation.seat_limit, active: activeCount, pending: pendingCount, allocated: activeCount + pendingCount, available: Math.max(0, invitationLimit - activeCount - pendingCount) }, members: members.results || [], invitations: invites.results || [] });
+  return json({ organisation, subscription, paymentsEnabled: env.PAYMENTS_ENABLED === 'true', seats: { purchased: organisation.seat_limit, active: activeCount, pending: pendingCount, allocated: activeCount + pendingCount, available: Math.max(0, invitationLimit - activeCount - pendingCount) }, members: members.results || [], invitations: invites.results || [] });
 }
 
 async function createInvitation(request, env) {
@@ -191,8 +282,9 @@ async function createInvitation(request, env) {
   const link = `${serviceOrigin(request)}/employee-access/?token=${encodeURIComponent(token)}`;
   await queueEmail(env, 'employee_invitation', recipient, { ...templates.employeeInvite(organisation.name, link), invitationId: saved.id });
   await flushEmailOutbox(env, 10);
+  const delivery = await env.DB.prepare(`SELECT delivery_status FROM employee_invitations WHERE id = ?`).bind(saved.id).first();
   await audit(env.DB, actor, 'employee.invited', 'employee_invitation', invitationId, actor.organisationId, { recipient });
-  return json({ ok: true, invitationId: saved.id, expiresAt }, 201);
+  return json({ ok: true, invitationId: saved.id, expiresAt, deliveryStatus: delivery?.delivery_status || 'queued' }, 201);
 }
 
 async function invitationAction(request, env, invitationId) {
@@ -217,8 +309,10 @@ async function invitationAction(request, env, invitationId) {
       .bind(await sha256(token), expiresAt, nowIso(), invitationId).run();
     const link = `${serviceOrigin(request)}/employee-access/?token=${encodeURIComponent(token)}`;
     await queueEmail(env, 'employee_invitation_reminder', invitation.email, { ...templates.employeeInviteReminder(invitation.organisation_name, link), invitationId });
+    await flushEmailOutbox(env, 10);
+    const delivery = await env.DB.prepare(`SELECT delivery_status FROM employee_invitations WHERE id = ?`).bind(invitationId).first();
     await audit(env.DB, actor, 'employee.invitation.resent', 'employee_invitation', invitationId, actor.organisationId);
-    return json({ ok: true, status: 'pending', expiresAt });
+    return json({ ok: true, status: 'pending', expiresAt, deliveryStatus: delivery?.delivery_status || 'queued' });
   }
   if (action === 'correct') {
     if (!['pending', 'expired'].includes(invitation.status)) throw new HttpError(409, 'An activated employee must be removed before inviting a different address.');
@@ -232,8 +326,10 @@ async function invitationAction(request, env, invitationId) {
     } catch { throw new HttpError(409, 'That email is already associated with this organisation.'); }
     const link = `${serviceOrigin(request)}/employee-access/?token=${encodeURIComponent(token)}`;
     await queueEmail(env, 'employee_invitation', corrected, { ...templates.employeeInvite(invitation.organisation_name, link), invitationId });
+    await flushEmailOutbox(env, 10);
+    const delivery = await env.DB.prepare(`SELECT delivery_status FROM employee_invitations WHERE id = ?`).bind(invitationId).first();
     await audit(env.DB, actor, 'employee.invitation.corrected', 'employee_invitation', invitationId, actor.organisationId, { previousEmail: invitation.email, correctedEmail: corrected });
-    return json({ ok: true, status: 'pending', email: corrected, expiresAt });
+    return json({ ok: true, status: 'pending', email: corrected, expiresAt, deliveryStatus: delivery?.delivery_status || 'queued' });
   }
   throw new HttpError(422, 'Action must be resend, revoke or correct.');
 }
@@ -286,8 +382,17 @@ async function acceptInvitation(request, env) {
   const tokenHash = await sha256(token);
   const invitation = await env.DB.prepare(`SELECT i.*, o.plan_type, o.expires_at AS organisation_expires_at, o.status AS organisation_status
     FROM employee_invitations i JOIN organisations o ON o.id = i.organisation_id
-    WHERE i.token_hash = ? AND i.status = 'pending' AND i.expires_at > ?`).bind(tokenHash, nowIso()).first();
-  if (!invitation || invitation.organisation_status !== 'active' || Date.parse(invitation.organisation_expires_at) <= Date.now()) throw new HttpError(410, 'This invitation is invalid or expired.');
+    WHERE i.token_hash = ? AND i.status IN ('pending', 'accepted')`).bind(tokenHash).first();
+  if (!invitation || invitation.organisation_status !== 'active' || Date.parse(invitation.organisation_expires_at) <= Date.now()
+    || (invitation.status === 'pending' && Date.parse(invitation.expires_at) <= Date.now())) throw new HttpError(410, 'This invitation is invalid or expired.');
+  if (invitation.status === 'accepted') {
+    const acceptedMembership = await env.DB.prepare(`SELECT id FROM organisation_memberships
+      WHERE organisation_id = ? AND invitation_id = ? AND revenuecat_app_user_id = ? AND status = 'active' LIMIT 1`)
+      .bind(invitation.organisation_id, invitation.id, account.id).first();
+    if (!acceptedMembership) throw new HttpError(410, 'This invitation is no longer available for this account.');
+    const reconciliation = await reconcileBusinessEntitlement(env, account.id);
+    return json({ ok: true, membershipId: acceptedMembership.id, accountId: account.id, premium: reconciliation, alreadyActivated: true });
+  }
   if (env.REQUIRE_APP_ACCOUNT_FOR_BUSINESS === 'true') throw new HttpError(409, 'Open this invitation in the SparkFit app and sign in with a verified account.');
   // Current SparkFit releases identify RevenueCat customers by normalised onboarding email.
   // The email comes only from the server-side invitation record after possession of the
@@ -325,14 +430,38 @@ async function acceptInvitation(request, env) {
 }
 
 async function activateInvitationForAccount(request, env) {
-  await enforceRateLimit(request, env, 'employee_activation', 10, 600);
   const account = await requireAppSession(request, env);
+  await enforceRateLimit(request, env, 'employee_activation_account', 10, 60, account.id);
   const body = await parseJson(request);
   const tokenHash = await sha256(clean(body.token, 200));
   const invitation = await env.DB.prepare(`SELECT i.*, o.plan_type, o.expires_at AS organisation_expires_at, o.status AS organisation_status
     FROM employee_invitations i JOIN organisations o ON o.id = i.organisation_id
     WHERE i.token_hash = ? AND i.status = 'pending' AND i.expires_at > ?`).bind(tokenHash, nowIso()).first();
   if (!invitation || invitation.organisation_status !== 'active' || Date.parse(invitation.organisation_expires_at) <= Date.now()) throw new HttpError(410, 'This invitation is invalid or expired.');
+  const activeAccountMembership = await env.DB.prepare(`SELECT * FROM organisation_memberships
+    WHERE organisation_id = ? AND revenuecat_app_user_id = ? AND status = 'active' LIMIT 1`)
+    .bind(invitation.organisation_id, account.id).first();
+  if (activeAccountMembership) {
+    if (account.primary_email !== invitation.email) {
+      throw new HttpError(409, 'This SparkFit account already has access for this organisation under a different email. Sign in to the account linked to the invitation, or ask your employer to update the invited email.');
+    }
+    const now = nowIso();
+    await env.DB.batch([
+      env.DB.prepare(`UPDATE employee_invitations SET status = 'revoked', revoked_at = ?
+        WHERE id = ? AND id != ? AND status = 'accepted'`)
+        .bind(now, activeAccountMembership.invitation_id, invitation.id),
+      env.DB.prepare(`UPDATE organisation_memberships SET email = ?, invitation_id = ?
+        WHERE id = ? AND organisation_id = ? AND status = 'active'`)
+        .bind(invitation.email, invitation.id, activeAccountMembership.id, invitation.organisation_id),
+      env.DB.prepare(`UPDATE employee_invitations SET status = 'accepted', accepted_at = COALESCE(accepted_at, ?),
+        verified_at = COALESCE(verified_at, ?) WHERE id = ? AND status = 'pending'`)
+        .bind(now, now, invitation.id),
+    ]);
+    const reconciliation = await reconcileBusinessEntitlement(env, account.id);
+    await audit(env.DB, { email: account.primary_email, role: 'employee' }, 'employee.invitation.relinked', 'membership', activeAccountMembership.id, invitation.organisation_id,
+      { previousEmail: activeAccountMembership.email, invitedEmail: invitation.email });
+    return json({ ok: true, membershipId: activeAccountMembership.id, accountId: account.id, premium: reconciliation, relinked: true });
+  }
   const previousMembership = await env.DB.prepare(`SELECT id FROM organisation_memberships WHERE organisation_id = ? AND email = ?`).bind(invitation.organisation_id, invitation.email).first();
   const membershipId = previousMembership?.id || id('mem');
   const entitlementId = id('ent');
@@ -354,6 +483,7 @@ async function activateInvitationForAccount(request, env) {
     ]);
   } catch (error) {
     if (String(error).includes('seat limit')) throw new HttpError(409, 'No employee seats are available.');
+    if (String(error).includes('account already activated')) throw new HttpError(409, 'This SparkFit account already has employee access for this organisation.');
     throw error;
   }
   const reconciliation = await reconcileBusinessEntitlement(env, account.id);
@@ -438,10 +568,15 @@ async function checkout(request, env) {
     Object.assign(order, { organisation_id: organisation.id, company_name: organisation.name,
       company_website: organisation.website, billing_email: actor.email });
   } else {
-    const existing = await env.DB.prepare(`SELECT organisation_id FROM organisation_admins WHERE email = ? AND status = 'active'`).bind(order.billing_email).first();
+    // Ended pilots and ended subscriptions should not permanently block a new
+    // purchase for the same billing contact. Active organisations still need
+    // to manage upgrades or renewals through their employer portal.
+    const existing = await env.DB.prepare(`SELECT oa.organisation_id FROM organisation_admins oa
+      JOIN organisations o ON o.id = oa.organisation_id
+      WHERE oa.email = ? AND oa.status = 'active' AND o.status = 'active' LIMIT 1`).bind(order.billing_email).first();
     if (existing) throw new HttpError(409, 'Sign in to your employer portal to upgrade or manage your existing organisation.');
   }
-  if (!order.company_name || order.company_website === null || !validEmail(order.billing_email) || !order.contact_name || !integer(order.seats, 20, 1000)) throw new HttpError(422, 'Please check the order details.');
+  if (!order.company_name || order.company_website === null || !validEmail(order.billing_email) || !order.contact_name || !integer(order.seats, 20, 500)) throw new HttpError(422, 'Please check the order details.');
   const price = priceAnnual(order.seats);
   if (price.provisional) throw new HttpError(409, 'Pricing above 500 seats requires commercial approval.');
   Object.assign(order, { unit_amount_ex_vat: price.unitExVat, subtotal_ex_vat: price.subtotalExVat, discount_bps: price.discountBps, pricing_version: price.pricingVersion });
@@ -593,12 +728,18 @@ async function lifecycle(env) {
     try { await reconcileBusinessEntitlement(env, user.revenuecat_app_user_id); } catch { /* Retry next run. */ }
   }
   const emailResult = await flushEmailOutbox(env);
-  return { ended, email: emailResult };
+  const retention = await runRetention(env);
+  return { ended, email: emailResult, retention };
 }
 
 async function route(request, env) {
   const url = new URL(request.url);
   const path = url.pathname.replace(/\/$/, '') || '/';
+  const signedWebhook = request.method === 'POST' && ['/v1/webhooks/stripe', '/v1/webhooks/resend'].includes(path);
+  const preparationRoute = path.startsWith('/v1/admin/') || path === '/v1/auth/consume';
+  if (env.ENVIRONMENT === 'production' && env.LAUNCH_ENABLED !== 'true' && path.startsWith('/v1/') && path !== '/v1/public-config' && !signedWebhook && !preparationRoute) {
+    throw new HttpError(503, 'SparkFit Business is being prepared for launch. Please contact partnerships@spark-fit.com.');
+  }
   if (request.method === 'GET' && path === '/health') return json({ ok: true, environment: env.ENVIRONMENT, paymentsEnabled: env.PAYMENTS_ENABLED === 'true', revenueCatWritesEnabled: env.REVENUECAT_WRITES_ENABLED === 'true', emailEnabled: env.EMAIL_ENABLED === 'true' });
   if (request.method === 'GET' && path === '/v1/public-config') return json({
     testMode: env.ENVIRONMENT !== 'production',
@@ -636,9 +777,11 @@ async function route(request, env) {
   }
   if (request.method === 'POST' && path === '/v1/pilot-applications') return pilotApplication(request, env);
   if (request.method === 'POST' && path === '/v1/auth/request') return requestSignIn(request, env);
-  if (request.method === 'GET' && path === '/v1/auth/consume') return consumeSignIn(request, env);
+  if (request.method === 'POST' && path === '/v1/admin/auth/request') return requestSignIn(request, env, 'admin');
+  if (['GET', 'POST'].includes(request.method) && path === '/v1/auth/consume') return consumeSignIn(request, env);
   if (request.method === 'GET' && path === '/v1/admin/pilot-applications') return listPilots(request, env);
   if (request.method === 'GET' && path === '/v1/admin/dashboard') return adminDashboard(request, env);
+  if (request.method === 'POST' && path === '/v1/admin/first-live-checkout') return prepareFirstLiveCheckout(request, env);
   const pilotMatch = path.match(/^\/v1\/admin\/pilot-applications\/([^/]+)\/decision$/);
   if (request.method === 'POST' && pilotMatch) return decidePilot(request, env, pilotMatch[1]);
   const organisationActionMatch = path.match(/^\/v1\/admin\/organisations\/([^/]+)\/action$/);
@@ -668,7 +811,12 @@ export default {
       const origin = request.headers.get('Origin');
       const allowed = new Set([env.PUBLIC_APP_ORIGIN, env.SERVICE_ORIGIN, new URL(request.url).origin]);
       if (env.ENVIRONMENT !== 'production') { allowed.add('http://localhost:4173'); allowed.add('http://127.0.0.1:4173'); }
-      if (!['GET', 'HEAD'].includes(request.method) && origin && !allowed.has(origin)) throw new HttpError(403, 'This request origin is not allowed.');
+      const sameOriginSignInPost = request.method === 'POST'
+        && new URL(request.url).pathname === '/v1/auth/consume'
+        && request.headers.get('Sec-Fetch-Site') === 'same-origin';
+      if (!['GET', 'HEAD'].includes(request.method) && origin && !allowed.has(origin) && !sameOriginSignInPost) {
+        throw new HttpError(403, 'This request origin is not allowed.');
+      }
       const response = await route(request, env);
       if (ctx?.waitUntil && request.method === 'POST') ctx.waitUntil(flushEmailOutbox(env).catch(() => {}));
       const headers = new Headers(response.headers);
@@ -678,7 +826,9 @@ export default {
       return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
     } catch (error) {
       console.error('request_failed', { message: error.message, path: new URL(request.url).pathname });
-      return json({ error: error instanceof HttpError ? error.message : 'The service could not complete this request.' }, error instanceof HttpError ? error.status : 500, cors);
+      const limited = error instanceof HttpError && error.status === 429;
+      const retryAfterSeconds = limited ? Math.max(1, Number(error.retryAfterSeconds || 60)) : 0;
+      return json({ error: error instanceof HttpError ? error.message : 'The service could not complete this request.', ...(limited ? { retryAfterSeconds } : {}) }, error instanceof HttpError ? error.status : 500, { ...cors, ...(limited ? { 'Retry-After': String(retryAfterSeconds) } : {}) });
     }
   },
   async scheduled(_controller, env, ctx) { ctx.waitUntil(lifecycle(env)); },

@@ -5,14 +5,19 @@ else {
   form.querySelector('button').disabled = true;
   getPublicConfig().then((config) => {
     if (config.requireAppAccountForBusiness) {
-      const link = document.createElement('a');
-      link.className = 'button';
-      link.href = `sparkfit://business-invitation?token=${encodeURIComponent(token)}`;
-      link.textContent = 'Open invitation in SparkFit';
-      form.querySelector('button').replaceWith(link);
-      document.querySelector('.auth-card > p').textContent = 'Open this invitation in SparkFit. Sign in to your existing account, or verify your email to create one. Your employer pays for your access.';
-      document.querySelector('.help').textContent = 'Already use a different email in SparkFit? Sign in to that account before accepting this invitation. You do not need to create a second account.';
-      setStatus(status, 'Open SparkFit to verify your account and accept your invitation.');
+      const ios = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const appLink = document.createElement('a');
+      appLink.className = 'button';
+      appLink.href = `${ios ? 'app.sparkfit' : 'myapp'}://business-invitation?token=${encodeURIComponent(token)}`;
+      appLink.textContent = 'Continue in SparkFit';
+      form.querySelector('button').replaceWith(appLink);
+
+      const intro = document.querySelector('[data-invitation-intro]');
+      intro.textContent = 'Your employer has paid for your SparkFit Premium access. Open the invitation in SparkFit, sign in or verify your email, then tap “Activate Premium access”.';
+      document.querySelector('[data-invitation-steps]').hidden = false;
+      document.querySelector('[data-install-links]').hidden = false;
+      document.querySelector('[data-help]').textContent = 'If SparkFit is not installed, install it below, then return to this invitation and tap “Continue in SparkFit”. Use the account you already have. If its email is different, sign in to that account before activating.';
+      setStatus(status, 'Your next step is to continue in the SparkFit app. Activation is completed there.');
     } else { form.querySelector('button').disabled = false; }
   }).catch(() => setStatus(status, 'We could not load your invitation. Please reload and try again.', 'error'));
 }

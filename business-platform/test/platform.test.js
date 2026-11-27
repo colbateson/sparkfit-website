@@ -34,12 +34,11 @@ test('accepts company websites with or without a protocol', () => {
   assert.equal(normaliseWebsite('', false), '');
 });
 
-test('accepts every integer seat quantity and flags unapproved extension', () => {
-  for (let seats = 20; seats <= 1000; seats += 1) assert.equal(priceAnnual(seats).seats, seats);
+test('accepts every integer seat quantity within the published self-service limit', () => {
+  for (let seats = 20; seats <= 500; seats += 1) assert.equal(priceAnnual(seats).seats, seats);
   assert.equal(priceAnnual(500).provisional, false);
-  assert.equal(priceAnnual(501).provisional, true);
+  assert.throws(() => priceAnnual(501), RangeError);
   assert.throws(() => priceAnnual(19), RangeError);
-  assert.throws(() => priceAnnual(1001), RangeError);
 });
 
 test('verifies Stripe webhook HMAC and rejects altered payloads', async () => {
@@ -84,10 +83,37 @@ test('creates tax-aware annual Checkout with a pinned API version and idempotenc
   const body = new URLSearchParams(request.options.body);
   assert.equal(request.options.headers['Stripe-Version'], '2026-10-28.endive');
   assert.equal(request.options.headers['Idempotency-Key'], 'checkout-ord_test');
+  assert.equal(body.get('managed_payments[enabled]'), 'false');
   assert.equal(body.get('automatic_tax[enabled]'), 'false');
   assert.equal(body.get('tax_id_collection[enabled]'), 'true');
   assert.equal(body.get('line_items[0][price_data][tax_behavior]'), 'exclusive');
   assert.equal(body.get('line_items[0][price_data][product_data][tax_code]'), 'txcd_10103101');
+  assert.equal(body.has('payment_method_types'), false);
+});
+
+test('Managed Payments checkout uses Stripe as merchant of record without conflicting tax fields', async () => {
+  const originalFetch = globalThis.fetch;
+  let request;
+  globalThis.fetch = async (url, options) => {
+    request = { url, options };
+    return new Response(JSON.stringify({ id: 'cs_test_managed', url: 'https://checkout.stripe.com/test' }), { status: 200 });
+  };
+  try {
+    await createCheckoutSession({ PAYMENTS_ENABLED: 'true', STRIPE_MANAGED_PAYMENTS_ENABLED: 'true', STRIPE_SECRET_KEY: 'sk_test_only' }, {
+      id: 'ord_managed', billing_email: 'billing@example.com', seats: 20, unit_amount_ex_vat: 1666, pricing_version: 'annual-v1-preview',
+    }, 'https://example.com/success', 'https://example.com/cancel');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+  const body = new URLSearchParams(request.options.body);
+  assert.equal(body.get('managed_payments[enabled]'), 'true');
+  assert.equal(body.get('mode'), 'subscription');
+  assert.equal(body.get('line_items[0][price_data][currency]'), 'gbp');
+  assert.equal(body.get('line_items[0][price_data][recurring][interval]'), 'year');
+  assert.equal(body.get('line_items[0][price_data][product_data][tax_code]'), 'txcd_10103101');
+  assert.equal(body.get('name_collection[business][enabled]'), 'true');
+  assert.equal(body.has('automatic_tax[enabled]'), false);
+  assert.equal(body.has('tax_id_collection[enabled]'), false);
   assert.equal(body.has('payment_method_types'), false);
 });
 

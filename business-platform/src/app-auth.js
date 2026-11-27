@@ -1,10 +1,20 @@
-import { email, HttpError, id, nowIso, randomToken, sha256, validEmail } from './lib.js';
+import { email, enforceRateLimit, HttpError, id, nowIso, randomToken, sha256, validEmail } from './lib.js';
 import { flushEmailOutbox, queueEmail, templates } from './email.js';
 
 export async function requestAppVerification(request, env, serviceOrigin) {
   const body = await request.json().catch(() => ({}));
   const address = email(body.email);
   if (!validEmail(address)) throw new HttpError(422, 'Enter a valid email address.');
+  if (env.ENVIRONMENT !== 'test') {
+    if (env.EMAIL_ENABLED !== 'true' || !env.RESEND_API_KEY) throw new HttpError(503, 'Email verification is temporarily unavailable. You can continue using your personal SparkFit access.');
+    if (env.ENVIRONMENT === 'staging') {
+      const allowed = String(env.STAGING_APP_EMAIL_ALLOWLIST || '').split(',').concat(String(env.STAGING_EMAIL_ALLOWLIST || '').split(',')).map(email);
+      if (!allowed.includes(address)) throw new HttpError(503, 'This test build cannot send verification to that address yet. You can continue using your personal SparkFit access.');
+    }
+  }
+  await enforceRateLimit(request, env, 'app_auth_recipient_minute', 1, 60, address);
+  await enforceRateLimit(request, env, 'app_auth_recipient_quarter', 3, 900, address);
+  await enforceRateLimit(request, env, 'app_auth_recipient_day', 10, 86400, address);
   const token = randomToken();
   const now = nowIso();
   await env.DB.prepare(`INSERT INTO app_auth_challenges (id, email, token_hash, expires_at, created_at)
@@ -13,7 +23,7 @@ export async function requestAppVerification(request, env, serviceOrigin) {
   const link = `${serviceOrigin}/v1/app-auth/verify?token=${encodeURIComponent(token)}`;
   await queueEmail(env, 'app_email_verification', address, templates.appEmailVerification(link));
   await flushEmailOutbox(env, 10);
-  return { ok: true };
+  return { ok: true, queued: true, resendAfterSeconds: 60 };
 }
 
 export async function verifyAppEmail(env, token, serviceOrigin) {

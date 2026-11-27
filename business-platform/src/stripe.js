@@ -28,18 +28,20 @@ async function stripeRequest(env, path, values, options = {}) {
   return payload;
 }
 
-export function createCheckoutSession(env, order, successUrl, cancelUrl) {
-  if (env.PAYMENTS_ENABLED !== 'true') throw new HttpError(503, 'Online purchasing is not enabled in this environment.');
+export function createCheckoutSession(env, order, successUrl, cancelUrl, { allowWhenPaymentsDisabled = false } = {}) {
+  if (env.PAYMENTS_ENABLED !== 'true' && !allowWhenPaymentsDisabled) throw new HttpError(503, 'Online purchasing is not enabled in this environment.');
+  const managedPayments = env.STRIPE_MANAGED_PAYMENTS_ENABLED === 'true';
   return stripeRequest(env, '/checkout/sessions', {
     mode: 'subscription',
-    'managed_payments[enabled]': 'false',
+    'managed_payments[enabled]': managedPayments ? 'true' : 'false',
     customer_email: order.billing_email,
     client_reference_id: order.id,
     success_url: successUrl,
     cancel_url: cancelUrl,
-    'automatic_tax[enabled]': env.STRIPE_AUTOMATIC_TAX_ENABLED === 'true' ? 'true' : 'false',
+    ...(!managedPayments ? { 'automatic_tax[enabled]': env.STRIPE_AUTOMATIC_TAX_ENABLED === 'true' ? 'true' : 'false' } : {}),
     'billing_address_collection': 'required',
-    'tax_id_collection[enabled]': 'true',
+    ...(!managedPayments ? { 'tax_id_collection[enabled]': 'true' } : {}),
+    ...(managedPayments ? { 'name_collection[business][enabled]': 'true' } : {}),
     'line_items[0][price_data][currency]': 'gbp',
     ...(env.STRIPE_PRODUCT_ID ? { 'line_items[0][price_data][product]': env.STRIPE_PRODUCT_ID } : {
       'line_items[0][price_data][product_data][name]': 'SparkFit Annual Employer Subscription',
@@ -64,6 +66,12 @@ export function createBillingPortalSession(env, customerId, returnUrl) {
     configuration: env.STRIPE_PORTAL_CONFIGURATION_ID,
     return_url: returnUrl,
   });
+}
+
+export async function cancelStripeSubscription(env, subscriptionId) {
+  const current = await retrieveStripeResource(env, `/subscriptions/${encodeURIComponent(subscriptionId)}`);
+  if (current.status === 'canceled') return current;
+  return stripeRequest(env, `/subscriptions/${encodeURIComponent(subscriptionId)}`, {}, { method: 'DELETE' });
 }
 
 async function annualPrice(env, product, seats) {

@@ -1,12 +1,12 @@
 # SparkFit Business Production Runbook
 
-This is the ordered implementation and launch guide for SparkFit Business. Follow it from top to bottom. Do not enable payments, outgoing email or RevenueCat writes until the relevant acceptance gate says it is safe.
+This is the ordered implementation and launch guide for SparkFit Business. Follow it from top to bottom. Customer-facing launch, public payments and RevenueCat writes stay off until the relevant acceptance gate says they are safe. Production email is enabled for allowlisted internal admin and approved transactional workflows while public launch remains gated.
 
 For the latest completed configuration, CLI recovery instructions and outstanding integration checks, read [STAGING_SETUP_STATUS.md](./STAGING_SETUP_STATUS.md) first. Code implemented behind a flag is not a completed end-to-end test.
 
 ## 1. Current position
 
-The following foundation is complete on the staging branch:
+The following foundation is complete on local `main` and deployed to staging:
 
 - Pilot application and internal approval flow.
 - Employer and SparkFit administrator sign-in using expiring email links.
@@ -17,8 +17,10 @@ The following foundation is complete on the staging branch:
 - Employee removal and seat recovery.
 - Separate employer entitlement ledger and audit history.
 - RevenueCat grant, revoke and reconciliation tested with staging writes; production remains disabled.
-- Stripe annual checkout, webhook and Customer Portal integration behind a disabled flag.
-- Lifecycle email queue enabled for the monitored staging allowlist; production remains disabled.
+- Stripe annual checkout, webhooks, Customer Portal and tested renewal failure and recovery. Live product category, price, quantity limit, Managed Payments eligibility, portal, invoice branding, retry and webhook settings have been reviewed; public purchasing remains disabled. The account owner must complete the first real hosted Checkout.
+- Lifecycle email queue and Resend verification are enabled in staging. A controlled production admin email was received and its signed delivered callback recorded in production D1; failure-path acceptance remains.
+- Automated business-data retention and legal-hold safeguards are deployed to staging; production retention remains disabled.
+- Mobile identity source is on local `main`, but has not been built or released to devices.
 - Daily pilot expiry and reminder processing.
 - Cloudflare D1 migrations and staging Worker deployment.
 
@@ -26,47 +28,42 @@ Staging URL:
 
 `https://sparkfit-business-platform-staging.colbateson.workers.dev`
 
-The safety flags are deliberately disabled:
+The production customer-launch gates are deliberately disabled while the owner prepares the first paid Checkout:
 
 ```text
+LAUNCH_ENABLED=false
 PAYMENTS_ENABLED=false
 REVENUECAT_WRITES_ENABLED=false
-EMAIL_ENABLED=false
-TURNSTILE_REQUIRED=false
+EMAIL_ENABLED=true (approved transactional mail only)
+TURNSTILE_REQUIRED=true
+RETENTION_ENABLED=true (approved retention policy)
+STRIPE_MANAGED_PAYMENTS_ENABLED=true
 ```
 
 ## 2. Work that is still required
 
 ### Required before any production employee activation
 
-- Add stable authenticated SparkFit accounts to the iOS and Android apps.
-- Give each account a non-guessable immutable ID, such as a UUID.
-- Verify account email addresses.
-- Migrate RevenueCat identification away from email addresses to the immutable account ID.
-- Add the separate RevenueCat Business entitlement to the app's premium access check.
-- Add the safe flow for an invited employee whose existing SparkFit account uses another email address.
-- Test that removing Business access never removes a separately purchased `Pro` entitlement or an existing `Trial` entitlement.
+- Build and install the current local mobile identity changes on iOS and Android, then complete the acceptance steps in `STAGING_SETUP_STATUS.md`.
+- Confirm personal purchases remain active through Business activation, removal and restore on both stores.
 
-### Required before a public form is protected by Turnstile
+### Required before public purchase is enabled
 
-- Render the Cloudflare Turnstile widget on the pilot and purchase forms.
-- Send its response token as `turnstileToken` in each API request.
-- Add a real Cloudflare rate-limiting binding or rule for public submission and sign-in endpoints.
-- Keep `TURNSTILE_REQUIRED=false` until the widget is deployed and verified.
+- The pilot Turnstile journey has passed. Complete a browser purchase journey with the purchase form's Turnstile challenge and Stripe test Checkout.
+- Confirm rate limits for pilot, checkout, sign-in and activation endpoints before production.
 
 ### Required before taking money
 
-- Agree final commercial terms, VAT wording, refunds, cancellation rules, payment-failure grace period and renewal wording.
-- Configure Stripe in test mode and complete every lifecycle test in section 9.
+- Commercial and privacy wording has been approved by the SparkFit owner on 27 November 2026 and published in the Business terms and Business privacy pages. Live payment acceptance is still gated on the first owner-completed Checkout.
+- Complete the outstanding Stripe acceptance items in section 9, including a hosted Checkout browser purchase.
 - Confirm the annual prices and volume tiers in `src/pricing.js` are commercially approved.
 - Test the proposed renewal-only seat reduction schedule against a real Stripe test subscription. Confirm that increases, scheduled changes and cancellation interact correctly before launch.
 
-### Required before production data is retained
+### Required before production retention is enabled
 
 - Approve the privacy notice and data-processing terms.
-- Define retention periods for applications, invitations, audit events and billing records.
-- Implement the approved deletion or anonymisation routine.
-- Document who may use the SparkFit administrator portal.
+- Confirm retention periods, legal hold operations and privacy wording with an adviser.
+- The anonymisation routine and legal-hold safeguards are implemented and staging-tested. The approved retention policy is enabled in production.
 
 ## 3. Immediate security action
 
@@ -76,7 +73,7 @@ SparkFit Business secrets must only be stored with Cloudflare secret commands. N
 
 ## 4. Confirm the commercial and privacy policy
 
-The proposed operating defaults are recorded in [COMMERCIAL_TERMS_DRAFT.md](./COMMERCIAL_TERMS_DRAFT.md). Have the renewal, cancellation, payment failure, refund, seat reduction and retention sections reviewed before copying them into the employer agreement or enabling live Stripe settings.
+The owner-approved operating policy is recorded in [COMMERCIAL_TERMS.md](./COMMERCIAL_TERMS.md), and customer-facing pages are [Business terms](../business/terms.html) and [Business privacy information](../business/privacy.html).
 
 Record written answers for all of these items before enabling checkout:
 
@@ -86,7 +83,7 @@ Record written answers for all of these items before enabling checkout:
 4. Maximum self-service order. Current maximum is 500 seats.
 5. Orders above 500 seats. Current route is contact with SparkFit Partnerships.
 6. Billing period. Current checkout is annual only.
-7. Price basis. Business prices exclude VAT and Stripe adds applicable tax.
+7. Price basis. Business prices are before applicable transaction tax. Stripe Managed Payments is enabled for eligible transactions and displays calculated tax and final amount in Checkout. SparkFit is not UK VAT registered; Managed Payments acts as merchant of record for supported transactions.
 8. Renewal rule. Confirm automatic renewal wording and reminder policy.
 9. Cancellation rule. Confirm whether access remains until the paid period ends.
 10. Payment failure rule. Set the grace period and the exact access suspension rule.
@@ -94,13 +91,13 @@ Record written answers for all of these items before enabling checkout:
 12. Seat reduction rule. Define whether it is immediate or effective at renewal.
 13. Employer reporting. Keep this limited to invited, pending, active, expired and removed statuses.
 14. Private employee data. Never show workouts, nutrition, weight, measurements, photos, chat or progress to an employer.
-15. Retention. Approve specific periods for unsuccessful applications, expired invitations, ended organisations and audit records.
+15. Retention. The approved periods are recorded in the Business privacy notice. Financial/tax record duration remains subject to applicable law and legal holds.
 
 Update the legal pages and customer-facing wording before the production website is linked.
 
 ## 5. Finish the mobile identity implementation
 
-This is the most important prerequisite. The current app identifies RevenueCat customers using a normalised onboarding email. Email is mutable and is not a safe long-term account identifier.
+The stable account identity, verified email, RevenueCat UUID migration and separate Business entitlement are implemented locally. The current local `main` changes still need an iOS and Android build and device acceptance before release.
 
 ### Account model
 
@@ -199,32 +196,32 @@ Only then is the RevenueCat integration ready for the full staging test.
 
 ## 7. Configure transactional email
 
-1. Create or use a dedicated sending subdomain, for example `mail.spark-fit.com`.
-2. Verify the domain with the email provider and publish the required SPF and DKIM records.
-3. Create a sender such as `SparkFit Partnerships <partnerships@mail.spark-fit.com>`.
-4. Use `partnerships@spark-fit.com` as the reply address if that mailbox is monitored.
-5. Create the Resend API key.
-6. Set it as a Cloudflare secret:
+Production email setup is now configured on the verified `business-mail.spark-fit.com` domain. The existing `mail.spark-fit.com` belongs to another Resend team and was left untouched. The production sender is `SparkFit Partnerships <partnerships@business-mail.spark-fit.com>` and replies go to the monitored `partnerships@spark-fit.com` inbox. A sending-only key restricted to the verified domain and a webhook signing secret are stored as Cloudflare Worker secrets. The production webhook is subscribed to delivered, bounced, complained, failed and delayed events.
+
+Before enabling production email, keep the customer launch gate closed and perform a controlled internal send to `partnerships@spark-fit.com`. Confirm the message in Inbox and Spam, and confirm the signed delivery callback is recorded. Then test provider failure events. `EMAIL_ENABLED` must remain false until this controlled acceptance succeeds.
+
+For a new environment, use the following steps:
+
+1. Create a dedicated sending subdomain and verify SPF/DKIM with the provider.
+2. Create a sender and monitored reply address.
+3. Create a domain-restricted sending key and store it as a Worker secret:
 
 ```sh
 cd /Users/col/Projects/sparkfit-website/business-platform
-npx wrangler secret put RESEND_API_KEY
+npx wrangler secret put RESEND_API_KEY --config wrangler.production.toml
 ```
 
-7. Add these variables to staging:
+4. Add the sender variables to the relevant environment:
 
 ```toml
-EMAIL_FROM = "SparkFit Partnerships <partnerships@mail.spark-fit.com>"
+EMAIL_FROM = "SparkFit Partnerships <partnerships@business-mail.spark-fit.com>"
 EMAIL_REPLY_TO = "partnerships@spark-fit.com"
 PARTNERSHIPS_EMAIL = "partnerships@spark-fit.com"
 ```
 
-8. Keep `EMAIL_ENABLED=false` for the first deployment.
-9. Submit a pilot application and inspect the email outbox in D1.
-10. Enable email in staging and deploy.
-11. Test pilot received, approval, rejection, sign-in, employee invitation, pilot reminder and pilot expiry messages.
-12. Verify links, sender alignment, reply handling, plain text readability, mobile readability, delivery events and spam placement.
-13. Confirm that sign-in responses do not reveal whether an email is registered.
+5. Keep `EMAIL_ENABLED=false` for initial deployment.
+6. Test every email template, links, reply handling, mobile readability, delivery events and spam placement in staging.
+7. Confirm that sign-in responses do not reveal whether an email is registered.
 
 Use monitored email addresses during testing. Do not use real employee lists in staging.
 
@@ -251,20 +248,7 @@ ADMIN_EMAILS = "approved.admin@spark-fit.com"
 
 ### Turnstile
 
-Before making Turnstile mandatory, add the widget and token handling to both public forms.
-
-1. Create a Turnstile widget for the staging hostname.
-2. Add the public site key as a non-secret variable.
-3. Render the widget in `/pilot/` and `/buy/`.
-4. Include its token as `turnstileToken` in the JSON submission.
-5. Store the secret with:
-
-```sh
-npx wrangler secret put TURNSTILE_SECRET_KEY
-```
-
-6. Test valid, missing, expired and reused tokens.
-7. Only after those tests pass, set `TURNSTILE_REQUIRED=true`.
+The staging widgets, token verification, staging hostname and required flag are configured. Before production, create a separate Turnstile widget for `business.spark-fit.com`, set its public site key and allowed hostname in the production config, store its secret with `wrangler secret put TURNSTILE_SECRET_KEY --config wrangler.production.toml`, then test valid, missing, expired and reused tokens before opening public forms.
 
 ### Rate limiting
 
@@ -290,16 +274,17 @@ Keep staging protected from indexing. Update `PUBLIC_APP_ORIGIN` and the Turnsti
 
 ## 9. Configure and test Stripe
 
-Complete this section in Stripe test mode first.
+Production uses Stripe Managed Payments for eligible employer Checkout. Keep the public launch and employee provisioning gates closed until the owner has reviewed and submitted the first live Checkout and completed final acceptance.
 
 ### Stripe account configuration
 
 1. Confirm the SparkFit legal entity and bank details.
-2. Keep automatic tax disabled while SparkFit is not VAT registered. No VAT is charged. Review registrations before changing that status.
+2. Keep Stripe Billing `automatic_tax` and tax-ID collection disabled on Managed Payments Checkout. Managed Payments calculates transaction taxes and shows the total to the buyer. Do not describe the seller as VAT-free.
 3. Configure the Customer Portal for payment method changes, invoices and the approved cancellation policy.
 4. Confirm customer emails and invoice branding.
 5. Confirm the statement descriptor and support contact.
 6. Decide whether Stripe should automatically retry failed payments and for how long.
+7. Managed Payments is enabled by default in the live Stripe Dashboard and eligible product. The product is classified as `txcd_10103101` (SaaS with mobile app/plugin, business use). Managed Payments acts as merchant of record for supported transactions and handles applicable tax, transaction emails, fraud, disputes and transaction-level support. The Worker passes `managed_payments[enabled]=true`; its Checkout omits tax-ID collection and `automatic_tax`.
 
 ### Worker secrets
 
@@ -327,7 +312,7 @@ charge.refunded
 radar.early_fraud_warning.created
 ```
 
-Keep `PAYMENTS_ENABLED=false` until the webhook endpoint verifies successfully.
+Keep `PAYMENTS_ENABLED=false` until the webhook endpoint verifies successfully. `STRIPE_MANAGED_PAYMENTS_ENABLED` is a separate setting and stays `false` for standard employer billing.
 
 ### Stripe test checklist
 
@@ -338,7 +323,7 @@ Test every item:
 3. Purchase 500 seats.
 4. Confirm a request above 500 routes to Partnerships instead of checkout.
 5. Confirm the displayed guide price matches the server-created Stripe line item.
-6. Confirm no VAT is added while SparkFit is not VAT registered and the displayed price matches the invoice.
+6. Confirm the live Checkout displays any applicable tax and the final amount due, and that the invoice reflects the Managed Payments transaction.
 7. Complete a successful payment.
 8. Confirm the organisation and subscription are created once.
 9. Replay the same webhook and confirm it is idempotent.
@@ -351,7 +336,7 @@ Test every item:
 16. Confirm invoices and receipts reach the billing contact.
 17. Confirm no client request can override the server pricing table.
 
-After all tests pass, enable `PAYMENTS_ENABLED=true` in staging and repeat the complete purchase journey once more.
+After the standard test items pass, set `PAYMENTS_ENABLED=true` in staging and repeat the complete purchase journey once more with test payment methods. To test Managed Payments, separately set `STRIPE_MANAGED_PAYMENTS_ENABLED=true`, confirm `managed_payments[enabled]=true`, confirm automatic tax and tax ID collection are omitted, and test the product, tax calculation, customer name/address collection, invoices, subscription lifecycle, receipts and support path. Return the flag to `false` after the test if SparkFit has not approved Managed Payments for employer sales.
 
 ## 10. Full staging acceptance test
 
@@ -393,54 +378,28 @@ Run this exact sequence:
 
 Repeat the employee activation, removal and restore cases on both iOS and Android.
 
-## 11. Create the production Cloudflare environment
+## 11. Current production state and final gates
 
-Do not reuse the staging database for production.
+Production D1 migrations `0001` through `0009` are applied. The production Worker is deployed to `business.spark-fit.com`; launch, public payments and RevenueCat writes are off. Approved transactional email and the approved retention policy are on. `/health` reports production, payments disabled, RevenueCat writes disabled and email enabled. The public config reports `testMode=false`, Turnstile required and app accounts required. Cloudflare Worker settings confirm the production D1 binding and expected production secret names.
 
-1. Copy `wrangler.production.example.toml` to `wrangler.production.toml`.
-2. Keep `wrangler.production.toml` out of Git if it contains environment-specific identifiers.
-3. Create the production D1 database:
+The production Turnstile hostname and keys, live Stripe product/price and restricted credentials, RevenueCat credentials, and verified Resend domain and credentials have been configured. Live Stripe has an active £20.83/year base price; the Worker calculates volume prices from the approved server-side schedule. The live product uses tax category `txcd_10103101`; Managed Payments is enabled by default, and the Worker production config sets its Managed Payments flag to true while public payments remain disabled. The active webhook has 11 required events. The Customer Portal enables payment-method updates, invoice access/downloads and end-of-period cancellation, with plan changes disabled. Invoice colours use SparkFit purple; Stripe has no uploaded SparkFit logo yet. Smart Retries run for up to 8 attempts over 2 weeks, and the final failure action leaves the subscription overdue so SparkFit can apply day-14 suspension/day-30 closure. Secret values are stored in Cloudflare and must never be copied into source or chat.
 
-```sh
-cd /Users/col/Projects/sparkfit-website/business-platform
-npx wrangler d1 create sparkfit-business-production
-```
+Complete the remaining acceptance work in this order while keeping the customer launch gate closed:
 
-4. Put the returned database ID into the production configuration.
-5. Apply all migrations:
-
-```sh
-npx wrangler d1 migrations apply sparkfit-business-production --remote --config wrangler.production.toml
-```
-
-6. Add every production secret using the production configuration:
-
-```sh
-npx wrangler secret put ADMIN_API_TOKEN --config wrangler.production.toml
-npx wrangler secret put RESEND_API_KEY --config wrangler.production.toml
-npx wrangler secret put RESEND_WEBHOOK_SECRET --config wrangler.production.toml
-npx wrangler secret put STRIPE_SECRET_KEY --config wrangler.production.toml
-npx wrangler secret put STRIPE_WEBHOOK_SECRET --config wrangler.production.toml
-npx wrangler secret put REVENUECAT_SECRET_KEY --config wrangler.production.toml
-npx wrangler secret put TURNSTILE_SECRET_KEY --config wrangler.production.toml
-```
-
-7. Deploy production first with all side-effect flags set to `false`:
-
-```sh
-npx wrangler deploy --config wrangler.production.toml
-```
-
-8. Attach `business.spark-fit.com` as the custom domain.
-9. Confirm `/health`, static assets, form validation, sign-in and database access.
-10. Configure the production Stripe webhook using the final hostname.
-11. Configure Turnstile for the final hostname.
+1. Verify the public config, required environment bindings and secret names without displaying secret values.
+2. Perform the controlled production email send and delivery/failure callback check described in section 7.
+3. Live product category, annual price, 20–500 server-validated quantity, Smart Retry settings, overdue handling, Customer Portal cancellation/payment/invoice options, invoice PDF/brand colours and 11-event webhook coverage have been verified. Add the published terms/privacy URLs in Stripe settings, inspect the live Checkout tax and total for the chosen buyer, and have the account owner complete the first paid order.
+4. After verification, prepare Checkout for the actual first purchasing organisation. The account owner must review and submit the payment on Stripe-hosted Checkout; the agent must not submit the charge.
+5. Release and acceptance-test the mobile UUID and Business entitlement changes on iOS and Android.
+6. Perform a controlled internal live purchase and employee grant/removal only after mobile release. The account owner must complete the first real Stripe Checkout payment.
+7. Enable customer launch, payments and RevenueCat writes only after the owner has completed the first Checkout and the mobile app is released with employee identity support. Email stays enabled for approved transactional routes. Enable retention only after the privacy notice is published and verify the first scheduled retention run.
+8. Update public business website links to production, then monitor webhooks, email delivery, billing and entitlement reconciliation.
 
 ## 12. Production launch order
 
 Use this order so old mobile builds are not given access they cannot understand:
 
-1. Release the stable account and Business entitlement mobile update.
+1. Build, install and accept the stable account and Business entitlement mobile update on iOS and Android, then release it.
 2. Confirm the minimum supported app version is installed by pilot testers.
 3. Deploy the production Worker with all side effects disabled.
 4. Verify production database, hostnames, authentication and logs.
