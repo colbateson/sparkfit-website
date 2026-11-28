@@ -5,3 +5,4 @@
 .field input[type="checkbox"]{width:18px;height:18px;flex:0 0 18px;margin:2px 0 0;padding:0;accent-color:var(--purple)}
 .activation-steps{padding-left:22px;color:var(--muted);line-height:1.6}.activation-steps li+li{margin-top:6px}.install-links{margin-top:18px;padding:16px;border:1px solid var(--line);border-radius:14px}.install-links>div{display:flex;flex-wrap:wrap;gap:14px;margin-top:8px}.install-links a{color:var(--purple);font-weight:750}
 .button[aria-disabled="true"]{opacity:.55;pointer-events:none;cursor:not-allowed}
+.forward-card{margin:22px 0;padding:20px;border:1px solid #d9c9f5;border-left:4px solid var(--purple);border-radius:16px;background:linear-gradient(135deg,#f4edff,#fff)}.forward-step{color:var(--purple);font-size:11px;font-weight:850;letter-spacing:.14em}.forward-card h2{margin:8px 0;font-size:21px;letter-spacing:-.02em}.forward-card p{margin:8px 0 14px}.forward-card .button{margin-top:2px}.forward-card .status{font-size:13px}

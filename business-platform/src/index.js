@@ -394,6 +394,7 @@ async function acceptInvitation(request, env) {
 
 async function activateInvitationForAccount(request, env) {
   const account = await requireAppSession(request, env);
+  if (!account.email_verified_at) throw new HttpError(403, 'Verify your SparkFit email before activating an employer invitation.');
   await enforceRateLimit(request, env, 'employee_activation_account', 10, 60, account.id);
   const body = await parseJson(request);
   const tokenHash = await sha256(clean(body.token, 200));
@@ -404,10 +405,13 @@ async function activateInvitationForAccount(request, env) {
   const activeAccountMembership = await env.DB.prepare(`SELECT * FROM organisation_memberships
     WHERE organisation_id = ? AND revenuecat_app_user_id = ? AND status = 'active' LIMIT 1`)
     .bind(invitation.organisation_id, account.id).first();
+  const invitedEmailMembership = await env.DB.prepare(`SELECT * FROM organisation_memberships
+    WHERE organisation_id = ? AND email = ? AND status = 'active' LIMIT 1`)
+    .bind(invitation.organisation_id, invitation.email).first();
+  if (invitedEmailMembership && invitedEmailMembership.revenuecat_app_user_id !== account.id) {
+    throw new HttpError(409, 'This invited email already has active access on another SparkFit account. Ask your employer to check the invitation before continuing.');
+  }
   if (activeAccountMembership) {
-    if (account.primary_email !== invitation.email) {
-      throw new HttpError(409, 'This SparkFit account already has access for this organisation under a different email. Sign in to the account linked to the invitation, or ask your employer to update the invited email.');
-    }
     const now = nowIso();
     await env.DB.batch([
       env.DB.prepare(`UPDATE employee_invitations SET status = 'revoked', revoked_at = ?
@@ -425,7 +429,7 @@ async function activateInvitationForAccount(request, env) {
       { previousEmail: activeAccountMembership.email, invitedEmail: invitation.email });
     return json({ ok: true, membershipId: activeAccountMembership.id, accountId: account.id, premium: reconciliation, relinked: true });
   }
-  const previousMembership = await env.DB.prepare(`SELECT id FROM organisation_memberships WHERE organisation_id = ? AND email = ?`).bind(invitation.organisation_id, invitation.email).first();
+  const previousMembership = invitedEmailMembership || await env.DB.prepare(`SELECT id FROM organisation_memberships WHERE organisation_id = ? AND email = ?`).bind(invitation.organisation_id, invitation.email).first();
   const membershipId = previousMembership?.id || id('mem');
   const entitlementId = id('ent');
   const now = nowIso();

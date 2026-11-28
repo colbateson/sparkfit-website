@@ -74,9 +74,17 @@ test('pilot, verified different-email activation, privacy, removal and re-invita
   assert.equal(activated.data.premium.active, false, 'disabled provider must not claim actual premium activation');
   const replay = await call('/v1/app/employee-invitations/accept', { token }, null, { Authorization: `Bearer ${account.token}` });
   assert.equal(replay.response.status, 410);
+  const correctedInvite = await call('/v1/portal/invitations', { email: 'new-work@example.com' }, employer);
+  assert.equal(correctedInvite.response.status, 201);
+  const relinked = await call('/v1/app/employee-invitations/accept', {
+    token: emailToken(latestEmail(DB, 'employee_invitation')),
+  }, null, { Authorization: `Bearer ${account.token}` });
+  assert.equal(relinked.response.status, 200, 'a verified existing SparkFit account can use a new work invite address');
+  assert.equal(relinked.data.membershipId, activated.data.membershipId, 're-inviting an active account must not consume a second seat');
   const summary = await call('/v1/portal/summary', undefined, employer);
   assert.equal(summary.data.seats.active, 1);
   assert.equal(summary.data.seats.pending, 0);
+  assert.equal(summary.data.members[0].email, 'new-work@example.com', 'employers see the current invited work address');
   assert.equal(JSON.stringify(summary.data.members).includes('revenuecat_app_user_id'), false);
   assert.equal(JSON.stringify(summary.data.members).includes('personal@example.com'), false);
   const removed = await call(`/v1/portal/members/${activated.data.membershipId}/remove`, {}, employer);
@@ -87,7 +95,7 @@ test('pilot, verified different-email activation, privacy, removal and re-invita
   const reactivated = await call('/v1/app/employee-invitations/accept', { token: emailToken(latestEmail(DB, 'employee_invitation')) }, null,
     { Authorization: `Bearer ${account.token}` });
   assert.equal(reactivated.response.status, 200);
-  assert.equal(DB.prepare('SELECT COUNT(*) AS count FROM organisation_memberships').first().count, 1);
+  assert.equal(DB.prepare("SELECT COUNT(*) AS count FROM organisation_memberships WHERE status = 'active'").first().count, 1);
   const outsider = await cookieFor(env, 'other@example.com', 'other-org');
   assert.equal((await call(`/v1/portal/members/${activated.data.membershipId}/remove`, {}, outsider)).response.status, 404);
 });

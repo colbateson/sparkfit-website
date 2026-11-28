@@ -1,6 +1,15 @@
 import { api, getPublicConfig, setStatus } from '/common.js';
 const form = document.querySelector('[data-accept-form]'); const status = document.querySelector('[data-status]'); const token = new URLSearchParams(location.search).get('token');
-if (!token) { form.querySelector('button').disabled = true; setStatus(status, 'This invitation link is incomplete.', 'error'); }
+const copyButton = document.querySelector('[data-copy-invite]'); const copyStatus = document.querySelector('[data-copy-status]');
+copyButton.addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(location.href);
+    setStatus(copyStatus, 'Secure invitation link copied. Paste it into an email to yourself, then open that email on your phone.', 'success');
+  } catch {
+    setStatus(copyStatus, 'Copy was blocked by this browser. Forward the original invitation email to your personal inbox instead.', 'error');
+  }
+});
+if (!token) { form.querySelector('button').disabled = true; copyButton.disabled = true; setStatus(status, 'This invitation link is incomplete.', 'error'); }
 else {
   form.querySelector('button').disabled = true;
   getPublicConfig().then((config) => {
@@ -13,10 +22,10 @@ else {
       form.querySelector('button').replaceWith(appLink);
 
       const intro = document.querySelector('[data-invitation-intro]');
-      intro.textContent = 'Your employer has paid for your SparkFit Premium access. Open the invitation in SparkFit, sign in or verify your email, then tap “Activate Premium access”.';
+      intro.textContent = 'Your employer has paid for your SparkFit Premium access. Use the SparkFit account you want this access attached to; its email can be different from the work email your employer invited.';
       document.querySelector('[data-invitation-steps]').hidden = false;
       document.querySelector('[data-install-links]').hidden = false;
-      document.querySelector('[data-help]').textContent = 'If SparkFit is not installed, install it below, then return to this invitation and tap “Continue in SparkFit”. Use the account you already have. If its email is different, sign in to that account before activating.';
+      document.querySelector('[data-help]').textContent = 'If SparkFit is not installed, install it below, then return to this invitation on your phone. Sign in to your existing personal SparkFit account, even if it uses a different email. The invitation is linked only after you confirm activation in the app.';
       setStatus(status, 'Your next step is to continue in the SparkFit app. Activation is completed there.');
     } else { form.querySelector('button').disabled = false; }
   }).catch(() => setStatus(status, 'We could not load your invitation. Please reload and try again.', 'error'));
